@@ -1,0 +1,4 @@
+spring:  datasource:    url: localhost:3306/
+coolq: 
+  base: 
+    home: C:\Applications\CQP\酷Q Air
