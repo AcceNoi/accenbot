@@ -33,8 +33,8 @@ public interface CfgQuickReplyMapper {
 	@Select("select * from cfg_quick_reply where status = 1 and apply_type=#{applyType} and apply_target=#{applyTarget} order by create_time desc")
 	public List<CfgQuickReply> queryByApply(@Param("applyType") int applyType,@Param("applyTarget") String applyTarget);
 	
-	@Insert("insert into cfg_quick_reply(match_type,pattern,apply_type,apply_target,need_at,reply,create_user_id,createTime,status) "
-			+ " values(#{matchType},#{pattern},#{applyType},#{applyTarget},#{needAt},#{reply},#{createUserId},#{status})") 
+	@Insert("insert into cfg_quick_reply(match_type,pattern,apply_type,apply_target,need_at,reply,create_user_id,create_time,status) "
+			+ " values(#{matchType},#{pattern},#{applyType},#{applyTarget},#{needAt},#{reply},#{createUserId},sysdate(),#{status})") 
 	@Options(useGeneratedKeys = true,keyProperty = "id")
 	public long insert(CfgQuickReply cfgQuickReply);
 }

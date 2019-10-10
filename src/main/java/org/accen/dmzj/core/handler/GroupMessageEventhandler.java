@@ -1,15 +1,19 @@
 package org.accen.dmzj.core.handler;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.EventParser;
 import org.accen.dmzj.core.annotation.HandlerChain;
 import org.accen.dmzj.core.handler.cmd.CmdAdapter;
 import org.accen.dmzj.core.task.GeneralTask;
+import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.ApplicationContextUtil;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.dao.CfgQuickReplyMapper;
@@ -24,6 +28,8 @@ public class GroupMessageEventhandler implements EventHandler{
 	private QmessageMapper qmessageMapper;
 	@Autowired
 	private CfgQuickReplyMapper cfgQuickReplyMapper;
+	@Autowired
+	private TaskManager taskManager;
 	@Override
 	public void handle(Map<String, Object> event) {
 		if(EventParser.MESSAGE_TYPE_GROUP.equals(event.get("message_type"))
@@ -34,33 +40,54 @@ public class GroupMessageEventhandler implements EventHandler{
 			Qmessage qmessage = new Qmessage();
 			qmessage.setMessageType(EventParser.MESSAGE_TYPE_GROUP);
 			qmessage.setSubType(EventParser.SUB_TYPE_NORMAL);
-			qmessage.setMessageId(event.get("message_id").toString());
-			qmessage.setGroupId(event.get("groupId").toString());
-			qmessage.setUserId(event.get("user_id").toString());
+			qmessage.setMessageId(new BigDecimal((Double)event.get("message_id")).stripTrailingZeros().toPlainString());
+			qmessage.setGroupId(new BigDecimal((Double)event.get("group_id")).stripTrailingZeros().toPlainString());
+			qmessage.setUserId(new BigDecimal((Double)event.get("user_id")).stripTrailingZeros().toPlainString());
 			qmessage.setMessage(event.get("message").toString());
 			qmessage.setRawMessage(event.get("raw_message").toString());
 			qmessage.setSendTime(new Date());
-			qmessage.setFont(event.get("font").toString());
+			qmessage.setFont(new BigDecimal((Double)event.get("font")).stripTrailingZeros().toPlainString());
 			
 			qmessageMapper.insert(qmessage);
 			//2.自定义快速回复型（对确定的消息进行匹配并产生简要回复的任务）
-			List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByApply(2, event.get("groupId").toString());
+			List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByApply(2, qmessage.getGroupId());
 			if(replys!=null&&!replys.isEmpty()) {
-				replys.forEach(reply->{
-					if((reply.getMatchType()==1&&reply.getPattern().equals(event.get("message")))//精确匹配
-						||//模糊匹配
-						(reply.getMatchType()==2&&Pattern.matches(reply.getPattern(),event.get("message").toString()))) {
-						
-						GeneralTask task = new GeneralTask();
-						task.setSelfQnum(event.get("selfQnum").toString());
-						task.setTargetId(event.get("groupId").toString());
-						task.setType("message");
-						task.setMessage(1==reply.getNeedAt()?CQUtil.at(event.get("user_id").toString()):""
-							+reply.getReply());
-						tasks.add(task);
-					}
-					
-				});
+				List<CfgQuickReply> pReplys = replys.stream().filter(reply->1==reply.getMatchType()).collect(Collectors.toList());
+				List<GeneralTask> pTasks = pReplys.stream()
+						.filter(reply->1==reply.getMatchType()&&reply.getPattern().equals(qmessage.getMessage()))
+						.map(reply->{
+							GeneralTask task = new GeneralTask();
+							task.setSelfQnum(event.get("selfQnum").toString());
+							task.setTargetId(qmessage.getGroupId());
+							task.setType("group");
+							task.setMessage((1==reply.getNeedAt()?CQUtil.at(qmessage.getUserId().toString()):"")
+								+reply.getReply());
+							return task;
+							})
+						.collect(Collectors.toList());
+				if(pTasks==null||pTasks.isEmpty()) {
+					//精确未匹配到，再去匹配模糊的
+					pReplys = replys.stream().filter(reply->2==reply.getMatchType()).collect(Collectors.toList());
+					pTasks = pReplys.stream()
+							.filter(reply->reply.getMatchType()==2&&Pattern.matches(reply.getPattern(),qmessage.getMessage()))
+							.map(reply->{
+								GeneralTask task = new GeneralTask();
+								task.setSelfQnum(event.get("selfQnum").toString());
+								task.setTargetId(qmessage.getGroupId());
+								task.setType("group");
+								task.setMessage((1==reply.getNeedAt()?CQUtil.at(qmessage.getUserId().toString()):"")
+									+reply.getReply());
+								return task;
+							})
+							.collect(Collectors.toList());
+				}
+				//匹配结束
+				if(pTasks!=null&&!pTasks.isEmpty()) {
+					//匹配到了记录，则随机取一个
+					tasks.add(pTasks.get(new Random().nextInt(pTasks.size())));
+				}
+				
+				
 			}
 			//3.功能型（对系统功能进行操作，或对确定的消息匹配并产生复杂的回复的任务）
 			Map<String, CmdAdapter> cmds = ApplicationContextUtil.getBeans(CmdAdapter.class); 
@@ -68,6 +95,12 @@ public class GroupMessageEventhandler implements EventHandler{
 				tasks.add(cmds.get(cmdName).cmdAdapt(qmessage, event.get("selfQnum").toString()));
 			}
 			//4.监听型（匹配所有消息，但满足特定条件后产生复杂的回复的任务）
+			
+			//5.处理task
+//			tasks.forEach(task->{
+//				
+//			});
+			taskManager.addGeneralTasks(tasks);
 		}
 	}
 	

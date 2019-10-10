@@ -21,8 +21,11 @@ public class CqhttpSecurity {
 	public boolean checkCqhttp(String qnum,String sig,String body) {
 		if(!StringUtils.isEmpty(qnum)) {
 			SysQnum sysQnum = sysQnumMapper.getByQnum(qnum);
-			if(sysQnum!=null&&null!=sysQnum.getSecret()) {
+			if(sysQnum!=null) {
 				String secret = sysQnum.getSecret();
+				if(StringUtils.isEmpty(secret)) {
+					return true;
+				}
 				try {
 					SecretKeySpec signinKey = new SecretKeySpec(secret.getBytes("utf-8"), "HmacSHA1");
 					Mac mac = Mac.getInstance("HmacSHA1");
@@ -39,7 +42,7 @@ public class CqhttpSecurity {
 				
 			}
 		}
-		return true;
+		return false;
 	}
 	public static String byte2hex(byte[] b) {
         StringBuilder hs = new StringBuilder();

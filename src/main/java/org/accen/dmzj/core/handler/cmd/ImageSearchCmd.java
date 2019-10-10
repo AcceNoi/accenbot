@@ -16,8 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 public class ImageSearchCmd implements CmdAdapter {
 
 	@Value("${coolq.base.home}")
@@ -46,14 +48,15 @@ public class ImageSearchCmd implements CmdAdapter {
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		// TODO Auto-generated method stub
 		//http://saucenao.com/
-		GeneralTask task =  new GeneralTask();
-		String message = qmessage.getMessage().trim();
-		task.setSelfQnum(selfQnum);
-		task.setType(qmessage.getMessageType());
-		task.setTargetId(qmessage.getGroupId());
 		
+		String message = qmessage.getMessage().trim();
 		Matcher matcher = patternCmd.matcher(message);
-		if(matcher.find()) {
+		if(matcher.matches()) {
+			GeneralTask task =  new GeneralTask();
+		
+			task.setSelfQnum(selfQnum);
+			task.setType(qmessage.getMessageType());
+			task.setTargetId(qmessage.getGroupId());
 			String imageCq = matcher.group(1);
 			if(imageCq==null) {
 				//TODO 手机qq无法同时发消息和图片，这里要回复“请发送图片”，并监听该id的下次消息

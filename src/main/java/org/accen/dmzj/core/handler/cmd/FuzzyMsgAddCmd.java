@@ -11,9 +11,11 @@ import org.accen.dmzj.web.vo.CfgQuickReply;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Component
+@Transactional
 public class FuzzyMsgAddCmd implements CmdAdapter {
 	@Autowired
 	private CfgQuickReplyMapper cfgQuickReplyMapper;
@@ -32,10 +34,7 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 	public GeneralTask cmdAdapt(Qmessage qmessage,String selfQnum) {
 		//1.基本信息
 		String message = qmessage.getMessage().trim();
-		GeneralTask task = new GeneralTask();
-		task.setSelfQnum(selfQnum);
-		task.setType(qmessage.getMessageType());
-		task.setTargetId(qmessage.getGroupId());
+		
 		//2.匹配
 		//	2.1匹配结果
 		boolean isPrecise = false;//是否是精确的
@@ -44,8 +43,12 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 		Pattern pattern = Pattern.compile("^添加(精确)?问(.*?)答(回复)?(.*)");
 		Matcher matcher = pattern.matcher(message);
 		if(matcher.matches()) {
-			isPrecise |= matcher.group(1)==null;
-			isNeedReply |= matcher.group(3)==null;
+			GeneralTask task = new GeneralTask();
+			task.setSelfQnum(selfQnum);
+			task.setType(qmessage.getMessageType());
+			task.setTargetId(qmessage.getGroupId());
+			isPrecise |= matcher.group(1)!=null;
+			isNeedReply |= matcher.group(3)!=null;
 			
 			String ask = matcher.group(2);
 			String reply = matcher.group(4);
@@ -56,7 +59,7 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 			}else {
 				CfgQuickReply cfgReply = new CfgQuickReply();
 				cfgReply.setMatchType(isPrecise?1:2);
-				cfgReply.setPattern(ask);
+				cfgReply.setPattern(isPrecise?ask:".*?"+ask+".*");
 				cfgReply.setReply(reply);
 				
 				switch (task.getType()) {
@@ -76,17 +79,16 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 				cfgReply.setApplyTarget(task.getTargetId());
 				cfgReply.setNeedAt(isNeedReply?1:2);
 				cfgReply.setCreateTime(new Date());
-				cfgReply.setCreatUserId(qmessage.getUserId());
+				cfgReply.setCreateUserId(qmessage.getUserId());
 				cfgReply.setStatus(1);
 				long replyId = cfgQuickReplyMapper.insert(cfgReply);
 				
 				task.setMessage(CQUtil.at(qmessage.getUserId())+"添加成功！词条编号："+replyId);
 			}
-			
+			return task;
 		}else {
-			//3.2未匹配到
-			task.setMessage(CQUtil.at(qmessage.getUserId())+"添加失败，示例："+example());
+			return null;
 		}
-		return task;
+		
 	}
 }

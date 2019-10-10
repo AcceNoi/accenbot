@@ -14,7 +14,7 @@ public class CfgQuickReply {
 	private String applyTarget;//应用目标号，例如群号
 	private int needAt;//是否需要at，群组和讨论组时有效，1-需要，2-不需要
 	private String reply;
-	private String creatUserId;
+	private String createUserId;
 	private Date createTime;
 	private int status;//0-无效，1-启用，2-停用
 	public long getId() {
@@ -47,11 +47,11 @@ public class CfgQuickReply {
 	public void setApplyTarget(String applyTarget) {
 		this.applyTarget = applyTarget;
 	}
-	public String getCreatUserId() {
-		return creatUserId;
+	public String getCreateUserId() {
+		return createUserId;
 	}
-	public void setCreatUserId(String creatUserId) {
-		this.creatUserId = creatUserId;
+	public void setCreateUserId(String createUserId) {
+		this.createUserId = createUserId;
 	}
 	public Date getCreateTime() {
 		return createTime;

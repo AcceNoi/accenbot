@@ -1,10 +1,13 @@
 package org.accen.dmzj.core;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.accen.dmzj.core.annotation.HandlerChain;
 import org.accen.dmzj.core.handler.EventHandler;
@@ -12,6 +15,15 @@ import org.accen.dmzj.util.ApplicationContextUtil;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.LongSerializationPolicy;
+import com.google.gson.reflect.TypeToken;
 
 @Service
 public class EventParser {
@@ -106,7 +118,11 @@ public class EventParser {
 		
 		initHandlerChain();
 		
-		Gson gson = new Gson();
+		GsonBuilder gb = new GsonBuilder()
+				.setLongSerializationPolicy(LongSerializationPolicy.STRING);
+				
+		Gson gson = gb.create();
+		
 		Map<String, Object> bodyMap = gson.fromJson(body, Map.class);
 		bodyMap.put("selfQnum", qnum);
 		List<EventHandler> handlerChain = handlerChains.get(bodyMap.get("post_type"));
