@@ -62,17 +62,17 @@ public class EventParser {
 	public final static String SUB_TYPE_ENABLE="enable";
 	public final static String SUB_TYPE_DISABLE="disable";
 	
-	private Map<String, List<EventHandler>> handlerChains;
-	private Map<EventHandler,HandlerChain> handlerCfg;
+	private Map<String, List<EventHandler>> handlerChains = new HashMap<String, List<EventHandler>>();
+	private Map<EventHandler,HandlerChain> handlerCfg = new HashMap<EventHandler, HandlerChain>();
 	//延迟加载handlerChain
 	private void initHandlerChain() {
-		synchronized (handlerChains) {
-			if(handlerChains==null) {
+//		synchronized (handlerChains) {
+			if(handlerChains.isEmpty()) {
 				synchronized (handlerChains) {
 					Map<String, EventHandler> handlerBeans = ApplicationContextUtil.getBeans(EventHandler.class);
-					if(handlerBeans!=null) {
-						handlerChains = new HashMap<String, List<EventHandler>>();
-						handlerCfg = new HashMap<EventHandler, HandlerChain>();
+					if(handlerChains.isEmpty()) {
+//						handlerChains = new HashMap<String, List<EventHandler>>();
+//						handlerCfg = new HashMap<EventHandler, HandlerChain>();
 						for(String handlerBeanName:handlerBeans.keySet()) {
 							EventHandler handlerBean = handlerBeans.get(handlerBeanName);
 							Class<? extends EventHandler> beanClazz = handlerBean.getClass();
@@ -94,7 +94,7 @@ public class EventParser {
 					}
 				}
 			}
-		}
+//		}
 	}
 	/**
 	 * 解析器允许
