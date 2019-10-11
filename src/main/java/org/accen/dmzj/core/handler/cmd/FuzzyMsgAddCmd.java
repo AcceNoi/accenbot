@@ -83,7 +83,7 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 				cfgReply.setStatus(1);
 				long replyId = cfgQuickReplyMapper.insert(cfgReply);
 				
-				task.setMessage(CQUtil.at(qmessage.getUserId())+"添加成功！词条编号："+replyId);
+				task.setMessage(CQUtil.at(qmessage.getUserId())+"添加成功！词条编号："+cfgReply.getId());
 			}
 			return task;
 		}else {
