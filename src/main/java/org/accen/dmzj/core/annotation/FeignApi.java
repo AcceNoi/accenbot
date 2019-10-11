@@ -5,7 +5,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import feign.codec.Decoder;
 import feign.codec.Encoder;
+import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 
 /**
@@ -23,4 +25,9 @@ public @interface FeignApi {
 	 * @return
 	 */
 	Class<? extends Encoder> encoder() default GsonEncoder.class;//TODO 这里的默认最好弄成form/muilti/json自适应的encoder
+	/**
+	 * 自定义decoder
+	 * @return
+	 */
+	Class<? extends Decoder> decoder() default GsonDecoder.class;
 }

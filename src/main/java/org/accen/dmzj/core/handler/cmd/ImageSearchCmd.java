@@ -42,7 +42,7 @@ public class ImageSearchCmd implements CmdAdapter {
 	private final static Pattern patternCmd = Pattern
 			.compile("^龙妈找图(\\[CQ\\:image,file=.*?\\])?$");
 	private final static Pattern patternCq = Pattern
-			.compile("^\\[CQ\\:image,file=(.*?)\\]$");
+			.compile("^\\[CQ\\:image,file=(.*?),url=(.*?)\\]$");
 
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
@@ -63,14 +63,15 @@ public class ImageSearchCmd implements CmdAdapter {
 			}else {
 				matcher = patternCq.matcher(imageCq);
 				if(matcher.find()) {
-					String imageFile = coolqHome
+					/*String imageFile = coolqHome
 							+SystemUtil.getFileSeperate()
 							+"data"
 							+SystemUtil.getFileSeperate()
 							+"image"
 							+SystemUtil.getFileSeperate()
-							+imageCq;
-					ImageResult imageResult = saucenaoApiClient.search(new File(imageFile));
+							+matcher.group(1);
+					ImageResult imageResult = saucenaoApiClient.search(new File(imageFile));*/
+					ImageResult imageResult = saucenaoApiClient.search(matcher.group(2));
 					if(imageResult==null||!imageResult.isSuccess()) {
 						task.setMessage(CQUtil.at(qmessage.getUserId())+"图片检索不到喵...");
 					}else {

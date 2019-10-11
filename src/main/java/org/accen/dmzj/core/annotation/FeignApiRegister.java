@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import feign.Feign;
 import feign.Request;
 import feign.Retryer;
+import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
@@ -33,18 +34,20 @@ public class FeignApiRegister implements BeanFactoryPostProcessor { // 扫描的
 			if(!(url.startsWith("http://")||url.startsWith("https://"))) {
 				url = "http://"+url;
 			}
-			Feign.Builder builder = getFeignBuilder(feignClass.loadClass().getAnnotation(FeignApi.class).encoder());
+			Feign.Builder builder = getFeignBuilder(feignClass.loadClass().getAnnotation(FeignApi.class).encoder(),feignClass.loadClass().getAnnotation(FeignApi.class).decoder());
 			beanFactory.registerSingleton(feignClass.getName(), builder.target(feignClass.loadClass(), url));
 		});
 	}
 
 	public Feign.Builder getFeignBuilder(){
-		return getFeignBuilder(GsonEncoder.class);
+		return getFeignBuilder(GsonEncoder.class,GsonDecoder.class);
 	}
-	public Feign.Builder getFeignBuilder(Class<? extends Encoder> encoderClass) {
+	public Feign.Builder getFeignBuilder(Class<? extends Encoder> encoderClass,Class<? extends Decoder> decoderClass) {
 		Feign.Builder builder = null;
 		try {
-			builder = Feign.builder().encoder(encoderClass.getDeclaredConstructor().newInstance()).decoder(new GsonDecoder())
+			builder = Feign.builder()
+					.encoder(encoderClass.getDeclaredConstructor().newInstance())
+					.decoder(decoderClass.getDeclaredConstructor().newInstance())
 					.options(new Request.Options(1000, 3500)).retryer(new Retryer.Default(5000, 5000, 3));
 		} catch (InstantiationException e) {
 			e.printStackTrace();

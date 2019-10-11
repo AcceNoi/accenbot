@@ -1,4 +1,4 @@
 spring:  datasource:    url: jdbc:mysql://localhost:3306/dmzjbot?characterEncoding=UTF-8&serverTimezone=UTC    username: accen    password: 123456    driver-class-name: com.mysql.cj.jdbc.Driver
 coolq: 
   base: 
-    home: C:\Applications\CQP\酷Q Air
+    home: D:\Software\Coolq\酷Q Air

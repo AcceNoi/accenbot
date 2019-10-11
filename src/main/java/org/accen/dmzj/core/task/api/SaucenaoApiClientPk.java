@@ -34,6 +34,10 @@ public class SaucenaoApiClientPk {
 		String resp = apiClient.search(file);
 		return parseSearchResult(resp);
 	}
+	public ImageResult search(String url) {
+		String resp = apiClient.search(url);
+		return parseSearchResult(resp);
+	}
 	private ImageResult parseSearchResult(String responseHtml) {
 		ImageResult imageResult = new ImageResult();
 		Document dom = Jsoup.parse(responseHtml);
