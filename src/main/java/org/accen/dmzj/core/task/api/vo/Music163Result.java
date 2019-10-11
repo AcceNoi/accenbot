@@ -3,6 +3,7 @@ package org.accen.dmzj.core.task.api.vo;
 public class Music163Result {
 	private Music163Ctt result;
 	private String code;
+	private String msg;
 	public Music163Ctt getResult() {
 		return result;
 	}
@@ -16,8 +17,15 @@ public class Music163Result {
 		this.code = code;
 	}
 	
-	class Music163Ctt{
-		class Music163{
+	public String getMsg() {
+		return msg;
+	}
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
+
+	public class Music163Ctt{
+		public class Music163{
 			private long id;
 			private String name;
 			private int position;

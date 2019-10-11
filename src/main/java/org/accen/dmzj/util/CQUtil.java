@@ -8,7 +8,7 @@ public class CQUtil {
 	 * @return
 	 */
 	public static String at(String targetQq) {
-		return "[CQ:at,qq={"+targetQq+"}]";
+		return "[CQ:at,qq="+targetQq+"]";
 	}
 	/**
 	 * 发送音乐分享的CQ码
@@ -17,7 +17,8 @@ public class CQUtil {
 	 * @return
 	 */
 	public static String music(String type,String id) {
-		return "[CQ:music,type="+type+",id="+id+"]";
+//		return "[CQ:music,id="+id+",type="+type+"]";
+		return "[CQ:music,id=28406557,type=163]";
 	}
 	/**
 	 * 发送音乐分享的CQ码，但是会通过名字去匹配<br>
