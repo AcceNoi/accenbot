@@ -40,7 +40,7 @@ public class ImageSearchCmd implements CmdAdapter {
 	}
 	
 	private final static Pattern patternCmd = Pattern
-			.compile("^龙妈找图(\\[CQ\\:image,file=.*?\\])?$");
+			.compile("^老婆找图(\\[CQ\\:image,file=.*?\\])?$");
 	private final static Pattern patternCq = Pattern
 			.compile("^\\[CQ\\:image,file=(.*?),url=(.*?)\\]$");
 
