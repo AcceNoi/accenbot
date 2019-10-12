@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.accen.dmzj.core.EventParser;
 import org.accen.dmzj.core.annotation.HandlerChain;
 import org.accen.dmzj.core.handler.cmd.CmdAdapter;
+import org.accen.dmzj.core.handler.cmd.TriggerProSwitchCmd;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.ApplicationContextUtil;
@@ -33,6 +34,10 @@ public class GroupMessageEventhandler implements EventHandler{
 	private CfgQuickReplyMapper cfgQuickReplyMapper;
 	@Autowired
 	private TaskManager taskManager;
+	
+	@Autowired
+	private TriggerProSwitchCmd tpsc;
+	private static final Random random = new Random();
 	
 	@Value("${coolq.manager}")
 	private String manager = "1339633536";//管理员qq
@@ -71,6 +76,7 @@ public class GroupMessageEventhandler implements EventHandler{
 					task.setTargetId(qmessage.getGroupId());
 					task.setType("group");
 					if(noActiveGroup.contains(qmessage.getGroupId())) {
+						noActiveGroup.remove(qmessage.getGroupId());
 						task.setMessage("冲喵！");
 					}else {
 						task.setMessage("已冲喵！");
@@ -95,7 +101,10 @@ public class GroupMessageEventhandler implements EventHandler{
 			
 			
 			//2.自定义快速回复型（对确定的消息进行匹配并产生简要回复的任务）
-			if(false) {
+			//概率触发
+			int pro = tpsc.triggerPro(qmessage.getGroupId());
+			int tgt = random.nextInt(100);//[0~100)
+			if(tgt<pro) {
 				
 			
 				List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByApply(2, qmessage.getGroupId());
