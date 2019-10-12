@@ -18,7 +18,7 @@ public class CQUtil {
 	 */
 	public static String music(String type,String id) {
 //		return "[CQ:music,id="+id+",type="+type+"]";
-		return "[CQ:music,id=28406557,type=163]";
+		return "[CQ:music,id="+id+",type=163]";
 	}
 	/**
 	 * 发送音乐分享的CQ码，但是会通过名字去匹配<br>

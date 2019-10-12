@@ -2,10 +2,12 @@ package org.accen.dmzj.core.handler;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -21,6 +23,7 @@ import org.accen.dmzj.web.dao.QmessageMapper;
 import org.accen.dmzj.web.vo.CfgQuickReply;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 @HandlerChain(postType = "message")
 public class GroupMessageEventhandler implements EventHandler{
@@ -30,12 +33,22 @@ public class GroupMessageEventhandler implements EventHandler{
 	private CfgQuickReplyMapper cfgQuickReplyMapper;
 	@Autowired
 	private TaskManager taskManager;
+	
+	@Value("${coolq.manager}")
+	private String manager = "1339633536";//管理员qq
+	//不活跃的群组，即面壁中的
+	private Set<String> noActiveGroup = new HashSet<String>();
+	private static final String startSign = "召唤";
+	private static final String endSign = "去面壁";
+	
 	@Override
 	public void handle(Map<String, Object> event) {
 		if(EventParser.MESSAGE_TYPE_GROUP.equals(event.get("message_type"))
 				&&EventParser.SUB_TYPE_NORMAL.equals(event.get("sub_type"))) {
 			//生命周期开始
 			List<GeneralTask> tasks = new LinkedList<GeneralTask>();
+			
+			
 			//1.元数据记录
 			Qmessage qmessage = new Qmessage();
 			qmessage.setMessageType(EventParser.MESSAGE_TYPE_GROUP);
@@ -49,27 +62,47 @@ public class GroupMessageEventhandler implements EventHandler{
 			qmessage.setFont(new BigDecimal((Double)event.get("font")).stripTrailingZeros().toPlainString());
 			
 			qmessageMapper.insert(qmessage);
+			
+			//1.1是否为管理员
+			if(manager.equals(qmessage.getUserId())) {
+				if(startSign.equals(qmessage.getMessage())) {
+					GeneralTask task = new GeneralTask();
+					task.setSelfQnum(event.get("selfQnum").toString());
+					task.setTargetId(qmessage.getGroupId());
+					task.setType("group");
+					if(noActiveGroup.contains(qmessage.getGroupId())) {
+						task.setMessage("冲喵！");
+					}else {
+						task.setMessage("已冲喵！");
+					}
+					taskManager.addGeneralTask(task);
+					return ;
+				}else if(endSign.equals(qmessage.getMessage())&&!noActiveGroup.contains(qmessage.getGroupId())) {
+					noActiveGroup.add(qmessage.getGroupId());
+					GeneralTask task = new GeneralTask();
+					task.setSelfQnum(event.get("selfQnum").toString());
+					task.setTargetId(qmessage.getGroupId());
+					task.setType("group");
+					task.setMessage("面壁中~");
+					taskManager.addGeneralTask(task);
+					return ;
+				}
+			}
+			
+			if(noActiveGroup.contains(qmessage.getGroupId())) {
+				return ;
+			}
+			
+			
 			//2.自定义快速回复型（对确定的消息进行匹配并产生简要回复的任务）
-			List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByApply(2, qmessage.getGroupId());
-			if(replys!=null&&!replys.isEmpty()) {
-				List<CfgQuickReply> pReplys = replys.stream().filter(reply->1==reply.getMatchType()).collect(Collectors.toList());
-				List<GeneralTask> pTasks = pReplys.stream()
-						.filter(reply->1==reply.getMatchType()&&reply.getPattern().equals(qmessage.getMessage()))
-						.map(reply->{
-							GeneralTask task = new GeneralTask();
-							task.setSelfQnum(event.get("selfQnum").toString());
-							task.setTargetId(qmessage.getGroupId());
-							task.setType("group");
-							task.setMessage((1==reply.getNeedAt()?CQUtil.at(qmessage.getUserId().toString()):"")
-								+reply.getReply());
-							return task;
-							})
-						.collect(Collectors.toList());
-				if(pTasks==null||pTasks.isEmpty()) {
-					//精确未匹配到，再去匹配模糊的
-					pReplys = replys.stream().filter(reply->2==reply.getMatchType()).collect(Collectors.toList());
-					pTasks = pReplys.stream()
-							.filter(reply->reply.getMatchType()==2&&Pattern.matches(reply.getPattern(),qmessage.getMessage()))
+			if(false) {
+				
+			
+				List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByApply(2, qmessage.getGroupId());
+				if(replys!=null&&!replys.isEmpty()) {
+					List<CfgQuickReply> pReplys = replys.stream().filter(reply->1==reply.getMatchType()).collect(Collectors.toList());
+					List<GeneralTask> pTasks = pReplys.stream()
+							.filter(reply->1==reply.getMatchType()&&reply.getPattern().equals(qmessage.getMessage()))
 							.map(reply->{
 								GeneralTask task = new GeneralTask();
 								task.setSelfQnum(event.get("selfQnum").toString());
@@ -78,16 +111,32 @@ public class GroupMessageEventhandler implements EventHandler{
 								task.setMessage((1==reply.getNeedAt()?CQUtil.at(qmessage.getUserId().toString()):"")
 									+reply.getReply());
 								return task;
-							})
+								})
 							.collect(Collectors.toList());
+					if(pTasks==null||pTasks.isEmpty()) {
+						//精确未匹配到，再去匹配模糊的
+						pReplys = replys.stream().filter(reply->2==reply.getMatchType()).collect(Collectors.toList());
+						pTasks = pReplys.stream()
+								.filter(reply->reply.getMatchType()==2&&Pattern.matches(reply.getPattern(),qmessage.getMessage()))
+								.map(reply->{
+									GeneralTask task = new GeneralTask();
+									task.setSelfQnum(event.get("selfQnum").toString());
+									task.setTargetId(qmessage.getGroupId());
+									task.setType("group");
+									task.setMessage((1==reply.getNeedAt()?CQUtil.at(qmessage.getUserId().toString()):"")
+										+reply.getReply());
+									return task;
+								})
+								.collect(Collectors.toList());
+					}
+					//匹配结束
+					if(pTasks!=null&&!pTasks.isEmpty()) {
+						//匹配到了记录，则随机取一个
+						tasks.add(pTasks.get(new Random().nextInt(pTasks.size())));
+					}
+					
+					
 				}
-				//匹配结束
-				if(pTasks!=null&&!pTasks.isEmpty()) {
-					//匹配到了记录，则随机取一个
-					tasks.add(pTasks.get(new Random().nextInt(pTasks.size())));
-				}
-				
-				
 			}
 			//3.功能型（对系统功能进行操作，或对确定的消息匹配并产生复杂的回复的任务）
 			Map<String, CmdAdapter> cmds = ApplicationContextUtil.getBeans(CmdAdapter.class); 
