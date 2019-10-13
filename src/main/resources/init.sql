@@ -56,3 +56,16 @@ create_user_id varchar(20),
 update_time datetime,
 update_user_id varchar(20)
 );
+
+create table cmd_bu_sub(
+	id bigint not null primary key auto_increment,
+    `type` varchar(10) not null,
+    target_id varchar(20) not null,
+    subscriber varchar(20) not null,
+    sub_target varchar(20) ,
+    sub_type varchar(20),
+    sub_obj varchar(20),
+	sub_obj_mark varchar(200),
+    sub_time datetime,
+    `status` varchar(2) not null
+);
