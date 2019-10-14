@@ -69,3 +69,16 @@ create table cmd_bu_sub(
     sub_time datetime,
     `status` varchar(2) not null
 );
+
+create table sys_group_member(
+	id bigint not null primary key auto_increment,
+	`type` varchar(10) not null,
+	target_id varchar(20) not null,
+	user_id varchar(20) not null,
+	coin int ,
+	checkin_count int,
+	favorability int,
+	create_time datetime,
+	last_checkin_time datetime,
+	`status` int not null
+);
