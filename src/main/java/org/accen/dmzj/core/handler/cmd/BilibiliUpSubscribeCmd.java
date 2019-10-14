@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.api.BilibiliSearchApiClientPk;
+import org.accen.dmzj.core.task.api.vo.BilibiliBangumiInfo;
 import org.accen.dmzj.core.task.api.vo.BilibiliUserInfo;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.StringUtil;
@@ -49,13 +50,33 @@ public class BilibiliUpSubscribeCmd implements CmdAdapter{
 			String subObj = null;
 			String subObjMark = null;
 			List<CmdBuSub>  subs = null;
-			if(StringUtil.isNumberString(matcher.group(3))) {
-				subObj = matcher.group(3);
-				subs = cmdBuSubMapper.findBySubscriberAndObj("group", qmessage.getGroupId(), qmessage.getUserId(), "bilibili",subType,subObj);
-			}else {
+			
+			BilibiliBangumiInfo bInfo = null;
+			BilibiliUserInfo uInfo = null;
+			
+			
+			if(!StringUtil.isNumberString(matcher.group(3))) {
 				subObjMark = matcher.group(3);
-				subs = cmdBuSubMapper.findBySubscriberAndObjMark("group", qmessage.getGroupId(), qmessage.getUserId(), "bilibili",subType,subObjMark);
+				//不是id,而是标题，则先获取下完整的标题
+				if("bangumi".equals(subType)) {
+					bInfo = bilibiliSearchApiClientPk.searchBangumi(subObjMark);
+					if(bInfo!=null) {
+						subObj = ""+bInfo.getMediaId();
+					}
+				}else if("up".equals(subType)) {
+					uInfo = bilibiliSearchApiClientPk.searchUser(subObjMark);
+					if(uInfo!=null) {
+						subObj = ""+uInfo.getMid();
+					}
+				}
+				
+			}else {
+				subObj = matcher.group(3);
 			}
+			
+			
+			subs = cmdBuSubMapper.findBySubscriberAndObj("group", qmessage.getGroupId(), qmessage.getUserId(), subTarget,subType,subObj);
+			
 			
 			GeneralTask task =  new GeneralTask();
 			task.setSelfQnum(selfQnum);
@@ -83,22 +104,13 @@ public class BilibiliUpSubscribeCmd implements CmdAdapter{
 							+"["+subs.get(0).getSubObj()+","+subs.get(0).getSubObjMark()+"]不要重复订阅喵！！");
 					return task;
 				}else {
-					if("bangui".equals(subType)) {
+					if("bangumi".equals(subType)) {
 						
-					}else if("up".equals(subType)) {
-						BilibiliUserInfo info = null;
-						if(StringUtil.isNumberString(matcher.group(3))) {
-							info = bilibiliSearchApiClientPk.searchUser(Long.parseLong(subObj));
-						}else {
-							info = bilibiliSearchApiClientPk.searchUser(subObjMark);
-						}
-						
-						if(info!=null) {
-							//找到了，则订阅
+						if(bInfo!=null) {
 							CmdBuSub sub = new CmdBuSub();
 							sub.setStatus("1");
-							sub.setSubObj(""+info.getMid());
-							sub.setSubObjMark(info.getName());
+							sub.setSubObj(""+bInfo.getMediaId());
+							sub.setSubObjMark(bInfo.getName());
 							sub.setSubscriber(qmessage.getUserId());
 							sub.setTargetId(qmessage.getGroupId());
 							sub.setSubTarget("bilibili");
@@ -107,10 +119,37 @@ public class BilibiliUpSubscribeCmd implements CmdAdapter{
 							sub.setSubTime(new Date());
 							cmdBuSubMapper.insert(sub);
 							
-							task.setMessage(CQUtil.at(qmessage.getUserId()+" 已成功订阅B站"+matcher.group(2)+":"+info.getName()+"("+info.getMid()+")喵~"));
+							task.setMessage(CQUtil.at(qmessage.getUserId())+" 已成功订阅B站"+matcher.group(2)+":"+bInfo.getName()+"("+bInfo.getMediaId()+")喵~");
 							return task;
 						}else {
-							task.setMessage(CQUtil.at(qmessage.getUserId()+" 未找到此B站"+matcher.group(2)+"信息哦，请核对名称或id喵~"));
+							task.setMessage(CQUtil.at(qmessage.getUserId())+" 未找到此B站"+matcher.group(2)+"信息哦，请核对名称或id喵~");
+							return null;
+						}
+					}else if("up".equals(subType)) {
+						
+						if(StringUtil.isNumberString(matcher.group(3))&&uInfo==null) {
+							//由于第一次初始化uInfo只是在非id情况下，所以这里再找一次id情况的
+							uInfo = bilibiliSearchApiClientPk.searchUser(Long.parseLong(subObj));
+						}
+						
+						if(uInfo!=null) {
+							//找到了，则订阅
+							CmdBuSub sub = new CmdBuSub();
+							sub.setStatus("1");
+							sub.setSubObj(""+uInfo.getMid());
+							sub.setSubObjMark(uInfo.getName());
+							sub.setSubscriber(qmessage.getUserId());
+							sub.setTargetId(qmessage.getGroupId());
+							sub.setSubTarget("bilibili");
+							sub.setSubType(subType);
+							sub.setType("group");
+							sub.setSubTime(new Date());
+							cmdBuSubMapper.insert(sub);
+							
+							task.setMessage(CQUtil.at(qmessage.getUserId())+" 已成功订阅B站"+matcher.group(2)+":"+uInfo.getName()+"("+uInfo.getMid()+")喵~");
+							return task;
+						}else {
+							task.setMessage(CQUtil.at(qmessage.getUserId())+" 未找到此B站"+matcher.group(2)+"信息哦，请核对名称或id喵~");
 							return null;
 						}
 					}

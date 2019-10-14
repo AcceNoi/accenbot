@@ -31,6 +31,9 @@ public interface CmdBuSubMapper {
 	public CmdBuSub selectById(@Param("id")long id);
 	
 	@ResultMap("cmdBuSubMapper")
+	@Select("select * from cmd_bu_sub where type=#{type} and sub_target = #{subTarget} and sub_type=#{subType} and status = 1")
+	public List<CmdBuSub> findBySubType(@Param("type")String type,@Param("subTarget") String subTarget,@Param("subType") String subType);	
+	@ResultMap("cmdBuSubMapper")
 	@Select("select * from cmd_bu_sub where type=#{type} and target_id=#{targetId} and subscriber=#{subscriber} and status = 1")
 	public List<CmdBuSub> findBySubscriber(@Param("type")String type,@Param("targetId")String targetId,@Param("subscriber")String subscriber);
 	

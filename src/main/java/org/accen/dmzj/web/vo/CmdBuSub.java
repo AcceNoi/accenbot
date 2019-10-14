@@ -13,6 +13,8 @@ public class CmdBuSub {
 	private String subObjMark;//唯一标识的补充说明 例如up主名字
 	private Date subTime;//订阅时间
 	private String status;//1-有效 2-无效
+	
+	private String botId;
 	public String getType() {
 		return type;
 	}
@@ -72,6 +74,12 @@ public class CmdBuSub {
 	}
 	public void setSubObjMark(String subObjMark) {
 		this.subObjMark = subObjMark;
+	}
+	public String getBotId() {
+		return botId;
+	}
+	public void setBotId(String botId) {
+		this.botId = botId;
 	}
 	
 }
