@@ -1,10 +1,22 @@
 package org.accen.dmzj.core.task.api.baidu;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.task.api.vo.BaikeResult;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 @Component
@@ -12,27 +24,84 @@ public class BaikeApicClientPk {
 	@Autowired
 	private BaikeApiClient baikeApiClient;
 	
+	
+	/**
+	 * 使用httpclient实现
+	 * @param word
+	 * @return
+	 */
+	private final static HttpClient client = HttpClientBuilder.create().build();
+	private String httpBaike(String url) {
+		try {
+			
+			HttpGet getReq = new HttpGet(url);
+			HttpResponse originResp = client.execute(getReq);
+			HttpEntity responseEntity = originResp.getEntity();
+			if(originResp.getStatusLine().getStatusCode()==200) {
+				return EntityUtils.toString(responseEntity,"UTF-8");
+			}
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return "";
+	}
+	
 	public BaikeResult baike(String word) {
-		String html = baikeApiClient.baike(word);
-		return parseHtml(html);
+//		String html = baikeApiClient.baike(word);
+		try {
+			String url = "https://baike.baidu.com/item/"+URLEncoder.encode(word, "UTF-8");
+			String html = httpBaike(url);
+			//先解析是否有多义词
+			String secUrl = parsePolysemy(html);
+			if(secUrl!=null) {
+				html = httpBaike(secUrl);
+			}
+			BaikeResult br = parseHtml(html);
+			br.setUrl(secUrl==null?url:secUrl);
+			return br;
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 	private final static Pattern pattern = Pattern.compile("^.*?baike.baidu.com/item/.*?/\\d+");
+	/**
+	 * 由于词条有多义词，需要解析下
+	 * @param html
+	 * @return
+	 */
+	public String parsePolysemy(String html) {
+		Document dom = Jsoup.parse(html);
+		Elements lis = dom.select("ul.custom_dot li.list-dot a");
+		Elements sign = dom.select("div.lemmaWgt-subLemmaListTitle");
+		if(lis!=null&&!lis.isEmpty()&&sign!=null&&!sign.isEmpty()) {
+			return "https://baike.baidu.com"+lis.get(0).attr("href");
+		}else {
+			return null;
+		}
+	}
 	public BaikeResult parseHtml(String html) {
 		Document dom = Jsoup.parse(html);
-		if(pattern.matcher(dom.baseUri()).matches()) {
+//		if(pattern.matcher(dom.baseUri()).matches()) {
 			//找到了
-			String summary = dom.select("div.content div.main-content div.lemma-summary").text();
-			String title = dom.select("div.content div.main-content dd.lemmaWgt-lemmaTitle-title h1").text()
-					+dom.select("div.content div.main-content dd.lemmaWgt-lemmaTitle-title h2").text();
+			String summary = dom.select("div.lemma-summary").text();
+			String title = dom.select("dd.lemmaWgt-lemmaTitle-title h1").text()
+					+dom.select("dd.lemmaWgt-lemmaTitle-title h2").text();
 			String url = dom.baseUri();
 			BaikeResult br = new BaikeResult();
 			br.setSummary(summary);
 			br.setUrl(url);
 			br.setTitle(title);
 			return br;
-		}else {
-			//没找到
-			return null;
-		}
+//		}else {
+//			//没找到
+//			return null;
+//		}
 	}
 }
