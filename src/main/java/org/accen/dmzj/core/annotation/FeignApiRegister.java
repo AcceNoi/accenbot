@@ -3,10 +3,14 @@ package org.accen.dmzj.core.annotation;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSocketFactory;
+
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.stereotype.Component;
 
+import feign.Client;
 import feign.Feign;
 import feign.Request;
 import feign.Retryer;
@@ -34,19 +38,24 @@ public class FeignApiRegister implements BeanFactoryPostProcessor { // 扫描的
 			if(!(url.startsWith("http://")||url.startsWith("https://"))) {
 				url = "http://"+url;
 			}
-			Feign.Builder builder = getFeignBuilder(feignClass.loadClass().getAnnotation(FeignApi.class).encoder(),feignClass.loadClass().getAnnotation(FeignApi.class).decoder());
+			Feign.Builder builder = getFeignBuilder(feignClass.loadClass().getAnnotation(FeignApi.class).encoder()
+					,feignClass.loadClass().getAnnotation(FeignApi.class).decoder()
+					,feignClass.loadClass().getAnnotation(FeignApi.class).client());
 			beanFactory.registerSingleton(feignClass.getName(), builder.target(feignClass.loadClass(), url));
 		});
 	}
 
 	public Feign.Builder getFeignBuilder(){
-		return getFeignBuilder(GsonEncoder.class,GsonDecoder.class);
+		return getFeignBuilder(GsonEncoder.class,GsonDecoder.class,Client.Default.class);
 	}
-	public Feign.Builder getFeignBuilder(Class<? extends Encoder> encoderClass,Class<? extends Decoder> decoderClass) {
+	public Feign.Builder getFeignBuilder(Class<? extends Encoder> encoderClass
+			,Class<? extends Decoder> decoderClass
+			,Class<? extends Client> clientClass) {
 		Feign.Builder builder = null;
 		try {
 			builder = Feign.builder()
 					.encoder(encoderClass.getDeclaredConstructor().newInstance())
+					.client(clientClass.getDeclaredConstructor(SSLSocketFactory.class,HostnameVerifier.class).newInstance(null,null))
 					.decoder(decoderClass.getDeclaredConstructor().newInstance())
 					.options(new Request.Options(1000, 3500)).retryer(new Retryer.Default(5000, 5000, 3));
 		} catch (InstantiationException e) {

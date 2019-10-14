@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import feign.Client;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.gson.GsonDecoder;
@@ -30,4 +31,9 @@ public @interface FeignApi {
 	 * @return
 	 */
 	Class<? extends Decoder> decoder() default GsonDecoder.class;
+	/**
+	 * 自定义Client
+	 * @return
+	 */
+	Class<? extends Client> client() default Client.Default.class;
 }
