@@ -28,7 +28,7 @@ public class BilibiliSchedule {
 	@Autowired
 	private BilibiliSearchApiClientPk bilibiliSearchApiClientPk;
 	
-	@Value("{coolq.bot}")
+	@Value("${coolq.bot}")
 	private String botId;
 	/**
 	 * 每15分钟执行一次，也就是说最糟糕情况下，会有153*订阅up总数分钟的延迟。但是由于api是<a href="http://docs.kaaass.net/showdoc/web/#/2?page_id=3">Kaass</a>提供的，还是不要调用过于频繁
