@@ -9,6 +9,7 @@ import org.accen.dmzj.core.task.api.vo.Music163Result;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -17,6 +18,12 @@ public class MusicShareCmd implements CmdAdapter {
 
 	@Autowired
 	private MusicApiClient musicApiClient;
+	
+	@Value("${coolq.musicshare.fav.increase:1}")
+	private int increase = 1;
+	
+	@Autowired
+	private CheckinCmd checkinCmd;
 	
 	@Override
 	public String describe() {
@@ -46,7 +53,10 @@ public class MusicShareCmd implements CmdAdapter {
 				if(result!=null&&"200".equals(result.getCode())&&result.getResult().getSongs().length>0) {
 					long songId = result.getResult().getSongs()[0].getId();
 					
-					task.setMessage(CQUtil.music("163", ""+songId));
+					//增加好感度
+					int curFav = checkinCmd.modifyFav(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), increase);
+					
+					task.setMessage(CQUtil.music("163", ""+songId)+(curFav<0?"（绑定可以增加好感度哦喵~）":("增加"+increase+"点好感喵~，当前好感度:"+curFav)));
 					return task;
 				}
 			}

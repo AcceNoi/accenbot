@@ -28,6 +28,11 @@ public class ImageSearchCmd implements CmdAdapter {
 	private SaucenaoApiClientPk saucenaoApiClient;
 	
 	private final static Logger logger = LoggerFactory.getLogger(GroupRepeatListener.class);
+	@Value("${coolq.imagesearch.fav.increase:1}")
+	private int increase = 1;
+	
+	@Autowired
+	private CheckinCmd checkinCmd;
 	
 	@Override
 	public String describe() {
@@ -75,13 +80,18 @@ public class ImageSearchCmd implements CmdAdapter {
 					if(imageResult==null||!imageResult.isSuccess()) {
 						task.setMessage(CQUtil.at(qmessage.getUserId())+"图片检索不到喵...");
 					}else {
+						
+						//增加好感度
+						int curFav = checkinCmd.modifyFav(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), increase);
+						
 						task.setMessage(CQUtil.at(qmessage.getUserId())
 								+"检索到图片喵！相似度："
 								+imageResult.getSimilarity()
 								+"。标题："
 								+imageResult.getTitle()
 								+"。来源："
-								+imageResult.getContent());
+								+imageResult.getContent()
+								+(curFav<0?"（绑定可以增加好感度哦喵~）":("增加"+increase+"点好感喵~，当前好感度:"+curFav)));
 					}
 					return task;
 				}else {
