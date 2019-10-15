@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationContext;
 public class DmzjSpringBootApplication {
 
 	public static void main(String[] args) {
+		System.setProperty("user.timezone","GMT +08");
 		ApplicationContext applicationContext = SpringApplication.run(DmzjSpringBootApplication.class, args);
 		ApplicationContextUtil.setContext(applicationContext);
 	}
