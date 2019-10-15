@@ -82,3 +82,27 @@ create table sys_group_member(
 	last_checkin_time datetime,
 	`status` int not null
 );
+
+create table cmd_sv_card(
+	id bigint not null primary key auto_increment,
+	pk_id bigint not null,
+	card_name varchar(200) not null,
+	card_name_jp varchar(200) ,
+	career varchar(200) ,
+	card_rarity int,
+	probability double,
+	create_time datetime,
+	create_user_id varchar(20),
+	`status` int not null
+);
+create table cmd_sv_pk(
+	id bigint not null primary key auto_increment,
+	pk_name varchar(200) not null,
+	pk_alias varchar(200) ,
+	pk_jp_name varchar(200) ,
+	pk_en_name varchar(200) ,
+	pk_seq int,
+	create_time datetime,
+	create_user_id varchar(20),
+	update_time datetime
+);
