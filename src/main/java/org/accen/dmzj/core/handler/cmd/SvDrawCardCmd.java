@@ -55,9 +55,9 @@ public class SvDrawCardCmd implements CmdAdapter {
 			//金币检验
 			int curCoin = checkinCmd.getCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 			if(curCoin<0) {
-				task.setMessage(CQUtil.at(qmessage.getUserId()+" 您还未绑定哦，暂时无法抽卡，发送[绑定]即可绑定个人信息喵~"));
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还未绑定哦，暂时无法抽卡，发送[绑定]即可绑定个人信息喵~");
 			}else if(curCoin-decrease<0) {
-				task.setMessage(CQUtil.at(qmessage.getUserId()+" 您库存金币不够了哦，暂无法抽卡添加词条喵~"));
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您库存金币不够了哦，暂无法抽卡添加词条喵~");
 			}else {
 				String pkName = matcher.group(1);
 				CmdSvPk pk = null;
