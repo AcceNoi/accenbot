@@ -1,17 +1,14 @@
 package org.accen.dmzj.core.handler.cmd;
 
 import java.util.Date;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.dao.CfgQuickReplyMapper;
-import org.accen.dmzj.web.dao.SysGroupMemberMapper;
 import org.accen.dmzj.web.vo.CfgQuickReply;
 import org.accen.dmzj.web.vo.Qmessage;
-import org.accen.dmzj.web.vo.SysGroupMember;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
