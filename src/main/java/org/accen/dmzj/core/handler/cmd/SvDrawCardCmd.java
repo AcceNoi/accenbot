@@ -72,7 +72,7 @@ public class SvDrawCardCmd implements CmdAdapter {
 					List<CmdSvCard> cards = cmdSvCardMapper.findCardByPk(pk.getId());
 					//抽取
 					List<RandomMeta<CmdSvCard>> cardsO = cards.stream()
-							.map(card->new RandomMeta(card,(int)(card.getProbability()*10000)))
+							.map(card->new RandomMeta<CmdSvCard>(card,(int)(card.getProbability()*10000)))
 							.collect(Collectors.toList());
 					List<CmdSvCard> rs = RandomUtil.randomObjWeight(cardsO, drawCount);
 					
