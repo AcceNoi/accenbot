@@ -191,5 +191,20 @@ public class CheckinCmd implements CmdAdapter {
 			return mem.getFavorability();
 		}
 	}
+	/**
+	 * 获取一名用户的好感度，如果为负数，则表示还未绑定
+	 * @param type
+	 * @param targetId
+	 * @param userId
+	 * @return
+	 */
+	public int getFav(String type,String targetId,String userId) {
+		List<SysGroupMember> mems = sysGroupMember.selectByTarget(type, targetId, userId);
+		if(mems==null||mems.isEmpty()) {
+			return -999;
+		}else {
+			return mems.get(0).getFavorability();
+		}
+	}
 	
 }
