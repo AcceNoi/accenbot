@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
+import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CfgQuickReplyMapper;
 import org.accen.dmzj.web.vo.CfgQuickReply;
 import org.accen.dmzj.web.vo.Qmessage;
@@ -73,7 +74,7 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 				}else {
 					CfgQuickReply cfgReply = new CfgQuickReply();
 					cfgReply.setMatchType(isPrecise?1:2);
-					cfgReply.setPattern(isPrecise?ask:".*?"+ask+".*");
+					cfgReply.setPattern(isPrecise?ask:".*?"+StringUtil.transferPattern(ask)+".*");
 					cfgReply.setReply(reply);
 					
 					switch (task.getType()) {
