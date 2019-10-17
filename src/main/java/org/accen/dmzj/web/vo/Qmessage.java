@@ -1,6 +1,7 @@
 package org.accen.dmzj.web.vo;
 
 import java.util.Date;
+import java.util.Map;
 
 public class Qmessage {
 	private long id;
@@ -13,6 +14,7 @@ public class Qmessage {
 	private String rawMessage;
 	private Date sendTime;
 	private String font;
+	private Map<String, Object> event;//原始数据
 	public long getId() {
 		return id;
 	}
@@ -72,6 +74,12 @@ public class Qmessage {
 	}
 	public void setGroupId(String groupId) {
 		this.groupId = groupId;
+	}
+	public Map<String, Object> getEvent() {
+		return event;
+	}
+	public void setEvent(Map<String, Object> event) {
+		this.event = event;
 	}
 	
 }
