@@ -31,4 +31,16 @@ public class CQUtil {
 		//https://music.163.com/#/search/m/?s=a&type=1
 		return "";
 	}
+	
+	public static String imageUrl(String url) {
+		return "[CQ:image,file="+url+"]";
+	}
+	/**
+	 * 网络语音
+	 * @param url
+	 * @return
+	 */
+	public static String recordUrl(String url) {
+		return "[CQ:record,file="+url+"]";
+	}
 }
