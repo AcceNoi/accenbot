@@ -67,9 +67,9 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 				//金币检验
 				int curCoin = checkinCmd.getCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 				if(curCoin<0) {
-					task.setMessage(CQUtil.at(qmessage.getUserId()+" 您还未绑定哦，暂时无法添加词条，发送[绑定]即可绑定个人信息喵~"));
+					task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还未绑定哦，暂时无法添加词条，发送[绑定]即可绑定个人信息喵~");
 				}else if(curCoin-decrease<0) {
-					task.setMessage(CQUtil.at(qmessage.getUserId()+" 您库存金币不够了哦，暂无法添加词条喵~"));
+					task.setMessage(CQUtil.at(qmessage.getUserId())+" 您库存金币不够了哦，暂无法添加词条喵~");
 				}else {
 					CfgQuickReply cfgReply = new CfgQuickReply();
 					cfgReply.setMatchType(isPrecise?1:2);

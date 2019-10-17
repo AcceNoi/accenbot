@@ -69,7 +69,8 @@ public class GroupMessageEventhandler implements EventHandler{
 			qmessageMapper.insert(qmessage);
 			
 			//1.1是否为管理员
-			if(manager.equals(qmessage.getUserId())) {
+			String role = (String) ((Map<String,Object>)event.get("sender")).get("role");
+			if(manager.equals(qmessage.getUserId())||"owner".equals(role)||"admin".equals(role)) {
 				if(startSign.equals(qmessage.getMessage())) {
 					GeneralTask task = new GeneralTask();
 					task.setSelfQnum(event.get("selfQnum").toString());

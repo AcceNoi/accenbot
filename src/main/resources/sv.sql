@@ -30,7 +30,7 @@ INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarit
 INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '吸血鬼探索者·尤娜', '吸血鬼', '2', '0.0096', '1');
 ----仇
 INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '科技玛纳', '复仇者', '2', '0.0096', '1');
-INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '暗云巫女·叶捏司', '复仇者', '2', '0.0096', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '暗云巫女·叶涅司', '复仇者', '2', '0.0096', '1');
 INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '机动猛虎', '复仇者', '2', '0.0096', '1');
 ----中立
 INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '极品大萝卜', '中立', '2', '0.0096', '1');
@@ -75,7 +75,7 @@ INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarit
 ----仇
 INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '人偶手术', '复仇者', '1', '0.0192', '1');
 INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '人偶宗师', '复仇者', '1', '0.0192', '1');
-INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '尖转刺猬', '复仇者', '1', '0.0192', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '尖钻刺猬', '复仇者', '1', '0.0192', '1');
 INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '光明射手', '复仇者', '1', '0.0192', '1');
 ----中立
 INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '甜品侦探', '中立', '1', '0.0192', '1');
