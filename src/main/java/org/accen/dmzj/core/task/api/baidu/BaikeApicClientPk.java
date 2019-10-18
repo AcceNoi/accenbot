@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.task.api.vo.BaikeResult;
+import org.accen.dmzj.util.RandomUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -81,7 +82,7 @@ public class BaikeApicClientPk {
 		Elements lis = dom.select("ul.custom_dot li.list-dot a");
 		Elements sign = dom.select("div.lemmaWgt-subLemmaListTitle");
 		if(lis!=null&&!lis.isEmpty()&&sign!=null&&!sign.isEmpty()) {
-			return "https://baike.baidu.com"+lis.get(0).attr("href");
+			return "https://baike.baidu.com"+lis.get(RandomUtil.randomInt(lis.size())).attr("href");
 		}else {
 			return null;
 		}
@@ -93,8 +94,15 @@ public class BaikeApicClientPk {
 			String summary = dom.select("div.lemma-summary").text();
 			String title = dom.select("dd.lemmaWgt-lemmaTitle-title h1").text()
 					+dom.select("dd.lemmaWgt-lemmaTitle-title h2").text();
-			String url = dom.baseUri();
+			Elements  imgs = dom.select("div.summary-pic a img");
 			BaikeResult br = new BaikeResult();
+			if(imgs!=null&&!imgs.isEmpty()) {
+				String imageUrl = imgs.first().attr("src");
+				br.setImageUrl(imageUrl);
+			}
+			
+			String url = dom.baseUri();
+			
 			br.setSummary(summary);
 			br.setUrl(url);
 			br.setTitle(title);
