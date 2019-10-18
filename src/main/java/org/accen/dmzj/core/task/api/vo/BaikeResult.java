@@ -4,6 +4,7 @@ public class BaikeResult {
 	private String summary;
 	private String url;
 	private String title;
+	private String imageUrl;
 	public String getSummary() {
 		return summary;
 	}
@@ -21,6 +22,12 @@ public class BaikeResult {
 	}
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	public String getImageUrl() {
+		return imageUrl;
+	}
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 	
 }

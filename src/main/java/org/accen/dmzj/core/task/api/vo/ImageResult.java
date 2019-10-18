@@ -1,6 +1,7 @@
 package org.accen.dmzj.core.task.api.vo;
 
 public class ImageResult {
+	private String url;
 	private String similarity;//相似度
 	private String title;
 	private String content;//具体来源如Pixiv ID: 76742665及画师
@@ -29,6 +30,12 @@ public class ImageResult {
 	}
 	public void setContent(String content) {
 		this.content = content;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 }

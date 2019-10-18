@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.EventParser;
 import org.accen.dmzj.core.annotation.HandlerChain;
+import org.accen.dmzj.core.handler.callbacker.CallbackListener;
+import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.handler.cmd.CmdAdapter;
 import org.accen.dmzj.core.handler.cmd.TriggerProSwitchCmd;
 import org.accen.dmzj.core.task.GeneralTask;
@@ -65,7 +67,7 @@ public class GroupMessageEventhandler implements EventHandler{
 			qmessage.setRawMessage(event.get("raw_message").toString());
 			qmessage.setSendTime(new Date());
 			qmessage.setFont(new BigDecimal((Double)event.get("font")).stripTrailingZeros().toPlainString());
-			
+			qmessage.setEvent(event);
 			qmessageMapper.insert(qmessage);
 			
 			//1.1是否为管理员
@@ -154,6 +156,10 @@ public class GroupMessageEventhandler implements EventHandler{
 				tasks.add(cmds.get(cmdName).cmdAdapt(qmessage, event.get("selfQnum").toString()));
 			}
 			//4.监听型（匹配所有消息，但满足特定条件后产生复杂的回复的任务）
+			//4.5 回调监听型
+			
+			CallbackManager cm = ApplicationContextUtil.getBean(CallbackManager.class);
+			cm.accept(qmessage);
 			
 			//5.处理task
 //			tasks.forEach(task->{

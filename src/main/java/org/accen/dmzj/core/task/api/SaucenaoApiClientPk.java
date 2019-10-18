@@ -16,6 +16,10 @@
 package org.accen.dmzj.core.task.api;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.task.api.vo.ImageResult;
@@ -38,9 +42,24 @@ public class SaucenaoApiClientPk {
 		String resp = apiClient.search(url);
 		return parseSearchResult(resp);
 	}
+	private static final Pattern imageUrlPattern = Pattern.compile("http://saucenao.com/search.php.*?\\&url=(.*)");
 	private ImageResult parseSearchResult(String responseHtml) {
 		ImageResult imageResult = new ImageResult();
 		Document dom = Jsoup.parse(responseHtml);
+		
+		Elements urls = dom.select("div.result:not(.hidden) table.resulttable div.resultimage a");
+		if(urls!=null&&!urls.isEmpty()) {
+			String encodingUrl = urls.first().attr("href");
+			try {
+				Matcher matcher = imageUrlPattern.matcher(URLDecoder.decode(encodingUrl, "utf-8"));
+				if(matcher.matches()) {
+					imageResult.setUrl(matcher.group(1));
+				}
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		Elements similarityEles = dom.select("div.result:not(.hidden) table.resulttable div.resultsimilarityinfo");
 		if(similarityEles!=null&&!similarityEles.isEmpty()) {
 			imageResult.setSimilarity(similarityEles.first().text());
