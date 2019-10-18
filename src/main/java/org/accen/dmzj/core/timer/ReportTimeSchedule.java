@@ -7,6 +7,8 @@ import java.util.Map;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.CQUtil;
+import org.accen.dmzj.web.dao.CfgResourceMapper;
+import org.accen.dmzj.web.vo.CfgResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +18,9 @@ import org.springframework.stereotype.Component;
 public class ReportTimeSchedule {
 	@Autowired
 	private TaskManager taskManager;
+	
+	@Autowired
+	private CfgResourceMapper cfgResourceMapper;
 	
 	/**
 	 * 每个群对应的闹钟
@@ -41,27 +46,38 @@ public class ReportTimeSchedule {
 			}
 		});
 	}
+	private static final String KEY_PREFFIX = "record_clock_";
 	/**
 	 * 萌娘上的报时语音
 	 * @param clock
 	 * @return 
 	 */
 	private String getMp3UrlMoegirl(String clock,int hour) {
+		String key = null;
 		switch (clock) {
 		case "晓":
-			return "https://img.moegirl.org/common/3/35/Akatsuki"+(30+hour	)+".mp3";
+			key= KEY_PREFFIX+"Akatsuki_"+hour;
+			break;
 		case "响":
-			return "https://img.moegirl.org/common/e/ee/%D0%92%D0%B5%D1%80%D0%BD%D1%8B%D0%B9"+(30+hour)+".mp3";
+			key = KEY_PREFFIX+"Hibiki_"+hour;
+			break;
 		default:
-			return null;
+			break;
 		}
+		if(null!=key) {
+			CfgResource cr = cfgResourceMapper.selectByKey(key);
+			if(cr!=null) {
+				return cr.getCfgResource();
+			}
+		}
+		return null;
 	}
 	
 	public boolean isOpenClock(String groupId) {
 		return groupClockMap.containsKey(groupId);
 	}
 	public String openClock(String groupId,String clock) {
-		return groupClockMap.put(groupId, groupId);
+		return groupClockMap.put(groupId, clock);
 	}
 	public String closeClock(String groupId) {
 		return groupClockMap.remove(groupId);

@@ -33,7 +33,7 @@ public class BilibiliSchedule {
 	/**
 	 * 每15分钟执行一次，也就是说最糟糕情况下，会有153*订阅up总数分钟的延迟。但是由于api是<a href="http://docs.kaaass.net/showdoc/web/#/2?page_id=3">Kaass</a>提供的，还是不要调用过于频繁
 	 */
-	@Scheduled(cron = "0 */15 * * * *")
+	@Scheduled(cron = "0 */15 * * * ?")
 	public void bilibiUpScan() {
 		//先获取当前时间戳，用于15min内投稿即为新投稿
 		long curTimestamp=new Date().getTime();

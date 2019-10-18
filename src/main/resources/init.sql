@@ -106,3 +106,9 @@ create table cmd_sv_pk(
 	create_user_id varchar(20),
 	update_time datetime
 );
+create table cfg_resource(
+	id bigint not null primary key auto_increment,
+	cfg_key varchar(200) not null,
+	cfg_resource varchar(2000),
+	resource_type varchar(200)
+);

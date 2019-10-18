@@ -1,5 +1,6 @@
 package org.accen.dmzj.core.handler.cmd;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +37,8 @@ public class TimerManagerCmd implements CmdAdapter {
 	private static final Pattern pattern = Pattern.compile("^(开启|关闭)(.*?)报时$");
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
-		if(!manager.equals(qmessage.getUserId())) {
+		String role = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("role");
+		if((!manager.equals(qmessage.getUserId()))&&(!"owner".equals(role))&&(!"admin".equals(role))) {
 			return null;
 		}
 		String message = qmessage.getMessage().trim();
