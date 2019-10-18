@@ -57,4 +57,19 @@ public class TaskManager {
 	public void addTimerTask(GeneralTask task,Date date) {
 		
 	}
+	/**\
+	 * 快速添加任务
+	 * @param selfQnum
+	 * @param messageType
+	 * @param targetId
+	 * @param message
+	 */
+	public void addGeneralTaskQuick(String selfQnum,String messageType,String targetId,String message) {
+		GeneralTask task = new GeneralTask();
+		task.setSelfQnum(selfQnum);
+		task.setMessage(message);
+		task.setTargetId(targetId);
+		task.setType(messageType);
+		addGeneralTask(task);
+	}
 }
