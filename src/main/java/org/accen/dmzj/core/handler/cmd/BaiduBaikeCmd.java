@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.api.baidu.BaikeApicClientPk;
 import org.accen.dmzj.core.task.api.vo.BaikeResult;
+import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,7 +41,7 @@ public class BaiduBaikeCmd implements CmdAdapter{
 			
 			BaikeResult br = baikeApicClientPk.baike(matcher.group(1));
 			if(br!=null) {
-				task.setMessage(br.getTitle()+"\n"+br.getSummary()+"["+br.getUrl()+"]喵~");
+				task.setMessage(CQUtil.imageUrl(br.getImageUrl())+br.getTitle()+"\n"+br.getSummary()+"["+br.getUrl()+"]喵~");
 			}else {
 				task.setMessage("抱歉，我太弱了，找不到该词条喵~");
 			}
