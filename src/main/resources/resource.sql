@@ -49,3 +49,12 @@ INSERT INTO `dmzjbot`.`cfg_resource` (`cfg_key`, `cfg_resource`, `resource_type`
 INSERT INTO `dmzjbot`.`cfg_resource` (`cfg_key`, `cfg_resource`, `resource_type`) VALUES ('record_clock_Hibiki_22', 'https://img.moegirl.org/common/6/60/%D0%92%D0%B5%D1%80%D0%BD%D1%8B%D0%B952.mp3', 'record');
 INSERT INTO `dmzjbot`.`cfg_resource` (`cfg_key`, `cfg_resource`, `resource_type`) VALUES ('record_clock_Hibiki_23', 'https://img.moegirl.org/common/6/62/%D0%92%D0%B5%D1%80%D0%BD%D1%8B%D0%B953.mp3', 'record');
 
+-----假面骑士变身
+INSERT INTO `dmzjbot`.`cfg_resource` (`cfg_key`, `cfg_resource`, `resource_type`) VALUES ('record_kamenrider_Chronus', 'file:////home/user/coolq/myRecord/Chronus.mp3', 'record');
+INSERT INTO `dmzjbot`.`cfg_resource` (`cfg_key`, `cfg_resource`, `resource_type`) VALUES ('record_kamenrider_Error', 'file:////home/user/coolq/myRecord/Error.mp3', 'record');
+INSERT INTO `dmzjbot`.`cfg_resource` (`cfg_key`, `cfg_resource`, `resource_type`) VALUES ('record_kamenrider_Fang', 'file:////home/user/coolq/myRecord/Fang.mp3', 'record');
+INSERT INTO `dmzjbot`.`cfg_resource` (`cfg_key`, `cfg_resource`, `resource_type`) VALUES ('record_kamenrider_utsumi', 'file:////home/user/coolq/myRecord/utsumi.mp3', 'record');
+INSERT INTO `dmzjbot`.`cfg_resource` (`cfg_key`, `cfg_resource`, `resource_type`) VALUES ('record_kamenrider_iiyo', 'file:////home/user/coolq/myRecord/iiyo.mp3', 'record');
+INSERT INTO `dmzjbot`.`cfg_resource` (`cfg_key`, `cfg_resource`, `resource_type`) VALUES ('record_kamenrider_Build', 'file:////home/user/coolq/myRecord/Build.mp3', 'record');
+INSERT INTO `dmzjbot`.`cfg_resource` (`cfg_key`, `cfg_resource`, `resource_type`) VALUES ('record_kamenrider_OhmaZIO', 'file:////home/user/coolq/myRecord/OhmaZIO.mp3', 'record');
+INSERT INTO `dmzjbot`.`cfg_resource` (`cfg_key`, `cfg_resource`, `resource_type`) VALUES ('record_kamenrider_HazardOn', 'file:////home/user/coolq/myRecord/HazardOn.mp3', 'record');
