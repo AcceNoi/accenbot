@@ -40,6 +40,8 @@ public class SvDrawCardCmd implements CmdAdapter {
 	
 	private String[] careers = new String[] {"铜","银","金","虹","异画"};
 
+	private int[] returnCoin = new int[] {0,1,3,8,16};
+	
 	private final static Pattern pattern = Pattern.compile("^影之诗抽卡(.*)");
 	
 	@Override
@@ -81,13 +83,40 @@ public class SvDrawCardCmd implements CmdAdapter {
 						int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -decrease);
 						//抽取成功，格式化消息
 						StringBuffer msgBuf = new StringBuffer();
-						msgBuf.append("抽卡成功喵~消耗金币"+decrease+"，剩余"+newCoin+"。本次抽取卡包为["+pk.getPkName()+"]:\n");
+//						msgBuf.append("抽卡成功喵~消耗金币"+decrease+"，剩余"+newCoin+"。本次抽取卡包为["+pk.getPkName()+"]:\n");
+						msgBuf.append("抽卡成功喵~消耗金币"+decrease+"。抽取卡包为["+pk.getPkName()+"]:\n");
 						
-						boolean legend = false;//虹卡
-						boolean diffPaint = false;//异画
+//						boolean legend = false;//虹卡
+//						boolean diffPaint = false;//异画
+						int bronze = 0;
+						int silver = 0;
+						int gold = 0;
+						int legend = 0;
+						int diffPaint = 0;
+						
 						for (int i = 0; i <rs.size(); i++) {
-							legend |= rs.get(i).getCardRarity()==4;
-							diffPaint |= rs.get(i).getCardRarity()==5;
+//							legend |= rs.get(i).getCardRarity()==4;
+//							diffPaint |= rs.get(i).getCardRarity()==5;
+							
+							switch (rs.get(i).getCardRarity()) {
+							case 1:
+								bronze++;
+								break;
+							case 2:
+								silver++;
+								break;
+							case 3:
+								gold++;
+								break;
+							case 4:
+								legend++;
+								break;
+							case 5:
+								diffPaint++;
+							default:
+								break;
+							}
+							
 							String desc =rs.get(i).getCareer()
 									+" "
 									+careers[rs.get(i).getCardRarity()-1];
@@ -95,11 +124,18 @@ public class SvDrawCardCmd implements CmdAdapter {
 							msgBuf.append(i+1+". ["+desc+"]"+rs.get(i).getCardName()+"\n");
 							
 						}
-						if(diffPaint) {
+						if(diffPaint>0) {
 							msgBuf.append("抽到异画啦！欧狗吃矛！");
-						}else if(legend) {
-							msgBuf.append("抽到虹卡啦！恭喜这个B......站用户");
+						}else if(legend>0) {
+							msgBuf.append("抽到虹卡啦！恭喜这个B......站用户。");
 						}
+						
+						//返还金币
+						int returnC = bronze*returnCoin[0]+silver*returnCoin[1]+gold*returnCoin[2]+legend*returnCoin[3]+diffPaint*returnCoin[4];
+						
+						newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), returnC);
+						msgBuf.append("本次获得金币："+returnC+"，库存："+newCoin);
+						
 						task.setMessage(CQUtil.at(qmessage.getUserId())+msgBuf.toString());
 						
 					}else {
