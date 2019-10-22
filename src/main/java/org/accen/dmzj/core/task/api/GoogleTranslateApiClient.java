@@ -16,6 +16,6 @@ public interface GoogleTranslateApiClient {
 	 * @param word
 	 * @return
 	 */
-	@RequestLine("GET /translate_a/single?client=gtx&dt=t&dj=1&ie=UTF-8&sl=zh_CN&tl={lang}&q={word}")
-	public Map<String,Object> translate(@Param("lang")String lang,@Param("word")String word);
+	@RequestLine("GET /translate_a/single?client=gtx&dt=t&dj=1&ie=UTF-8&sl={sl}&tl={lang}&q={word}")
+	public Map<String,Object> translate(@Param("lang")String lang,@Param("word")String word,@Param("sl")String sl);
 }

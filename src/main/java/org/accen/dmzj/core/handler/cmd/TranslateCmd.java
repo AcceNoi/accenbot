@@ -10,9 +10,11 @@ import org.accen.dmzj.core.task.api.GoogleTranslateApiClient;
 import org.accen.dmzj.core.task.api.YoudaoApiClient;
 import org.accen.dmzj.core.task.api.vo.YoudaoTranslateResult;
 import org.accen.dmzj.util.CQUtil;
+import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class TranslateCmd implements CmdAdapter{
@@ -43,10 +45,10 @@ public class TranslateCmd implements CmdAdapter{
 
 	@Override
 	public String example() {
-		return "日语翻译我回来了";
+		return "日语说我回来了";
 	}
 
-	private final static Pattern pattern = Pattern.compile("^(日语|英语|法语|韩语|俄语|西班牙语)说(.+)");
+	private final static Pattern pattern = Pattern.compile("^(日语|英语|法语|韩语|俄语|西班牙语|中文){0,1}说(.+)");
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
@@ -60,6 +62,10 @@ public class TranslateCmd implements CmdAdapter{
 			task.setTargetId(qmessage.getGroupId());
 			
 			String langZ = matcher.group(1);
+			
+			String sl = "auto";
+			
+			
 			String lang = "JA";
 			/*switch(langZ) {
 			case "日语翻译":lang = Lang.LANG_CN2JA;break;
@@ -90,12 +96,20 @@ public class TranslateCmd implements CmdAdapter{
 			case "俄语":
 				lang = "RU";
 				break;
+			case "中文":
+				lang = "zh_CN";
+				break;
 			default:
 				
 				break;
 			}
 			String word = matcher.group(2);
-			Map<String, Object> result = googleTranslateApiClient.translate(lang, word);
+			Map<String, Object> result = googleTranslateApiClient.translate(lang, word,sl);
+			
+			if(StringUtils.isEmpty(langZ)) {
+				//如果是空的，ze
+			}
+			
 			task.setMessage(CQUtil.at(qmessage.getUserId())+((List<Map<String,Object>>)result.get("sentences")).get(0).get("trans")+" (kana");
 			return task;
 		}
