@@ -1,4 +1,4 @@
-spring:  datasource:    url: jdbc:mysql://localhost:3306/dmzjbot?characterEncoding=UTF-8&serverTimezone=UTC    username: root    password: 123456    driver-class-name: com.mysql.cj.jdbc.Driver
+spring:  datasource:    url: jdbc:mysql://localhost:3306/dmzjbot?characterEncoding=UTF-8&serverTimezone=UTC    username: root    password: 123456    driver-class-name: com.mysql.cj.jdbc.Driverffmpeg:   bin: /usr/local/ffmpeg/bin/sys:   static:     html:       music: /usr/local/nginx/html/music/      mime: /usr/local/nginx/html/mime/    url:       music: http://129.204.0.108/music/
 coolq: 
   base: 
-    home: D:\Software\Coolq\酷Q Air  manager: 1339633536  bot: 1023915086  mem:     iniCoin: 20    coinIncr: -6    iniFavorability: 0    favorabilityIncr: 1
+    home: /home/usr/coolq  manager: 1339633536  bot: 1023915086  mem:     iniCoin: 20    coinIncr: -16    iniFavorability: 0    favorabilityIncr: 1

@@ -5,13 +5,17 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class FfmpegUtil {
-	@Value("${ffmpeg.home}")
-	private String ffmpegHome ;
+	@Value("${ffmpeg.bin}")
+	private String ffmpegBin ;
+	
+	private static final Logger logger = LoggerFactory.getLogger(FfmpegUtil.class);
 	/**
 	 * 将原视频转化为音频
 	 * @param src 原视频url，支持本地文件
@@ -22,8 +26,9 @@ public class FfmpegUtil {
 	 * @return
 	 */
 	public String convertVideo2Audio(String src,String target,String targetFmt,String ss,String t) {
-		String bin = ffmpegHome+SystemUtil.getFileSeperate()+"bin"+SystemUtil.getFileSeperate();
+		String bin = ffmpegBin;
 		String cmd = "ffmpeg -i "+src+" -ss "+ss+" -t "+t+" -acodec "+targetFmt+" -vn "+target;
+		logger.info("ffmpeg cmd: "+cmd);
 		Runtime run = Runtime.getRuntime();
 		try {
 			Process p = run.exec(bin+cmd);
@@ -82,7 +87,7 @@ public class FfmpegUtil {
 	 * @return
 	 */
 	public boolean isFfmpegExists() {
-		String bin = ffmpegHome+SystemUtil.getFileSeperate()+"bin"+SystemUtil.getFileSeperate();
+		String bin = ffmpegBin;
 		if(!new File(bin+"ffmpeg").exists()) {
 			return false;
 		}

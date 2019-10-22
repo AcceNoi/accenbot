@@ -30,8 +30,9 @@ import com.google.gson.Gson;
 
 @Component
 public class ApiBiliBiliApiClient {
-	@Value("${cool.temp.mime}")
-	private String tempMimePath;
+	@Value("${sys.static.html.mime}")
+	private String tempMimePath;//usr/local/niginx/music/
+
 	public String sessData = null;//登陆cookie的SESSDATA
 	
 	public void checkCookie() throws BiliBiliCookieNeverInit {
@@ -88,7 +89,7 @@ public class ApiBiliBiliApiClient {
 		return videoName;
 		
 	}
-	private final static String BILIBILI_API_VIEW="https://api.bilibili.com/x/web-interface/view?aid={0}";
+	private final static String BILIBILI_API_VIEW="https://api.bilibili.com/x/web-interface/view?aid=%s";
 	
 	public String getAvCid(String avid) {
 		HttpGet viewGet = new HttpGet(String.format(BILIBILI_API_VIEW, avid));
@@ -108,7 +109,7 @@ public class ApiBiliBiliApiClient {
 		}
 		return null;
 	}
-	private final static String BILIBILI_API_PLAYURL="https://api.bilibili.com/x/player/playurl?cid={0}&avid={1}&qn={2}";
+	private final static String BILIBILI_API_PLAYURL="https://api.bilibili.com/x/player/playurl?cid=%s&avid=%s&qn=%s";
 	public String getUrl(String cid,String avid,int qn) {
 		int qni = 16;//默认360p
 		switch(qn) {
@@ -118,7 +119,7 @@ public class ApiBiliBiliApiClient {
 		case 360:qni = 16;break;
 		default:break;
 		}
-		HttpGet urlGet = new HttpGet(String.format(BILIBILI_API_PLAYURL, cid,avid,qni));
+		HttpGet urlGet = new HttpGet(String.format(BILIBILI_API_PLAYURL, cid,avid,""+qni));
 		urlGet.setHeader("Cookie", "SESSDATA="+sessData);
 		urlGet.setHeader("Host", "api.bilibili.com");
 		try {
