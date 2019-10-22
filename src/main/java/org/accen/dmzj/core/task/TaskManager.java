@@ -18,7 +18,8 @@ public class TaskManager {
 //	private Timer timer;
 	
 	//线程池
-	private ExecutorService generalTaskProcessorPool = Executors.newCachedThreadPool();
+	private int poolSize  = 10;
+	private ExecutorService generalTaskProcessorPool = Executors.newFixedThreadPool(poolSize);
 	
 	public TaskManager() {
 		super();
@@ -30,7 +31,9 @@ public class TaskManager {
 	 * 开始任务调度
 	 */
 	public void start() {
-		generalTaskProcessorPool.execute(new TaskProcessor(generalTaskQueue));
+		for(int index = 0;index<poolSize;index++) {
+			generalTaskProcessorPool.execute(new TaskProcessor(generalTaskQueue));
+		}
 		logger.info("TaskManager启动成功！开始接收任务调度...");
 	}
 	/**
