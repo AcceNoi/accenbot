@@ -1,5 +1,7 @@
 package org.accen.dmzj.core.handler.cmd;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -10,6 +12,7 @@ import org.accen.dmzj.core.task.api.GoogleTranslateApiClient;
 import org.accen.dmzj.core.task.api.YoudaoApiClient;
 import org.accen.dmzj.core.task.api.vo.YoudaoTranslateResult;
 import org.accen.dmzj.util.CQUtil;
+import org.accen.dmzj.util.GoogleUtil;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,34 +86,49 @@ public class TranslateCmd implements CmdAdapter{
 			}else {
 				task.setMessage(CQUtil.at(qmessage.getUserId())+ "抱歉，俺太弱了，翻译不出来喵~");
 			}*/
-			switch (langZ) {
-			case "日语":
-				lang = "JA";
-				break;
-			case "英语":
-				lang = "EN";
-				break;
-			case "法语":
-				lang = "FR";
-				break;
-			case "俄语":
-				lang = "RU";
-				break;
-			case "中文":
-				lang = "zh_CN";
-				break;
-			default:
-				
-				break;
+			if(langZ!=null) {
+				switch (langZ) {
+				case "日语":
+					lang = "JA";
+					break;
+				case "英语":
+					lang = "EN";
+					break;
+				case "法语":
+					lang = "FR";
+					break;
+				case "俄语":
+					lang = "RU";
+					break;
+				case "中文":
+					lang = "zh_CN";
+					break;
+				default:
+					
+					break;
+				}
 			}
-			String word = matcher.group(2);
+			
+			String word = matcher.group(2).trim();
 			Map<String, Object> result = googleTranslateApiClient.translate(lang, word,sl);
 			
 			if(StringUtils.isEmpty(langZ)) {
-				//如果是空的，ze
+				//如果是空的，则认为是语音
+				//先拿到语种
+				String src = (String) result.get("src");
+				try {
+					String wordU = URLEncoder.encode(word,"UTF-8");
+					String token = GoogleUtil.calculate_token(word);
+					task.setMessage(CQUtil.recordUrl("http://translate.google.cn/translate_tts?ie=UTF-8&q="+wordU+"&tl="+src+"&total=1&idx=0&textlen=4&tk="+token+"&client=webapp&prev=input"));
+				} catch (UnsupportedEncodingException e1) {
+					e1.printStackTrace();
+				}
+//				String token = GoogleUtil.calculate_token(word);
+//				task.setMessage(CQUtil.recordUrl("http://translate.google.cn/translate_tts?ie=UTF-8&q="+word+"&tl="+src+"&total=1&idx=0&textlen=4&tk="+token+"&client=webapp&prev=input"));
+			}else {
+				task.setMessage(CQUtil.at(qmessage.getUserId())+((List<Map<String,Object>>)result.get("sentences")).get(0).get("trans")+" (kana");
 			}
 			
-			task.setMessage(CQUtil.at(qmessage.getUserId())+((List<Map<String,Object>>)result.get("sentences")).get(0).get("trans")+" (kana");
 			return task;
 		}
 		return null;
