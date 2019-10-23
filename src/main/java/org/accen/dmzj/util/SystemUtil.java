@@ -15,6 +15,9 @@ public class SystemUtil {
 			return "/";
 		}
 	}
+	public static String getOs() {
+		return getSystemProperty("os.name").toUpperCase();
+	}
 	/**
 	 * 获取系统变量
 	 * @param var

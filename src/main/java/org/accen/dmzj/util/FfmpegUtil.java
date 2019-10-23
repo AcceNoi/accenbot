@@ -31,7 +31,10 @@ public class FfmpegUtil {
 		logger.info("ffmpeg cmd: "+cmd);
 		Runtime run = Runtime.getRuntime();
 		try {
-			Process p = run.exec(bin+cmd);
+			if(SystemUtil.getOs().startsWith("LINUX")) {
+				
+			}
+			Process p = run.exec(new String[] {,bin+cmd});
 			p.getOutputStream().close();
 			p.getInputStream().close();
 			p.getErrorStream().close();
