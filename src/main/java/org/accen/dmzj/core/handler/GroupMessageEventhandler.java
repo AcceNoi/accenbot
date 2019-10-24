@@ -36,6 +36,8 @@ public class GroupMessageEventhandler implements EventHandler{
 	private CfgQuickReplyMapper cfgQuickReplyMapper;
 	@Autowired
 	private TaskManager taskManager;
+	@Autowired
+	private CallbackManager callbackManager;
 	
 	@Autowired
 	private TriggerProSwitchCmd tpsc;
@@ -158,8 +160,8 @@ public class GroupMessageEventhandler implements EventHandler{
 			//4.监听型（匹配所有消息，但满足特定条件后产生复杂的回复的任务）
 			//4.5 回调监听型
 			
-			CallbackManager cm = ApplicationContextUtil.getBean(CallbackManager.class);
-			cm.accept(qmessage);
+//			CallbackManager cm = ApplicationContextUtil.getBean(CallbackManager.class);
+			callbackManager.accept(qmessage);
 			
 			//5.处理task
 //			tasks.forEach(task->{

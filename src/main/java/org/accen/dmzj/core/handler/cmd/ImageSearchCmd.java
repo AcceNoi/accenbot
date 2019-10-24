@@ -47,7 +47,7 @@ public class ImageSearchCmd implements CmdAdapter,CallbackListener {
 
 	@Override
 	public String example() {
-		return "龙妈找图[图片]";
+		return "老婆找图[图片]";
 	}
 	
 	private final static Pattern patternCmd = Pattern
@@ -120,9 +120,9 @@ public class ImageSearchCmd implements CmdAdapter,CallbackListener {
 
 	@Override
 	public boolean listen(Qmessage originQmessage,Qmessage qmessage,String selfQnum) {
-		if(originQmessage.getGroupId().equals(qmessage.getGroupId())&&originQmessage.getUserId().equals(qmessage.getUserId())) {
+		if(originQmessage!=qmessage&&originQmessage.getGroupId().equals(qmessage.getGroupId())&&originQmessage.getUserId().equals(qmessage.getUserId())) {
 			//是同一个群的同一个人发的消息
-			Matcher imgMatcher = patternCq.matcher(qmessage.getMessage());
+			Matcher imgMatcher = patternCq.matcher(qmessage.getMessage().trim());
 			if(imgMatcher.find()) {
 				
 				taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), "少女折寿中···");
