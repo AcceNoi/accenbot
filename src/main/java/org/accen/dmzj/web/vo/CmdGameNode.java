@@ -4,7 +4,7 @@ public class CmdGameNode {
 	private long id;
 	private long gameId;
 	private String nodeDesc;
-	private String nodeType;//Begin,Flow,End
+	private String nodeType;//First,Flow,Last,Result
 	public long getId() {
 		return id;
 	}

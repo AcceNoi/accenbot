@@ -20,6 +20,12 @@ public interface CmdGameMapper {
 	})
 	@Select("select * from cmd_game where id = #{id}")
 	public CmdGame selectGameById(@Param("id")long id);
+	@ResultMap("cmdGameMapper")
+	@Select("select * from cmd_game where game_name = #{gameName} and status = 1 ")
+	public CmdGame selectGameByName(@Param("gameName")String gameName);
+	@ResultMap("cmdGameMapper")
+	@Select("select * from cmd_game where status = 1 ")
+	public List<CmdGame> findAllGame();
 	
 	@Results(id = "cmdGameNodeMapper",value = {
 			@Result(property = "id",column = "id"),
@@ -32,6 +38,14 @@ public interface CmdGameMapper {
 	public CmdGameNode selectGameNodeById(@Param("id")long id);
 	
 	@ResultMap("cmdGameNodeMapper")
-	@Select("select * from cmd_game_node where game_id = #{gameId} and ")
-	public CmdGameNode findStartNodeByGame(@Param("gameId")long gameId);
+	@Select("select * from cmd_game_node where game_id = #{gameId} and node_type = 'First'}")
+	public CmdGameNode findFirstNodeByGame(@Param("gameId")long gameId);
+	@ResultMap("cmdGameNodeMapper")
+	@Select("select cgn.* from cmd_game_node cgn left join cmd_node_relation cnr on cnr.c_node_id = cgn.id "
+			+ " where cnr.p_node_id = #{parentId} ")
+	public List<CmdGameNode> findNextNode(@Param("parentId")long parentId);
+	@ResultMap("cmdGameNodeMapper")
+	@Select("select cgn.* from cmd_game_node cgn left join cmd_node_relation cnr on cnr.c_node_id = cgn.id "
+			+ " where cnr.p_node_id = #{parentId} and cnr.check_no = #{checkNo}")
+	public CmdGameNode selectNextNodeByNo(@Param("parentId")long parentId,String checkNo);
 }
