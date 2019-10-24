@@ -27,19 +27,19 @@ public class SetuCmd implements CmdAdapter {
 
 	private static final Pattern pattern = Pattern.compile("^随机(色图|瑟图|涩图)$");
 	
-	private Boolean locked = false;//未知原因使得此功能被滥用则回系统崩溃，可能是coolq pro接收数据的超时设置问题，这里为了防止滥用，同一时间段只接收一个请求。
+//	private Boolean locked = false;//未知原因使得此功能被滥用则回系统崩溃，可能是coolq pro接收数据的超时设置问题，这里为了防止滥用，同一时间段只接收一个请求。
 	
 	@Override
-	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
-		if(locked) {
-			return null;
-		}else {
-			synchronized (locked) {
-				
-				if(locked) {
-					return null;
-				}else {
-					locked = true;
+	public synchronized GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
+//		if(locked) {
+//			return null;
+//		}else {
+//			synchronized (locked) {
+//				
+//				if(locked) {
+//					return null;
+//				}else {
+//					locked = true;
 					String message = qmessage.getMessage().trim();
 					Matcher matcher = pattern.matcher(message);
 					if(matcher.matches()) {
@@ -52,19 +52,19 @@ public class SetuCmd implements CmdAdapter {
 							task.setTargetId(qmessage.getGroupId());
 							task.setMessage(CQUtil.imageUrl(imageUrl));
 							
-							locked = false;
+//							locked = false;
 							return task;
 						}
 						
 						
 						
 					}
-					locked = false;
+//					locked = false;
 					return null;
-				}
+//				}
 				
-			}
-		}
+//			}
+//		}
 		
 		
 	}
