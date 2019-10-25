@@ -1,6 +1,5 @@
 package org.accen.dmzj.core.handler.cmd;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -89,7 +88,11 @@ public class CheckinCmd implements CmdAdapter {
 							SysGroupMember mem = mems.get(0);
 							int ci = coinIncr;
 							if(coinIncr<0) {
-								ci = RandomUtil.randomInt(-coinIncr);
+								//2019.10.25根据好感度增加下限 2 * log(1.5) (X+1)
+								double lowerLimitD = 2*(Math.log(mem.getFavorability()+1)/Math.log(1.5));
+								int lowLimit = lowerLimitD<0?0:((int)lowerLimitD);
+								
+								ci = lowLimit + RandomUtil.randomInt(-coinIncr);
 							}
 							mem.setCoin(mem.getCoin()+ci);
 							mem.setCheckinCount(mem.getCheckinCount()+1);
