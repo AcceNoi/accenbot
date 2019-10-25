@@ -110,5 +110,28 @@ create table cfg_resource(
 	id bigint not null primary key auto_increment,
 	cfg_key varchar(200) not null,
 	cfg_resource varchar(2000),
-	resource_type varchar(200)
+	resource_type varchar(200),
+	title varchar(200),
+	content varchar(2000),
+	image varchar(200)
 );
+create table cmd_game(
+	id bigint not null primary key auto_increment,
+	game_name varchar(200) not null,
+	coin_consum int default 0,
+	fav_limit int default 0,
+	status int not null
+);
+create table cmd_game_node(
+	id bigint not null primary key auto_increment,
+	game_id bigint,
+	node_desc varchar(4000),
+	node_type varchar(10)
+);
+create table cmd_node_relation(
+	id bigint not null primary key auto_increment,
+	p_node_id bigint not null,
+	c_node_id bigint not null,
+	check_no varchar(200)
+);
+
