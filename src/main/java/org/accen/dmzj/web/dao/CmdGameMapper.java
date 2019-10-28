@@ -4,12 +4,13 @@ import java.util.List;
 
 import org.accen.dmzj.web.vo.CmdGame;
 import org.accen.dmzj.web.vo.CmdGameNode;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
-
+@Mapper
 public interface CmdGameMapper {
 	@Results(id = "cmdGameMapper",value = {
 			@Result(property = "id",column = "id"),
