@@ -31,8 +31,8 @@ public class CQUtil {
 		//https://music.163.com/#/search/m/?s=a&type=1
 		return "";
 	}
-	public static String selfMusic(String url,String title,String content,String imageUrl) {
-		return "[CQ:music,type=custom,url="+url+",audio="+url+",title="+title+",content="+content+",image="+imageUrl+"]";
+	public static String selfMusic(String url,String audio,String title,String content,String imageUrl) {
+		return "[CQ:music,type=custom,url="+url+",audio="+audio+",title="+title+",content="+content+",image="+imageUrl+"]";
 	}
 	
 	public static String imageUrl(String url) {

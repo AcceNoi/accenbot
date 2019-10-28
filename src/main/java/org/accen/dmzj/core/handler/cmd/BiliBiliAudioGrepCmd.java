@@ -43,12 +43,12 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 
 	@Override
 	public String example() {
-		return "抽取B站[www.bilibili.com/video/av64689940]从[00:00:00]到[00:01:59]音频，设置名称[小狐狸]，简介[无]";
+		return "抽取B站[www.bilibili.com/video/av64689940]从[00:00:00]到[00:01:59]音频，设置名称[小狐狸]";
 	}
 
 	private static final String KEY_PREFFIX = "audio_bilibili_";
 	
-	private final static Pattern grepPattern = Pattern.compile("^抽取B站(.+)?从(.+)?到(.+)?音频，设置名称(.+)?，简介(.*)$");
+	private final static Pattern grepPattern = Pattern.compile("^抽取B站(.+)?从(.+)?到(.+)?音频，设置名称(.+)?$");
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
@@ -64,7 +64,7 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 			String ss = matcher.group(2);
 			String tt = matcher.group(3);
 			String name = matcher.group(4);
-			String ctt = matcher.group(5);
+			
 			if(!ffmpegUtil.checkTimeIllegal(ss, tt)) {
 				task.setMessage("时间格式输入错误喵~");
 				return task;
@@ -73,7 +73,8 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 				
 				taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), "视频["+url+"]解析中~");
 				
-				String videoFile = apiClient.downLoadAdaptive(url, 360);
+				String[] rs = apiClient.downLoadAdaptive(url, 360);
+				String videoFile = rs[0];
 				//剪切音频
 				String target = tempMusicPath+KEY_PREFFIX+name+".aac";
 				String audio = ffmpegUtil.convertVideo2Audio(videoFile, target, "aac", ss, tt);
@@ -86,9 +87,11 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 				cr.setCfgResource(staticMusic+KEY_PREFFIX+name+".aac");
 				cr.setResourceType("music");
 				cr.setTitle(name);
-				cr.setContent(ctt);
+				cr.setContent(rs[2]);
+				cr.setImage(rs[1]);
+				cr.setOriginResource(rs[3]);
 				cfgResourceMapper.insert(cr);
-				task.setMessage(CQUtil.at(qmessage.getUserId())+" 视频解析完成喵~触发词条为B站点歌"+name);
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 视频解析完成喵~触发词条为[B站点歌"+name+"]");
 				return task;
 			} catch (BiliBiliCookieNeverInit e) {
 				e.printStackTrace();

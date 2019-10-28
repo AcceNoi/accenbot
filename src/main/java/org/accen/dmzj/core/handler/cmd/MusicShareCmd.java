@@ -69,7 +69,7 @@ public class MusicShareCmd implements CmdAdapter {
 			}else if("B站".equals(matcher.group(1))) {
 				CfgResource cr  = cfgResourceMapper.selectByKey(KEY_PREFFIX+matcher.group(2));
 				if(cr!=null) {
-					task.setMessage(CQUtil.selfMusic(cr.getCfgResource(), cr.getTitle(), cr.getContent(), ""));
+					task.setMessage(CQUtil.selfMusic(cr.getOriginResource(),cr.getCfgResource(), cr.getTitle(), cr.getContent(), cr.getImage()));
 					return task;
 				}
 				

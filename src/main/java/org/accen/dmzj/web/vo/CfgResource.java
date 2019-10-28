@@ -12,6 +12,7 @@ public class CfgResource {
 	private String title;
 	private String content;
 	private String image;
+	private String originResource;
 	
 	public String getTitle() {
 		return title;
@@ -54,6 +55,12 @@ public class CfgResource {
 	}
 	public void setResourceType(String resourceType) {
 		this.resourceType = resourceType;
+	}
+	public String getOriginResource() {
+		return originResource;
+	}
+	public void setOriginResource(String originResource) {
+		this.originResource = originResource;
 	}
 	
 }

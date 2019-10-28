@@ -19,14 +19,15 @@ public interface CfgResourceMapper {
 			@Result(property = "resourceType",column = "resource_type"),
 			@Result(property = "title",column = "title"),
 			@Result(property = "content",column = "content"),
-			@Result(property = "image",column = "image")
+			@Result(property = "image",column = "image"),
+			@Result(property = "originResource",column = "origin_resource")
 	})
 	@Select("select * from cfg_resource where id = #{id}")
 	public CfgResource selectById(@Param("id")long id);
 	@ResultMap("cfgResourceMapper")
 	@Select("select * from cfg_resource where cfg_key = #{key} limit 1")
 	public CfgResource selectByKey(@Param("key")String key);
-	@Insert("insert into cfg_resource(cfg_key,cfg_resource,resource_type,title,content,image) values(#{cfgKey},#{cfgResource},#{resourceType},#{title},#{content},#{image})")
+	@Insert("insert into cfg_resource(cfg_key,cfg_resource,resource_type,title,content,image,origin_resource) values(#{cfgKey},#{cfgResource},#{resourceType},#{title},#{content},#{image},#{originResource})")
 	@Options(useGeneratedKeys = true,keyProperty = "id")
 	public long insert(CfgResource cr);
 	
