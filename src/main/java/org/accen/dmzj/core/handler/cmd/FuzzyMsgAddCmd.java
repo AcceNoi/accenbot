@@ -78,7 +78,7 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 				}else {
 					
 					//accen@2019.10.28新增持久化网络图片
-					ask = filePersistentUtil.persistent(ask);
+//					ask = filePersistentUtil.persistent(ask);
 					reply = filePersistentUtil.persistent(reply);
 					
 					CfgQuickReply cfgReply = new CfgQuickReply();

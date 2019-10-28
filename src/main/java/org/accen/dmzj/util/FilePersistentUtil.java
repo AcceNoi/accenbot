@@ -72,7 +72,7 @@ public class FilePersistentUtil {
 			String[] persistentResult = persistent(url, fileName);
 			if(persistentResult!=null) {
 				//转化成本地文件模式
-				cqImg = String.format("[CQ:image,file=file:\\\\%s]", persistentResult[0]);
+				cqImg = String.format("[CQ:image,file=file:///%s]", persistentResult[0]);
 			}
 		}
 		return cqImg;
