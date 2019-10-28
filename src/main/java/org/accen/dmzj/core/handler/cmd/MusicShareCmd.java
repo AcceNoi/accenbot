@@ -8,6 +8,7 @@ import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.api.MusicApiClient;
 import org.accen.dmzj.core.task.api.vo.Music163Result;
 import org.accen.dmzj.util.CQUtil;
+import org.accen.dmzj.util.RandomUtil;
 import org.accen.dmzj.web.dao.CfgResourceMapper;
 import org.accen.dmzj.web.vo.CfgResource;
 import org.accen.dmzj.web.vo.Qmessage;
@@ -47,7 +48,7 @@ public class MusicShareCmd implements CmdAdapter {
 	
 	private static final String KEY_PREFFIX = "audio_bilibili_";
 	
-	private final static Pattern pattern = Pattern.compile("^(网易|qq|QQ|Qq|qQ|虾米|B站)点歌(.+)");
+	private final static Pattern pattern = Pattern.compile("^(网易|qq|QQ|Qq|qQ|虾米|B站)(随机){0,1}点歌(.+)");
 	private final static Pattern listPattern = Pattern.compile("^B站歌曲列表(\\d*)$");
 	
 	@Override
@@ -56,7 +57,7 @@ public class MusicShareCmd implements CmdAdapter {
 		Matcher matcher = pattern.matcher(message);
 		Matcher listMatcher = listPattern.matcher(message);
 		if(matcher.matches()) {
-			String musicName = matcher.group(2);
+			String musicName = matcher.group(3);
 			GeneralTask task = new GeneralTask();
 			task.setSelfQnum(selfQnum);
 			task.setType(qmessage.getMessageType());
@@ -74,7 +75,17 @@ public class MusicShareCmd implements CmdAdapter {
 					return task;
 				}
 			}else if("B站".equals(matcher.group(1))) {
-				CfgResource cr  = cfgResourceMapper.selectByKey(KEY_PREFFIX+matcher.group(2));
+				String isRandom = matcher.group(2);
+				CfgResource cr  = null;
+				if(!StringUtils.isEmpty(isRandom)) {
+					List<CfgResource> crs = cfgResourceMapper.findByKey(KEY_PREFFIX, matcher.group(3));
+					if(crs!=null&&!crs.isEmpty()) {
+						cr = crs.get(RandomUtil.randomInt(crs.size()));
+					}
+				}else {
+					cr  = cfgResourceMapper.selectByKey(KEY_PREFFIX+matcher.group(3));
+				}
+				
 				if(cr!=null) {
 					task.setMessage(CQUtil.selfMusic(cr.getOriginResource(),cr.getCfgResource(), cr.getTitle(), cr.getContent(), cr.getImage()));
 					
@@ -106,7 +117,7 @@ public class MusicShareCmd implements CmdAdapter {
 								.append("\n");
 					
 				}
-				int maxPage = cfgResourceMapper.countBMusic()/musicListSize+1;
+				int maxPage = (cfgResourceMapper.countBMusic()-1)/musicListSize+1;
 				
 				if(maxPage>5) {
 					//大于5，则中间以省略号展示

@@ -32,6 +32,11 @@ public interface CfgResourceMapper {
 	@ResultMap("cfgResourceMapper")
 	@Select("select * from cfg_resource where cfg_key = #{key} limit 1")
 	public CfgResource selectByKey(@Param("key")String key);
+	
+	@ResultMap("cfgResourceMapper")
+	@Select("select * from cfg_resource where cfg_key like 'audio_bilibiliG_%' escape 'G' and  title like concat('%',concat(#{key},'%')) ")
+	public List<CfgResource> findByKey(@Param("preffix")String preffix ,@Param("key")String key);
+	
 	@Insert("insert into cfg_resource(cfg_key,cfg_resource,resource_type,title,content,image,origin_resource,create_user_id,create_user_name,create_time) "
 			+ " values(#{cfgKey},#{cfgResource},#{resourceType},#{title},#{content},#{image},#{originResource},#{createUserId},#{createUserName},#{createTime})")
 	@Options(useGeneratedKeys = true,keyProperty = "id")
