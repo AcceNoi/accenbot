@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
+import org.accen.dmzj.util.FilePersistentUtil;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CfgQuickReplyMapper;
 import org.accen.dmzj.web.vo.CfgQuickReply;
@@ -22,6 +23,9 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 	@Autowired
 	private CfgQuickReplyMapper cfgQuickReplyMapper;
 
+	@Autowired
+	private FilePersistentUtil filePersistentUtil;
+	
 	@Autowired
 	private CheckinCmd checkinCmd;
 	@Value("${coolq.fuzzymsg.coin.decrease:3}")
@@ -72,6 +76,11 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 				}else if(curCoin-decrease<0) {
 					task.setMessage(CQUtil.at(qmessage.getUserId())+" 您库存金币不够了哦，暂无法添加词条喵~");
 				}else {
+					
+					//accen@2019.10.28新增持久化网络图片
+					ask = filePersistentUtil.persistent(ask);
+					reply = filePersistentUtil.persistent(reply);
+					
 					CfgQuickReply cfgReply = new CfgQuickReply();
 					cfgReply.setMatchType(isPrecise?1:2);
 					cfgReply.setPattern(isPrecise?ask:".*?"+StringUtil.transferPattern(ask)+".*");
