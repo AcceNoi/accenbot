@@ -2,6 +2,7 @@ package org.accen.dmzj.core.task.api;
 
 import org.accen.dmzj.core.annotation.FeignApi;
 
+import feign.Param;
 import feign.RequestLine;
 import feign.Response;
 import feign.codec.Decoder;
@@ -20,5 +21,5 @@ public interface Wiki33mApiClient {
 	 * @return
 	 */
 	@RequestLine("GET /qq?lx={type}&qq={num}")
-	public Response qqImage(String type,String num);
+	public Response qqImage(@Param("type")String type,@Param("num")String num);
 }
