@@ -114,7 +114,10 @@ create table cfg_resource(
 	title varchar(200),
 	content varchar(2000),
 	image varchar(200),
-	origin_resource varchar(2000)
+	origin_resource varchar(2000),
+	create_user_id varchar(20),
+	create_user_name varchar(200),
+	create_time datetime
 );
 create table cmd_game(
 	id bigint not null primary key auto_increment,

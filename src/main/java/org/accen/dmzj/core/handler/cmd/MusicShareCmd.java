@@ -1,5 +1,6 @@
 package org.accen.dmzj.core.handler.cmd;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,6 +13,7 @@ import org.accen.dmzj.web.vo.CfgResource;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.connection.ReactiveListCommands.LSetCommand;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -40,14 +42,19 @@ public class MusicShareCmd implements CmdAdapter {
 		return "[网易|qq|虾米|B站]点歌 恋爱循环";
 	}
 
+	@Value("${coolq.music.list.pageSize:10}")
+	private int musicListSize;
+	
 	private static final String KEY_PREFFIX = "audio_bilibili_";
 	
 	private final static Pattern pattern = Pattern.compile("^(网易|qq|QQ|Qq|qQ|虾米|B站)点歌(.+)");
+	private final static Pattern listPattern = Pattern.compile("^B站歌曲列表(\\d*)$");
 	
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
 		Matcher matcher = pattern.matcher(message);
+		Matcher listMatcher = listPattern.matcher(message);
 		if(matcher.matches()) {
 			String musicName = matcher.group(2);
 			GeneralTask task = new GeneralTask();
@@ -70,12 +77,59 @@ public class MusicShareCmd implements CmdAdapter {
 				CfgResource cr  = cfgResourceMapper.selectByKey(KEY_PREFFIX+matcher.group(2));
 				if(cr!=null) {
 					task.setMessage(CQUtil.selfMusic(cr.getOriginResource(),cr.getCfgResource(), cr.getTitle(), cr.getContent(), cr.getImage()));
+					
+					//点歌成功，为创建者增加金币1
+					if(cr.getCreateUserId()!=null) {
+						checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), cr.getCreateUserId(), 1);
+					}
+					
+					
 					return task;
 				}
 				
 			}
 			
+		}else if(listMatcher.matches()) {
+			String pageNoStr = listMatcher.group(1);
+			int pageNo = StringUtils.isEmpty(pageNoStr)?1:Integer.parseInt(pageNoStr);
+			int offset = (pageNo-1)*musicListSize;
+			List<CfgResource> musics = cfgResourceMapper.findBMusicLimit(offset, musicListSize);
+			if(musics!=null&&!musics.isEmpty()) {
+				StringBuffer listBuffer = new StringBuffer("当前B站歌曲分页："+(pageNo));
+				listBuffer.append("\n");
+				for(int index = 0;index<musics.size();index++) {
+					listBuffer.append(index+1)
+								.append(". 【")
+								.append(musics.get(index).getCfgKey().substring(15))
+								.append("】 by ")
+								.append(musics.get(index).getCreateUserName())
+								.append("\n");
+					
+				}
+				int maxPage = cfgResourceMapper.countBMusic()/musicListSize+1;
+				
+				if(maxPage>5) {
+					//大于5，则中间以省略号展示
+					listBuffer.append("[1] [2]···["+(maxPage-1)+"] ["+maxPage+"]");
+				}else {
+					//小于等于5，就全部展示了
+					for(int i=1;i<=maxPage;i++) {
+						listBuffer.append("["+i+"]");
+						if(i<maxPage) {
+							listBuffer.append(" ");
+						}
+					}
+				}
+				listBuffer.append("\n发送 B站歌曲列表+[分页]即可查看可点歌曲喵~");
+				GeneralTask task = new GeneralTask();
+				task.setSelfQnum(selfQnum);
+				task.setType(qmessage.getMessageType());
+				task.setTargetId(qmessage.getGroupId());
+				task.setMessage(listBuffer.toString());
+				return task;
+			}
 		}
+		
 		return null;
 	}
 
