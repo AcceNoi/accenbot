@@ -44,28 +44,51 @@ public class ApiBiliBiliApiClient {
 	private final Gson gson = new Gson();
 	
 	private final static Pattern urlPattern = Pattern.compile(".*?www.bilibili.com/video/av(\\d+)?.*");
-	public String downLoadAdaptive(String str,int qn) throws BiliBiliCookieNeverInit {
+	/**
+	 * 
+	 * @param str
+	 * @param qn
+	 * @return 0-本地视频地址, 1-封面地址，2-标题（后续作为content），3-视频地址
+	 * @throws BiliBiliCookieNeverInit
+	 */
+	public String[] downLoadAdaptive(String str,int qn) throws BiliBiliCookieNeverInit {
 		if(StringUtil.isNumberString(str)) {
 			return downLoadByAvid(str, qn);
 		}else {
 			return downLoadByUrl(str, qn);
 		}
 	}
-	public String downLoadByUrl(String url,int qn) throws BiliBiliCookieNeverInit {
+	/**
+	 * 
+	 * @param url
+	 * @param qn
+	 * @return 0-本地视频地址, 1-封面地址，2-标题（后续作为content），3-视频地址
+	 * @throws BiliBiliCookieNeverInit
+	 */
+	public String[] downLoadByUrl(String url,int qn) throws BiliBiliCookieNeverInit {
 		Matcher mt = urlPattern.matcher(url);
 		if(mt.matches()) {
 			return downLoadByAvid(mt.group(1), qn);
 		}
 		return null;
 	}
-	public String downLoadByAvid(String avid,int qn) throws BiliBiliCookieNeverInit {
+	/**
+	 * 
+	 * @param avid
+	 * @param qn
+	 * @return 0-本地视频地址, 1-封面地址，2-标题（后续作为content）,3-视频地址
+	 * @throws BiliBiliCookieNeverInit
+	 */
+	public String[] downLoadByAvid(String avid,int qn) throws BiliBiliCookieNeverInit {
 		checkCookie();
 		
 		//1.获取cid
-		String cid = getAvCid(avid);
-		if(cid==null) {
+		String[] rs = getAvCid(avid);
+		if(rs==null) {
 			return null;
 		}
+		String cid = rs[0];
+		
 		//2.获取playurl
 		String url = getUrl(cid, avid, qn);
 		if(url==null) {
@@ -86,12 +109,17 @@ public class ApiBiliBiliApiClient {
 			e.printStackTrace();
 		}
 		
-		return videoName;
+		return new String[] {videoName,rs[1],rs[2],"https://www.bilibili.com/video/av"+avid};
 		
 	}
 	private final static String BILIBILI_API_VIEW="https://api.bilibili.com/x/web-interface/view?aid=%s";
 	
-	public String getAvCid(String avid) {
+	/**
+	 * 解析视频的基本信息
+	 * @param avid
+	 * @return 0-cid, 1-封面地址，2-标题（后续作为content）
+	 */
+	public String[] getAvCid(String avid) {
 		HttpGet viewGet = new HttpGet(String.format(BILIBILI_API_VIEW, avid));
 		try {
 			HttpResponse viewResp = httpClient.execute(viewGet);
@@ -100,7 +128,9 @@ public class ApiBiliBiliApiClient {
 				
 				Map<String, Object> data = gson.fromJson(ctt, Map.class);
 				Double cid = (Double)((List<Map<String, Object>>)((Map<String, Object>)data.get("data")).get("pages")).get(0).get("cid");
-				return new BigDecimal(cid).stripTrailingZeros().toPlainString();
+				String imageUrl = (String) ((Map<String, Object>)data.get("data")).get("pic");
+				String title = (String) ((Map<String, Object>)data.get("data")).get("title");
+				return new String[] {new BigDecimal(cid).stripTrailingZeros().toPlainString(),imageUrl,title};
 			}
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
