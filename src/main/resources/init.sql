@@ -113,7 +113,8 @@ create table cfg_resource(
 	resource_type varchar(200),
 	title varchar(200),
 	content varchar(2000),
-	image varchar(200)
+	image varchar(200),
+	origin_resource varchar(2000)
 );
 create table cmd_game(
 	id bigint not null primary key auto_increment,
