@@ -31,7 +31,7 @@ public interface CfgQuickReplyMapper {
 	public CfgQuickReply selectById(@Param("id") long id);
 	
 	@ResultMap("cfgQuickReplyResultMapper")
-	@Select("select * from cfg_quick_reply where status = 1 and apply_type=#{applyType} and apply_target=#{applyTarget} order by create_time desc")
+	@Select("select * from cfg_quick_reply where status = 1 and apply_type=#{applyType} and (apply_target=#{applyTarget} or apply_target = '0') order by create_time desc")
 	public List<CfgQuickReply> queryByApply(@Param("applyType") int applyType,@Param("applyTarget") String applyTarget);
 	
 	@Insert("insert into cfg_quick_reply(match_type,pattern,apply_type,apply_target,need_at,reply,create_user_id,create_time,status) "
