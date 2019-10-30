@@ -82,4 +82,7 @@ public class ReportTimeSchedule {
 	public String closeClock(String groupId) {
 		return groupClockMap.remove(groupId);
 	}
+	public String getClock(String groupId) {
+		return groupClockMap.get(groupId);
+	}
 }
