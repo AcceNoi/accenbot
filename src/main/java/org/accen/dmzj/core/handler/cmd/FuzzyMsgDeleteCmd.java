@@ -76,7 +76,10 @@ public class FuzzyMsgDeleteCmd  implements CmdAdapter{
 			CfgQuickReply reply = cfgQuickReplyMapper.selectById(Long.parseLong(matcher.group(1)));
 			if(reply==null||reply.getStatus()!=1) {
 				task.setMessage("无法找到此词条，请确认词条编号喵~");
-			}else if(!qmessage.getGroupId().equals(reply.getApplyTarget())) {
+			}else if("0".equals(reply.getApplyTarget())||"-1".equals(reply.getApplyTarget())) {
+				task.setMessage("无法删除公共词条喵~");
+			}
+			else if(!qmessage.getGroupId().equals(reply.getApplyTarget())) {
 				task.setMessage("非本群词条喵~");
 			}else {
 				reply.setStatus(2);
