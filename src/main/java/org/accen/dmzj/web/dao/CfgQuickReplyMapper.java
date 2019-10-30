@@ -34,6 +34,20 @@ public interface CfgQuickReplyMapper {
 	@Select("select * from cfg_quick_reply where status = 1 and apply_type=#{applyType} and (apply_target=#{applyTarget} or apply_target = '0') order by create_time desc")
 	public List<CfgQuickReply> queryByApply(@Param("applyType") int applyType,@Param("applyTarget") String applyTarget);
 	
+	@ResultMap("cfgQuickReplyResultMapper")
+	@Select("select * from cfg_quick_reply where status = 1 and (apply_target=#{applyTarget} or apply_target = '0') and pattern = #{pattern}  order by id asc limit #{offset},#{pageSize} ")
+	public List<CfgQuickReply> queryByTargetAndPattern(@Param("applyTarget") String applyTarget,@Param("pattern")String pattern,@Param("offset") int offset,@Param("pageSize") int pageSize);
+	
+	@Select("select count(1) from cfg_quick_reply where status = 1 and (apply_target=#{applyTarget} or apply_target = '0') and pattern = #{pattern} ")
+	public int queryCountByTargetAndPattern(@Param("applyTarget") String applyTarget,@Param("pattern")String pattern);
+	
+	@ResultMap("cfgQuickReplyResultMapper")
+	@Select("select * from cfg_quick_reply where status = 1 and (apply_target=#{applyTarget} or apply_target = '0') and create_user_id = #{createUserId}   order by id asc limit #{offset},#{pageSize}")
+	public List<CfgQuickReply> queryByCreator(@Param("applyTarget") String applyTarget,@Param("createUserId") String createUserId,@Param("offset") int offset,@Param("pageSize") int pageSize);
+	
+	@Select("select count(1) from cfg_quick_reply where status = 1 and (apply_target=#{applyTarget} or apply_target = '0') and create_user_id = #{createUserId}")
+	public int queryCountByCreator(@Param("applyTarget") String applyTarget,@Param("createUserId") String createUserId);
+	
 	@Insert("insert into cfg_quick_reply(match_type,pattern,apply_type,apply_target,need_at,reply,create_user_id,create_time,status) "
 			+ " values(#{reply.matchType},#{reply.pattern},#{reply.applyType},#{reply.applyTarget},#{reply.needAt},#{reply.reply},#{reply.createUserId},sysdate(),#{reply.status})") 
 	@Options(useGeneratedKeys = true,keyProperty = "reply.id")
