@@ -9,6 +9,7 @@ import org.accen.dmzj.core.task.api.MusicApiClient;
 import org.accen.dmzj.core.task.api.vo.Music163Result;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomUtil;
+import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CfgResourceMapper;
 import org.accen.dmzj.web.vo.CfgResource;
 import org.accen.dmzj.web.vo.Qmessage;
@@ -114,7 +115,7 @@ public class MusicShareCmd implements CmdAdapter {
 								.append(musics.get(index).getCfgKey().substring(15))
 								.append("】 by ")
 								.append(musics.get(index).getCreateUserName())
-								.append("\n");
+								.append("\n"+StringUtil.SPLIT);
 					
 				}
 				int maxPage = (cfgResourceMapper.countBMusic()-1)/musicListSize+1;
@@ -131,7 +132,8 @@ public class MusicShareCmd implements CmdAdapter {
 						}
 					}
 				}
-				listBuffer.append("\n发送 B站歌曲列表+[分页]即可查看可点歌曲喵~");
+				listBuffer.append("\n"+StringUtil.SPLIT_FOOT);
+				listBuffer.append("发送 B站歌曲列表+[分页]即可查看可点歌曲喵~");
 				GeneralTask task = new GeneralTask();
 				task.setSelfQnum(selfQnum);
 				task.setType(qmessage.getMessageType());
