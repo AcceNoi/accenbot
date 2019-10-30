@@ -84,4 +84,7 @@ public class StringUtil {
         }
         return ret.toString();
     }
+	
+	public static final String SPLIT = "--------------------\n";
+	public static final String SPLIT_FOOT = "====================\n";
 }
