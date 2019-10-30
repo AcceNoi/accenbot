@@ -12,7 +12,10 @@ import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.core.task.api.bilibili.ApiBiliBiliApiClient;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.FfmpegUtil;
+import org.accen.dmzj.util.StringUtil;
+import org.accen.dmzj.web.dao.CfgQuickReplyMapper;
 import org.accen.dmzj.web.dao.CfgResourceMapper;
+import org.accen.dmzj.web.vo.CfgQuickReply;
 import org.accen.dmzj.web.vo.CfgResource;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +38,13 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 	private ApiBiliBiliApiClient apiClient;
 	@Autowired
 	private CfgResourceMapper cfgResourceMapper;
+	@Autowired
+	private CfgQuickReplyMapper cfgQuickReplyMapper;
 	
 	@Value("${coolq.biligrep.coin.decrease:10}")
 	private int coinDescrease;
+	@Value("${coolq.fuzzymsg.coin.decrease:3}")
+	private int decrease = 3;
 	@Autowired
 	private CheckinCmd checkinCmd;
 	
@@ -51,12 +58,12 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 
 	@Override
 	public String example() {
-		return "抽取B站[www.bilibili.com/video/av64689940]从[00:00:00]到[00:01:59]音频，设置名称[小狐狸]";
+		return "抽取B站[www.bilibili.com/video/av64689940]从[00:00:00]到[00:01:59]音乐，设置名称[小狐狸]";
 	}
 
 	private static final String KEY_PREFFIX = "audio_bilibili_";
 	
-	private final static Pattern grepPattern = Pattern.compile("^抽取B站(.+)?从(.+)?到(.+)?音频，设置名称(.+)?$");
+	private final static Pattern grepPattern = Pattern.compile("^抽取B站(.+)?从(.+)?到(.+)?(音乐|语音)，设置名称(.+)?$");
 	@Override
 	public synchronized GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
@@ -78,10 +85,16 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 				String url = matcher.group(1);
 				String ss = matcher.group(2);
 				String tt = matcher.group(3);
-				String name = matcher.group(4);
+				String type = matcher.group(4);
+				String name = matcher.group(5);
 				
-				if(!ffmpegUtil.checkTimeIllegal(ss, tt)) {
+				int diff = ffmpegUtil.checkTimeIllegalEx(ss, tt);
+				if(diff<=0) {
 					task.setMessage("时间格式输入错误喵~");
+					return task;
+				}else if(diff>120&&"语音".equals(type)){
+					//如果大于120且为语音，则不给过
+					task.setMessage("抽取的语音时长不能超过120秒的说~");
 					return task;
 				}
 				try {
@@ -97,24 +110,42 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 						task.setMessage("视频剪切失败喵~");
 						return task;
 					}
-					CfgResource cr = new CfgResource();
-					cr.setCfgKey(KEY_PREFFIX+name);
-					cr.setCfgResource(staticMusic+KEY_PREFFIX+name+".aac");
-					cr.setResourceType("music");
-					cr.setTitle(name);
-					cr.setContent(rs[2]);
-					cr.setImage(rs[1]);
-					cr.setOriginResource(rs[3]);
-					cr.setCreateUserId(qmessage.getUserId());
-					String createNickName = (String) ((Map<String, Object>)qmessage.getEvent().get("sender")).get("nickname");
-					String createCard = (String) ((Map<String, Object>)qmessage.getEvent().get("sender")).get("card");//群名片
-					cr.setCreateUserName(StringUtils.isEmpty(createCard)?createNickName:createCard);
-					cr.setCreateTime(new Date());
-					cfgResourceMapper.insert(cr);
+					if("音乐".equals(type)) {
+						CfgResource cr = new CfgResource();
+						cr.setCfgKey(KEY_PREFFIX+name);
+						cr.setCfgResource(staticMusic+KEY_PREFFIX+name+".aac");
+						cr.setResourceType("music");
+						cr.setTitle(name);
+						cr.setContent(rs[2]);
+						cr.setImage(rs[1]);
+						cr.setOriginResource(rs[3]);
+						cr.setCreateUserId(qmessage.getUserId());
+						String createNickName = (String) ((Map<String, Object>)qmessage.getEvent().get("sender")).get("nickname");
+						String createCard = (String) ((Map<String, Object>)qmessage.getEvent().get("sender")).get("card");//群名片
+						cr.setCreateUserName(StringUtils.isEmpty(createCard)?createNickName:createCard);
+						cr.setCreateTime(new Date());
+						cfgResourceMapper.insert(cr);
+						
+						//消耗金币
+						int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -coinDescrease);
+						task.setMessage(CQUtil.at(qmessage.getUserId())+" 视频解析完成喵~触发词条为[B站点歌"+name+"]，本次消耗金币："+coinDescrease+"，剩余："+newCoin+"。Tips：每次点歌成功后会回赠1枚金币喵~");
+					}else {
+						CfgQuickReply reply = new CfgQuickReply();
+						reply.setMatchType(2);
+						reply.setPattern(".*?"+StringUtil.transferPattern(name)+".*");
+						reply.setReply("[CQ:record,file=file:///"+audio+"]");
+						reply.setApplyType(2);
+						reply.setApplyTarget(qmessage.getGroupId());
+						reply.setNeedAt(2);
+						reply.setCreateTime(new Date());
+						reply.setCreateUserId(qmessage.getUserId());
+						reply.setStatus(1);
+						cfgQuickReplyMapper.insert(reply);
+						//消耗金币
+						int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -decrease);
+						task.setMessage(CQUtil.at(qmessage.getUserId())+" 视频解析完成喵~添加词条编号："+reply.getId()+"，本次消耗金币："+decrease+"，剩余："+newCoin);
+					}
 					
-					//消耗金币
-					int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -coinDescrease);
-					task.setMessage(CQUtil.at(qmessage.getUserId())+" 视频解析完成喵~触发词条为[B站点歌"+name+"]，本次消耗金币："+coinDescrease+"，剩余："+newCoin+"。Tips：每次点歌成功后会回赠1枚金币喵~");
 					
 					return task;
 				} catch (BiliBiliCookieNeverInit e) {
