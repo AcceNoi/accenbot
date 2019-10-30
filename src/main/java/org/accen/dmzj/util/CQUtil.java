@@ -1,5 +1,10 @@
 package org.accen.dmzj.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import ch.qos.logback.core.pattern.parser.Parser;
+
 public class CQUtil {
 	
 	/**
@@ -45,5 +50,19 @@ public class CQUtil {
 	 */
 	public static String recordUrl(String url) {
 		return "[CQ:record,file="+url+"]";
+	}
+	/**
+	 * 截取at之后的字符串
+	 * @param str
+	 * @param selfNum
+	 * @return
+	 */
+	public static String subAtAfter(String str,String selfNum) {
+		Pattern pattern  = Pattern.compile("^\\[CQ:at,qq="+selfNum+"\\](.*)");
+		Matcher mt = pattern.matcher(str);
+		if(mt.matches()) {
+			return mt.group(1);
+		}
+		return null;
 	}
 }
