@@ -133,7 +133,7 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 						CfgQuickReply reply = new CfgQuickReply();
 						reply.setMatchType(2);
 						reply.setPattern(".*?"+StringUtil.transferPattern(name)+".*");
-						reply.setReply("[CQ:record,file=file:///"+audio+"]");
+						reply.setReply("[CQ:record,file="+staticMusic+KEY_PREFFIX+name+".aac]");
 						reply.setApplyType(2);
 						reply.setApplyTarget(qmessage.getGroupId());
 						reply.setNeedAt(2);
