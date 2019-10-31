@@ -94,7 +94,7 @@ public class CmdManageCmd implements CmdAdapter {
 		case "/抽卡":
 			func.append("#抽卡#\n")
 				.append(StringUtil.SPLIT)
-				.append("1. 影之诗抽卡>>发送【影之诗抽卡】\n")
+				.append("1. 影之诗抽卡>>发送【影之诗(十连)抽卡】\n")
 				.append(StringUtil.SPLIT)
 				.append("2. 其他卡包 敬请期待...");
 			break;

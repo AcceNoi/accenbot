@@ -21,7 +21,7 @@ public class RandomUtil {
 	 * @param <T>
 	 * @param objs
 	 * @param count
-	 * @return
+	 * @return 如果随机到重复的，则是同一个对象
 	 */
 	public static <T> List<T> randomObjWeight(List<RandomMeta<T>> objs,int count) {
 		int all  = objs.stream().map(obj->obj.getWeight()).reduce(Integer::sum).get();
