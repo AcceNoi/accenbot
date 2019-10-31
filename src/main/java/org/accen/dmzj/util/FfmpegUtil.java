@@ -1,7 +1,10 @@
 package org.accen.dmzj.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,10 +44,12 @@ public class FfmpegUtil {
 			}
 			exe[2] = cmd;
 			Process p = run.exec(exe);
-			p.getOutputStream().close();
-			p.getInputStream().close();
-			p.getErrorStream().close();
+//			p.getOutputStream().close();
+//			p.getInputStream().close();
+//			p.getErrorStream().close();
+			dealStream(p);
 			p.waitFor();
+			p.destroy();
 			return target;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -62,6 +67,7 @@ public class FfmpegUtil {
 	 * @param time
 	 * @return
 	 */
+	@Deprecated
 	public boolean checkTimeIllegal(String beginTime,String endTime) {
 		int bh = 0;int bm = 0;int bs = 0;
 		int eh = 999;int em = 59;int es = 59;
@@ -91,6 +97,40 @@ public class FfmpegUtil {
 		}
 		return true;
 	}
+	
+	/**
+	 * 要满足XX:XX:XX格式，同时如果两个参数都有值，
+	 * @param time
+	 * @return 如果格式错误，则返回0，正确则返回差值，单位s
+	 */
+	public int checkTimeIllegalEx(String beginTime,String endTime) {
+		int bh = 0;int bm = 0;int bs = 0;
+		int eh = 999;int em = 59;int es = 59;
+		if(beginTime!=null) {
+			Matcher bMatcher =  timePattern.matcher(beginTime);
+			if(!bMatcher.matches()) {
+				return 0;
+			}else {
+				bh = Integer.parseInt(bMatcher.group(1));
+				bm = Integer.parseInt(bMatcher.group(2));
+				bs = Integer.parseInt(bMatcher.group(3));
+			}
+		}
+		if(endTime!=null) {
+			Matcher eMatcher = timePattern.matcher(endTime);
+			if(!eMatcher.matches()) {
+				return 0;
+			}else {
+				eh = Integer.parseInt(eMatcher.group(1));
+				em = Integer.parseInt(eMatcher.group(2));
+				es = Integer.parseInt(eMatcher.group(3));
+			}
+		}
+		
+		return (bh*3600+bm*60+bs)-(eh*3600+em*60+es);
+		
+		
+	}
 	/**
 	 * 判断当前服务器是否安装有ffmpeg
 	 * @return
@@ -104,5 +144,53 @@ public class FfmpegUtil {
 			return false;
 		}
 		return true;
+	}
+	
+	private void dealStream(Process process) {
+	    if (process == null) {
+	        return;
+	    }
+	    // 处理InputStream的线程
+	    new Thread() {
+	        @Override
+	        public void run() {
+	            BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+	            String line = null;
+	            try {
+	                while ((line = in.readLine()) != null) {
+	                    logger.info("output: " + line);
+	                }
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	            } finally {
+	                try {
+	                    in.close();
+	                } catch (IOException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
+	    }.start();
+	    // 处理ErrorStream的线程
+	    new Thread() {
+	        @Override
+	        public void run() {
+	            BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+	            String line = null;
+	            try {
+	                while ((line = err.readLine()) != null) {
+	                    logger.info("err: " + line);
+	                }
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	            } finally {
+	                try {
+	                    err.close();
+	                } catch (IOException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
+	    }.start();
 	}
 }
