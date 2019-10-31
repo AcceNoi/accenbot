@@ -1,5 +1,6 @@
 package org.accen.dmzj.core.handler.cmd;
 
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,7 +31,7 @@ public class WeatherCmd implements CmdAdapter {
 	@Autowired
 	private JiRenGuApiClient jiRenGuApiClient;
 	
-	private static final Pattern pattern = Pattern.compile("^(.+)?(今天|今日|明天|明日)?天气$");
+	private static final Pattern pattern = Pattern.compile("^(.+)?(今天|今日|明天|明日)天气$");
 	
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
@@ -41,39 +42,39 @@ public class WeatherCmd implements CmdAdapter {
 			if(mt.matches()) {
 				String city = mt.group(1);
 				Map<String, Object> rs = jiRenGuApiClient.weather(city);
-				if((Double)rs.get("error")==0) {
+				if((Integer)rs.get("error")==0) {
 					
 					GeneralTask task = new GeneralTask();
 					task.setSelfQnum(selfQnum);
 					task.setType(qmessage.getMessageType());
 					task.setTargetId(qmessage.getGroupId());
 					
-					Map<String, Object> result = ((Map<String, Object>[])rs.get("results"))[0];
-					Map<String, Object>[] weathers  = (Map<String, Object>[]) result.get("weather_data");
-					Map<String, Object>[] indexes = (Map<String, Object>[]) result.get("index");
+					Map<String, Object> result = ((List<Map<String, Object>>)rs.get("results")).get(0);
+					List<Map<String, Object>> weathers  = (List<Map<String, Object>>) result.get("weather_data");
+					List<Map<String, Object>> indexes = (List<Map<String, Object>>) result.get("index");
 					StringBuffer msgBuff = new StringBuffer(result.get("currentCity").toString());
 					if("明日".equals(mt.group(2))||"明天".equals(mt.group(2))) {
 						//明日
 						msgBuff.append("明天")
-								.append(weathers[1].get("date"))
+								.append(weathers.get(1).get("date"))
 								.append("天气")
-								.append(weathers[1].get("weather"))
+								.append(weathers.get(1).get("weather"))
 								.append("温度")
-								.append(weathers[1].get("temperature"))
+								.append(weathers.get(1).get("temperature"))
 								.append("，")
-								.append(weathers[1].get("wind"));
+								.append(weathers.get(1).get("wind"));
 					}else {
 						//今日
 						msgBuff.append("今天")
-								.append(weathers[0].get("date"))
+								.append(weathers.get(0).get("date"))
 								.append("天气")
-								.append(weathers[0].get("weather"))
+								.append(weathers.get(0).get("weather"))
 								.append("温度")
-								.append(weathers[0].get("temperature"))
+								.append(weathers.get(0).get("temperature"))
 								.append("，")
-								.append(weathers[0].get("wind"))
+								.append(weathers.get(0).get("wind"))
 								.append("。")
-								.append(indexes[3].get("desc"));
+								.append(indexes.get(3).get("des"));
 					}
 					task.setMessage(msgBuff.toString());
 					return task;
