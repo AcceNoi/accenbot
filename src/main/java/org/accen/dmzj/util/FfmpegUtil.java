@@ -261,4 +261,37 @@ public class FfmpegUtil {
 		return null;
 		
 	}
+	
+	/**
+	 * qq录音中的silk格式转wav
+	 * @param silk
+	 * @return
+	 */
+	public String silk2Wav(String silk) {
+		String[] exe = new String[3];
+		if(SystemUtil.getOs().startsWith("LINUX")) {
+			String cmd= silkBin+"converter.sh "+silk+" wav";
+			logger.info("silk cmd: "+cmd);
+			exe[0] = "sh";
+			exe[1] = "-c";
+		}else if(SystemUtil.getOs().startsWith("WINDOWS")) {
+//			String cmd = silkBin+"silk_v3_decoder.exe "
+		}
+		Runtime run = Runtime.getRuntime();
+		Process p;
+		try {
+			p = run.exec(exe);
+			p.getOutputStream().close();
+			p.getInputStream().close();
+			p.getErrorStream().close();
+			p.waitFor();
+			return silk.substring(0, silk.lastIndexOf(".silk"))+".wav";
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
 }
