@@ -57,7 +57,7 @@ public class FuzzyMsgSearch implements CmdAdapter {
 			}else if(!qmessage.getGroupId().equals(reply.getApplyTarget())) {
 				task.setMessage("非本群词条喵~");
 			}else {
-				task.setMessage("词条"+reply.getId()+"为[问"+reply.getPattern()+"答"+reply.getReply()+"]喵~");
+				task.setMessage("词条"+reply.getId()+"为[问"+reply.getPattern()+"答"+reply.getReply().replaceAll("\\[CQ:record,file=.*?\\]", "[语音]")+"]喵~");
 			}
 			return task;
 		}else if(cttMatcher.matches()) {
@@ -135,7 +135,7 @@ public class FuzzyMsgSearch implements CmdAdapter {
 						.append(replys.get(index).getPattern().replaceAll("\\.\\*\\?", "").replaceAll("\\.\\*", ""))
 						.append("答")
 						.append(replys.get(index).getNeedAt()==1?"回复":"")
-						.append(replys.get(index).getReply())
+						.append(replys.get(index).getReply().replaceAll("\\[CQ:record,file=.*?\\]", "[语音]"))
 						.append("\n"+StringUtil.SPLIT);
 				
 			}

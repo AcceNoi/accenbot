@@ -84,7 +84,7 @@ public class FuzzyMsgDeleteCmd  implements CmdAdapter{
 			}else {
 				reply.setStatus(2);
 				cfgQuickReplyMapper.update(reply);
-				task.setMessage("删除词条"+reply.getId()+"[问"+reply.getPattern()+"答"+reply.getReply()+"]成功喵！");
+				task.setMessage("删除词条"+reply.getId()+"[问"+reply.getPattern()+"答"+reply.getReply().replaceAll("\\[CQ:record,file=.*?\\]", "[语音]")+"]成功喵！");
 			}
 			return task;
 		}
