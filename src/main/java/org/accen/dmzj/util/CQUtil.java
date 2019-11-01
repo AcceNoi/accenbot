@@ -41,7 +41,7 @@ public class CQUtil {
 	}
 	
 	public static String imageUrl(String url) {
-		return "[CQ:image,file="+url+"]";
+		return "[CQ:image,cache=0,file="+url+"]";
 	}
 	/**
 	 * 网络语音
@@ -49,7 +49,7 @@ public class CQUtil {
 	 * @return
 	 */
 	public static String recordUrl(String url) {
-		return "[CQ:record,file="+url+"]";
+		return "[CQ:record,cache=0,file="+url+"]";
 	}
 	/**
 	 * 截取at之后的字符串
