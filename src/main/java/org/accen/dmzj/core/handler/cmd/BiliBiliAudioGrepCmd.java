@@ -131,8 +131,8 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 						task.setMessage(CQUtil.at(qmessage.getUserId())+" 视频解析完成喵~触发词条为[B站点歌"+name+"]，本次消耗金币："+coinDescrease+"，剩余："+newCoin+"。Tips：每次点歌成功后会回赠1枚金币喵~");
 					}else {
 						CfgQuickReply reply = new CfgQuickReply();
-						reply.setMatchType(2);
-						reply.setPattern(".*?"+StringUtil.transferPattern(name)+".*");
+						reply.setMatchType(1);
+						reply.setPattern(StringUtil.transferPattern(name));
 						reply.setReply("[CQ:record,file="+staticMusic+KEY_PREFFIX+name+".aac]");
 						reply.setApplyType(2);
 						reply.setApplyTarget(qmessage.getGroupId());
