@@ -104,7 +104,8 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 					String[] rs = apiClient.downLoadAdaptive(url, 360);
 					String videoFile = rs[0];
 					//剪切音频
-					String target = tempMusicPath+KEY_PREFFIX+name+".aac";
+					String targetFileName = StringUtil.uuid();
+					String target = tempMusicPath+KEY_PREFFIX+targetFileName+".aac";
 					String audio = ffmpegUtil.convertVideo2Audio(videoFile, target, "aac", ss, tt);
 					if(audio==null) {
 						task.setMessage("视频剪切失败喵~");
@@ -113,7 +114,7 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 					if("音乐".equals(type)) {
 						CfgResource cr = new CfgResource();
 						cr.setCfgKey(KEY_PREFFIX+name);
-						cr.setCfgResource(staticMusic+KEY_PREFFIX+name+".aac");
+						cr.setCfgResource(staticMusic+KEY_PREFFIX+targetFileName+".aac");
 						cr.setResourceType("music");
 						cr.setTitle(name);
 						cr.setContent(rs[2]);
@@ -133,7 +134,7 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 						CfgQuickReply reply = new CfgQuickReply();
 						reply.setMatchType(1);
 						reply.setPattern(StringUtil.transferPattern(name));
-						reply.setReply("[CQ:record,file="+staticMusic+KEY_PREFFIX+name+".aac]");
+						reply.setReply("[CQ:record,file="+staticMusic+KEY_PREFFIX+targetFileName+".aac,cache=0]");
 						reply.setApplyType(2);
 						reply.setApplyTarget(qmessage.getGroupId());
 						reply.setNeedAt(2);
