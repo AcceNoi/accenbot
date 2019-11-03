@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import feign.Headers;
 import feign.RequestLine;
 
-@FeignApi(host="http://localhost:5700")
+@FeignApi(host="http://localhost:5700",maxPeriod = 15000,maxAttempts = 1)
 @Headers({"Content-Type: application/json","Accept: application/json","Authorization: Bearer kSLuTF2GC2Q4q4ugm3"})
 @Component
 public interface CqhttpClient {

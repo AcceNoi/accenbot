@@ -40,24 +40,28 @@ public class FeignApiRegister implements BeanFactoryPostProcessor { // 扫描的
 			}
 			Feign.Builder builder = getFeignBuilder(feignClass.loadClass().getAnnotation(FeignApi.class).encoder()
 					,feignClass.loadClass().getAnnotation(FeignApi.class).decoder()
-					,feignClass.loadClass().getAnnotation(FeignApi.class).client());
+					,feignClass.loadClass().getAnnotation(FeignApi.class).client()
+					,feignClass.loadClass().getAnnotation(FeignApi.class).maxPeriod()
+					,feignClass.loadClass().getAnnotation(FeignApi.class).maxAttempts());
 			beanFactory.registerSingleton(feignClass.getName(), builder.target(feignClass.loadClass(), url));
 		});
 	}
 
 	public Feign.Builder getFeignBuilder(){
-		return getFeignBuilder(GsonEncoder.class,GsonDecoder.class,Client.Default.class);
+		return getFeignBuilder(GsonEncoder.class,GsonDecoder.class,Client.Default.class,5000,3);
 	}
 	public Feign.Builder getFeignBuilder(Class<? extends Encoder> encoderClass
 			,Class<? extends Decoder> decoderClass
-			,Class<? extends Client> clientClass) {
+			,Class<? extends Client> clientClass
+			,long maxPeriod
+			,int maxAttempts) {
 		Feign.Builder builder = null;
 		try {
 			builder = Feign.builder()
 					.encoder(encoderClass.getDeclaredConstructor().newInstance())
 					.client(clientClass.getDeclaredConstructor(SSLSocketFactory.class,HostnameVerifier.class).newInstance(null,null))
 					.decoder(decoderClass.getDeclaredConstructor().newInstance())
-					.options(new Request.Options(1000, 3500)).retryer(new Retryer.Default(5000, 5000, 3));
+					.options(new Request.Options(1000, 3500)).retryer(new Retryer.Default(5000, maxPeriod, maxAttempts));
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
