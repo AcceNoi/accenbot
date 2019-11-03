@@ -139,3 +139,14 @@ create table cmd_node_relation(
 	check_no varchar(200)
 );
 
+create table cmd_my_card(
+	id bigint not null primary key auto_increment,
+	target_type varchar(10) not null,
+	target_id varchar(20) not null,
+	user_id varchar(20) not null,
+	pk_id bigint not null,
+	card_id bigint not null,
+	is_deleted smallint not null default 0,
+	create_time datetime,
+	update_time datetime
+);

@@ -1,7 +1,9 @@
 package org.accen.dmzj.web.dao;
 
+import java.util.Date;
 import java.util.List;
 
+import org.accen.dmzj.web.vo.CmdMyCard;
 import org.accen.dmzj.web.vo.CmdSvCard;
 import org.accen.dmzj.web.vo.CmdSvPk;
 import org.apache.ibatis.annotations.Insert;
@@ -12,6 +14,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface CmdSvCardMapper {
@@ -82,8 +85,42 @@ public interface CmdSvCardMapper {
 	@Select("select * from cmd_sv_card where pk_id = #{pkId} and status = 1 ")
 	public List<CmdSvCard> findCardByPk(@Param("pkId")long pkId);
 	
-	@ResultMap("cmdSvCardMapper")
 	@Insert("insert into cmd_sv_card(pk_id,card_name,card_name_jp,career,card_rarity,probability,create_time,create_user_id,status) "
 			+ "values(#{pkId},#{cardName},#{cardNameJp},#{career},#{cardRarity},#{probability},#{create_time},#{create_user_id},#{status})")
+	@Options(useGeneratedKeys = true,keyProperty = "id")
 	public long insertCard(CmdSvCard card);
+	
+	@Results(id = "cmdMyCardMapper",value = {
+			@Result(property = "id",column = "id"),
+			@Result(property = "targetType",column = "target_type"),
+			@Result(property = "targetId",column = "target_id"),
+			@Result(property = "userId",column = "user_id"),
+			@Result(property = "pkId",column = "pk_id"),
+			@Result(property = "cardId",column = "card_id"),
+			@Result(property = "isDeleted",column = "is_deleted"),
+			@Result(property = "createTime",column = "create_time"),
+			@Result(property = "updateTime",column = "update_time")
+	})
+	@Select("select * from cmd_my_card where id = #{id} ")
+	public CmdMyCard selectMyCardById(@Param("id")long id);
+	@ResultMap("cmdMyCardMapper")
+	@Select("select * from cmd_my_card where pk_id = #{pkId} and target_type = #{targetType} and target_id = #{targetId} and user_id = #{userId} and is_deleted = 0 ")
+	public List<CmdMyCard> findMyCardByPkId(@Param("pkId")long pkId,@Param("targetType")String targetType,@Param("targetId")String targetId,@Param("userId")String userId);
+	
+	@ResultMap("cmdSvCardMapper")
+	@Select("select csc.* from cmd_sv_card csc,cmd_my_card cmc where cmc.card_id = csc.id and  cmc.pk_id = #{pkId} and cmc.target_type = #{targetType} and cmc.target_id = #{targetId} and cmc.user_id = #{userId} and cmc.is_deleted = 0 order by csc.id asc ")
+	public List<CmdSvCard> findCardMyCardByPkId(@Param("pkId")long pkId,@Param("targetType")String targetType,@Param("targetId")String targetId,@Param("userId")String userId);
+	
+	
+	@Insert("insert into cmd_my_card(target_type,target_id,user_id,pk_id,card_id,is_deleted,create_time,update_time) "
+			+ " values(#{targetType},#{targetId},#{userId},#{pkId},#{cardId},#{isDeleted},#{createTime},#{updateTime} )")
+	@Options(useGeneratedKeys = true,keyProperty = "id")
+	public long insertMyCard(CmdMyCard myCard);
+	
+	@ResultMap("cmdMyCardMapper")
+	@Select("select * from cmd_my_card where target_type = #{targetType} and target_id = #{targetId} and user_id = #{userId} and card_id = #{cardId} and is_deleted = '0' ")
+	public CmdMyCard selectMyCardBySelf(@Param("targetType")String targetType,@Param("targetId")String targetId,@Param("userId")String userId,@Param("cardId")long cardId);
+	
+	@Update("update cmd_my_card set update_time = #{updateTime} where id = #{id} ")
+	public int updateMyCardTime(@Param("id")long id,@Param("updateTime")Date updateTime);
 }
