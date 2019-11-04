@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.handler.callbacker.CallbackListener;
 import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.task.GeneralTask;
@@ -15,6 +16,7 @@ import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomMeta;
 import org.accen.dmzj.util.RandomUtil;
+import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CmdSvCardMapper;
 import org.accen.dmzj.web.vo.CmdMyCard;
 import org.accen.dmzj.web.vo.CmdSvCard;
@@ -23,7 +25,10 @@ import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+@FuncSwitch("cmd_touhou_draw")
+@Transactional
 @Component
 public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 
@@ -65,8 +70,11 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 	@Value("${coolq.touhou.coin.descrease:10}")
 	private int decrease = 10;//抽取金币消耗
 	
+	@Value("${coolq.touhou.list.pageSize:5}")
+	private int myListSize;
+	
 	private static final Pattern drawPattern = Pattern.compile("^东方(十连|单抽|翻牌)$");
-	private static final Pattern myPattern = Pattern.compile("^我的图鉴$");
+	private static final Pattern myPattern = Pattern.compile("^我的图鉴(\\d*)$");
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
@@ -123,7 +131,7 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 					}
 					//金币消耗
 					int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -decrease);
-					task.setMessage(CQUtil.at(qmessage.getUserId())+" 抽卡成功喵！\n"+careers[rs.getCardRarity()-1]+" "+rs.getCardName()+"\n本次抽卡消耗金币："+decrease+"，剩余："+newCoin);
+					task.setMessage(CQUtil.at(qmessage.getUserId())+" 抽卡成功喵！\n"+StringUtil.SPLIT_FOOT+careers[rs.getCardRarity()-1]+" "+rs.getCardName()+"\n本次抽卡消耗金币："+decrease+"，剩余："+newCoin);
 					return task;
 				}else {
 					task.setMessage(CQUtil.at(qmessage.getUserId())+" 抽卡失败~但我不会道歉的哦");
@@ -140,7 +148,8 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 				if(rss!=null&&!rss.isEmpty()&&rss.size()==10) {
 					StringBuffer msgBuff = new StringBuffer(CQUtil.at(qmessage.getUserId()));
 					msgBuff.append("")
-							.append("抽卡成功喵！\n");
+							.append("抽卡成功喵！\n")
+							.append(StringUtil.SPLIT_FOOT);
 					for(int index = 0;index<rss.size();index++) {
 						CmdSvCard rs = rss.get(index);
 						
@@ -149,7 +158,8 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 								.append(careers[rs.getCardRarity()-1])
 								.append(" ")
 								.append(rs.getCardName())
-								.append("\n");
+								.append("\n")
+								.append(StringUtil.SPLIT);
 						
 						CmdMyCard mycard = cmdSvCardMapper.selectMyCardBySelf(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getGroupId(), rs.getId());
 						if(mycard!=null) {
@@ -166,7 +176,7 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 					//金币消耗
 					int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -decrease*10);
 					//task.setMessage(CQUtil.at(qmessage.getUserId())+" 抽卡成功！\n"+careers[rs.getCardRarity()-1]+" "+rs.getCardName()+"\n本次抽卡消耗金币："+decrease+"，剩余："+newCoin);
-					msgBuff.append("本次抽卡消耗金币："+decrease+"，剩余："+newCoin);
+					msgBuff.append("\n\n本次抽卡消耗金币："+decrease+"，剩余："+newCoin);
 					return task;
 				}else {
 					task.setMessage(CQUtil.at(qmessage.getUserId())+" 抽卡失败~但我不会道歉的哦");
@@ -191,7 +201,7 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 						for(int index = 0;index<pokerSize;index++) {
 							myPoker.put(pokerKey[index], rss.get(index));
 							msgBuff.append(pokerKey[index])
-									.append("  ");
+									.append("   ");
 						}
 						pokerMap.put(key, myPoker);
 
@@ -213,24 +223,52 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 			task.setSelfQnum(selfQnum);
 			task.setType(qmessage.getMessageType());
 			task.setTargetId(qmessage.getGroupId());
+			
 			//1.检查是否含有此卡包
 			CmdSvPk pk = cmdSvCardMapper.selectPkByName("东方Project", "TH", "東方Project", "Touhou Project");
 			if(pk==null) {
 				task.setMessage("东方Project抽卡暂未初始化，请联系[クロノス/Accen]进行初始化喵~");
 				return task;
 			}
+			
+			String pageNoStr = myMatcher.group(1);
+			int pageNo = StringUtils.isEmpty(pageNoStr)?1:Integer.parseInt(pageNoStr);
+			int offset = (pageNo-1)*myListSize;
+			
 			//查询我的图鉴
-			List<CmdSvCard>  cards = cmdSvCardMapper.findCardMyCardByPkId(pk.getId(), qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+			List<CmdSvCard>  cards = cmdSvCardMapper.findCardMyCardByPkIdLimit(pk.getId(), qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(),offset,myListSize);
+			int allCount = cmdSvCardMapper.countCardMyCardByPkId(pk.getId(), qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+			int maxPage = (allCount-1)/myListSize+1;
+			
 			StringBuffer msgBuff = new StringBuffer(CQUtil.at(qmessage.getUserId()));
-			msgBuff.append(" 东方Project图鉴为：\n");
+			msgBuff.append(" 东方Project图鉴["+pageNo+"]为：\n")
+					.append(StringUtil.SPLIT_FOOT);
 			for(int index=0;index<cards.size();index++) {
 				msgBuff.append(index+1)
 						.append(" ")
 						.append(careers[cards.get(index).getCardRarity()-1])
 						.append(" ")
 						.append(cards.get(index).getCardName())
-						.append("\n");
+						.append("\n")
+						.append(StringUtil.SPLIT);
 			}
+			
+			if(maxPage>5) {
+				//大于5，则中间以省略号展示
+				msgBuff.append("[1] [2]···["+(maxPage-1)+"] ["+maxPage+"]");
+			}else {
+				//小于等于5，就全部展示了
+				for(int i=1;i<=maxPage;i++) {
+					msgBuff.append("["+i+"]");
+					if(i<maxPage) {
+						msgBuff.append(" ");
+					}
+				}
+			}
+			
+			msgBuff.append("\n"+StringUtil.SPLIT_FOOT);
+			msgBuff.append("发送 我的图鉴+[分页]即可查看其他分页喵~");
+			
 			task.setMessage(msgBuff.toString());
 			return task;
 		}
@@ -242,8 +280,9 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 		if(originQmessage!=qmessage&&originQmessage.getGroupId().equals(qmessage.getGroupId())&&originQmessage.getUserId().equals(qmessage.getUserId())) {
 			String choose = CQUtil.subAtAfter(qmessage.getMessage().trim(), selfQnum);
 			if(pokerMap.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId()+"_Touhou")&&choose!=null) {
-				Map<String, CmdSvCard> poker = pokerMap.remove(qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId()+"_Touhou");
+				Map<String, CmdSvCard> poker = pokerMap.get(qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId()+"_Touhou");
 				if(poker.containsKey(choose.trim())) {
+					pokerMap.remove(qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId()+"_Touhou");
 					//正确选择
 					CmdSvCard card = poker.get(choose.trim());
 					CmdMyCard mycard = cmdSvCardMapper.selectMyCardBySelf(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getGroupId(), card.getId());
@@ -261,18 +300,19 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 					int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -decrease);
 					
 					StringBuffer msgBuff = new StringBuffer(CQUtil.at(qmessage.getUserId()));
-					msgBuff.append(" 本次翻到了")
+					msgBuff.append(" 本次翻到了【")
 							.append(choose.trim())
 							.append(" ")
 							.append(careers[card.getCardRarity()-1])
 							.append(" ")
 							.append(card.getCardName())
-							.append("。其他卡片为：\n");
+							.append("】。其他卡片为：\n")
+							.append(StringUtil.SPLIT_FOOT);
 					String others = poker.keySet().stream().filter(pokerKey->!pokerKey.equals(choose.trim())).map(pokerKey->{
 										CmdSvCard curCard = poker.get(pokerKey);
 										return pokerKey+" "+careers[curCard.getCardRarity()-1]+" "+curCard.getCardName();
-									}).collect(Collectors.joining("\n"));
-					msgBuff.append(others).append("\n本次抽卡消耗金币："+decrease+"，剩余："+newCoin);
+									}).collect(Collectors.joining("\n"+StringUtil.SPLIT));
+					msgBuff.append(others).append("\n\n本次抽卡消耗金币："+decrease+"，剩余："+newCoin);
 					taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), msgBuff.toString());
 					return true;
 				}else {

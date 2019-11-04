@@ -65,4 +65,19 @@ public class CQUtil {
 		}
 		return null;
 	}
+	
+	private final static Pattern patternCq = Pattern
+			.compile("\\[CQ\\:image,file=(.*?),url=(.*?)\\]");
+	/**
+	 * 抽取cq码中的图片url
+	 * @param cqImg
+	 * @return
+	 */
+	public static String grepImageUrl(String cqImg) {
+		Matcher matcher = patternCq.matcher(cqImg);
+		if(matcher.matches()) {
+			return matcher.group(2);
+		}
+		return null;
+	}
 }

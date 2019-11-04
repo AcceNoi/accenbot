@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.dao.CfgQuickReplyMapper;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+@FuncSwitch("cmd_msg_delete")
 @Component
 @Transactional
 public class FuzzyMsgDeleteCmd  implements CmdAdapter{

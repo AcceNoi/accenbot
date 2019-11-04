@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.StringUtil;
@@ -15,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
+@FuncSwitch("cmd_msg_search")
 @Component
 @Transactional
 public class FuzzyMsgSearch implements CmdAdapter {
@@ -36,7 +37,7 @@ public class FuzzyMsgSearch implements CmdAdapter {
 	
 	
 	private final static Pattern pattern = Pattern.compile("^查看词条(\\d+)$");
-	private final static Pattern cttPattern = Pattern.compile("^查询(精确){0,1}词条(.+)(\\d*)$");
+	private final static Pattern cttPattern = Pattern.compile("^查询(精确){0,1}词条(.+)$");
 	private final static Pattern myPattern = Pattern.compile("^我的词条(\\d*)$");
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
@@ -62,10 +63,10 @@ public class FuzzyMsgSearch implements CmdAdapter {
 			return task;
 		}else if(cttMatcher.matches()) {
 			
-			String pageNoStr = cttMatcher.group(3);
+			/*String pageNoStr = cttMatcher.group(4);
 			int pageNo = StringUtils.isEmpty(pageNoStr)?1:Integer.parseInt(pageNoStr);
 			int offset = (pageNo-1)*listSize;
-			
+			*/
 			String pt = null;
 			if(StringUtils.isEmpty(cttMatcher.group(1))) {
 				//模糊
@@ -74,7 +75,8 @@ public class FuzzyMsgSearch implements CmdAdapter {
 				//精确
 				pt = cttMatcher.group(2);
 			}
-			List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByTargetAndPattern( qmessage.getGroupId(), pt,offset,listSize);
+//			List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByTargetAndPattern( qmessage.getGroupId(), pt,offset,listSize);
+			List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByTargetAndPattern( qmessage.getGroupId(), pt);
 			if(replys!=null&&!replys.isEmpty()) {
 				StringBuffer msgBuf = new StringBuffer("本群");
 				msgBuf.append(StringUtils.isEmpty(cttMatcher.group(1))?"":"精确")
@@ -84,10 +86,10 @@ public class FuzzyMsgSearch implements CmdAdapter {
 				
 				listShow(replys, msgBuf);
 				
-				int maxPage = (cfgQuickReplyMapper.queryCountByTargetAndPattern(qmessage.getGroupId(), pt)-1)/listSize+1;
-				pageShow(maxPage, msgBuf);
-				msgBuf.append("\n"+StringUtil.SPLIT_FOOT);
-				msgBuf.append("\nTips:发送 查询(精确)词条+[分页]即可查看其他分页的词条喵~");
+//				int maxPage = (cfgQuickReplyMapper.queryCountByTargetAndPattern(qmessage.getGroupId(), pt)-1)/listSize+1;
+//				pageShow(maxPage, msgBuf);
+//				msgBuf.append("\n"+StringUtil.SPLIT_FOOT);
+//				msgBuf.append("\nTips:发送 查询(精确)词条+[词条问题]+翻页[分页]即可查看其他分页的词条喵~");
 				task.setMessage(msgBuf.toString());
 				
 				return task;
@@ -102,12 +104,12 @@ public class FuzzyMsgSearch implements CmdAdapter {
 			
 			List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByCreator(qmessage.getGroupId(), qmessage.getUserId(), offset, listSize);
 			if(replys!=null&&!replys.isEmpty()) {
-				StringBuffer msgBuf = new StringBuffer(CQUtil.at(qmessage.getUserId())+" 您在本群的词条为：\n");
+				StringBuffer msgBuf = new StringBuffer(CQUtil.at(qmessage.getUserId())+" 您在本群的词条["+pageNo+"]为：\n");
 				listShow(replys, msgBuf);
 				int maxPage = (cfgQuickReplyMapper.queryCountByCreator(qmessage.getGroupId(), qmessage.getUserId())-1)/listSize+1;
 				pageShow(maxPage, msgBuf);
 				msgBuf.append("\n"+StringUtil.SPLIT_FOOT);
-				msgBuf.append("Tips:发送 我的词条+[分页]即可查看其他分页的词条喵~");
+				msgBuf.append("Tips:发送 我的词条+[ 分页]即可查看其他分页的词条喵~");
 				task.setMessage(msgBuf.toString());
 				
 				return task;

@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomMeta;
@@ -19,8 +20,10 @@ import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
+@FuncSwitch("cmd_sv_draw")
+@Transactional
 @Component
 public class SvDrawCardCmd implements CmdAdapter {
 	@Autowired
@@ -65,7 +68,7 @@ public class SvDrawCardCmd implements CmdAdapter {
 			if(curCoin<0) {
 				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还未绑定哦，暂时无法抽卡，发送[绑定]即可绑定个人信息喵~");
 			}else if(curCoin-decrease*type<0) {
-				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您库存金币不够了哦，暂无法抽卡添加词条喵~");
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您库存金币不够了哦，暂无法抽卡喵~");
 			}else {
 				String pkName = matcher.group(2);
 				CmdSvPk pk = null;

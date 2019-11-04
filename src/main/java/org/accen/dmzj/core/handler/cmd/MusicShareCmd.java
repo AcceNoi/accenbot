@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.api.MusicApiClient;
 import org.accen.dmzj.core.task.api.vo.Music163Result;
@@ -17,8 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.ReactiveListCommands.LSetCommand;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+@FuncSwitch("cmd_music_share")
+@Transactional
 @Component
 public class MusicShareCmd implements CmdAdapter {
 

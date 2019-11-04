@@ -4,15 +4,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.timer.ReportTimeSchedule;
 import org.accen.dmzj.util.ApplicationContextUtil;
+import org.accen.dmzj.util.FuncSwitchUtil;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+@FuncSwitch("cmd_manage")
 @Lazy
 @Component
 public class CmdManageCmd implements CmdAdapter {
@@ -27,6 +30,9 @@ public class CmdManageCmd implements CmdAdapter {
 		return "展示所有的功能";
 	}
 
+	@Autowired
+	private FuncSwitchUtil funcSwitchUtil;
+	
 	@Override
 	public String example() {
 		return "";
@@ -133,8 +139,9 @@ public class CmdManageCmd implements CmdAdapter {
 				.append("3. 设置词条触发几率>>发送【设置几率\\d%】\n")
 				.append("\n")
 				.append("当前群状态:\n")
-				.append("报时：     "+(clock==null?"未开启":clock)+"\n")
+				.append("报时：           "+(clock==null?"未开启":clock)+"\n")
 				.append("词条触发率：  "+tpsc.triggerPro(qmessage.getGroupId())+"%\n")
+				.append("风纪模式:       "+funcSwitchUtil.judgeModeCn(qmessage.getMessageType(), qmessage.getGroupId())+"\n")
 				.append(StringUtil.SPLIT_FOOT)
 				.append("Copyright クロノス/Accen\n")
 				.append(StringUtil.SPLIT_FOOT);

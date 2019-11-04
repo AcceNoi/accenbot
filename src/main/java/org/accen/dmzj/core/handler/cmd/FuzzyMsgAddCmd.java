@@ -4,9 +4,11 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.FilePersistentUtil;
+import org.accen.dmzj.util.FuncSwitchUtil;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CfgQuickReplyMapper;
 import org.accen.dmzj.web.vo.CfgQuickReply;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+@FuncSwitch("cmd_msg_add")
 @Component
 @Transactional
 public class FuzzyMsgAddCmd implements CmdAdapter {
@@ -25,6 +28,9 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 
 	@Autowired
 	private FilePersistentUtil filePersistentUtil;
+	
+	@Autowired
+	private FuncSwitchUtil funcSwitchUtil;
 	
 	@Autowired
 	private CheckinCmd checkinCmd;
@@ -76,7 +82,17 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 				}else if(curCoin-decrease<0) {
 					task.setMessage(CQUtil.at(qmessage.getUserId())+" 您库存金币不够了哦，暂无法添加词条喵~");
 				}else {
-					
+					//accen@2019.11.4添加风纪委员模式
+					String askImgUrl = CQUtil.grepImageUrl(ask);
+					if(askImgUrl!=null&&!funcSwitchUtil.isImgReviewPass(askImgUrl, qmessage.getMessageType(), qmessage.getGroupId())) {
+						task.setMessage(CQUtil.at(qmessage.getUserId())+" 您发送的图片无法通过审核喵~请发送正常的图片喵~");
+						return task;
+					}
+					String replyImgUrl = CQUtil.grepImageUrl(reply);
+					if(replyImgUrl!=null&&!funcSwitchUtil.isImgReviewPass(replyImgUrl, qmessage.getMessageType(), qmessage.getGroupId())) {
+						task.setMessage(CQUtil.at(qmessage.getUserId())+" 您发送的图片无法通过审核喵~请发送正常的图片喵~");
+						return task;
+					}
 					//accen@2019.10.28新增持久化网络图片
 //					ask = filePersistentUtil.persistent(ask);
 					reply = filePersistentUtil.persistent(reply);

@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.EventParser;
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.annotation.HandlerChain;
 import org.accen.dmzj.core.handler.callbacker.CallbackListener;
 import org.accen.dmzj.core.handler.callbacker.CallbackManager;
@@ -21,6 +22,7 @@ import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.ApplicationContextUtil;
 import org.accen.dmzj.util.CQUtil;
+import org.accen.dmzj.util.FuncSwitchUtil;
 import org.accen.dmzj.web.dao.CfgQuickReplyMapper;
 import org.accen.dmzj.web.dao.QmessageMapper;
 import org.accen.dmzj.web.vo.CfgQuickReply;
@@ -38,6 +40,8 @@ public class GroupMessageEventhandler implements EventHandler{
 	private TaskManager taskManager;
 	@Autowired
 	private CallbackManager callbackManager;
+	@Autowired
+	private FuncSwitchUtil funcSwitchUtil;
 	
 	@Autowired
 	private TriggerProSwitchCmd tpsc;
@@ -155,7 +159,11 @@ public class GroupMessageEventhandler implements EventHandler{
 			//3.功能型（对系统功能进行操作，或对确定的消息匹配并产生复杂的回复的任务）
 			Map<String, CmdAdapter> cmds = ApplicationContextUtil.getBeans(CmdAdapter.class); 
 			for(String cmdName:cmds.keySet()) {
-				tasks.add(cmds.get(cmdName).cmdAdapt(qmessage, event.get("selfQnum").toString()));
+				CmdAdapter cmd = cmds.get(cmdName);
+				if(funcSwitchUtil.isCmdPass(cmd.getClass(), qmessage.getMessageType(), qmessage.getGroupId())) {
+					tasks.add(cmd.cmdAdapt(qmessage, event.get("selfQnum").toString()));
+				}
+				
 			}
 			//4.监听型（匹配所有消息，但满足特定条件后产生复杂的回复的任务）
 			//4.5 回调监听型

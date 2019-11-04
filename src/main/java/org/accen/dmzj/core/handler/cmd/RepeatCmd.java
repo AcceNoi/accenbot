@@ -3,10 +3,11 @@ package org.accen.dmzj.core.handler.cmd;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.stereotype.Component;
-
+@FuncSwitch("cmd_repeat")
 @Component
 public class RepeatCmd implements CmdAdapter {
 

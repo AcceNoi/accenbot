@@ -5,13 +5,14 @@ import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+@FuncSwitch("cmd_timer")
 @Component
 public class TimerCmd implements CmdAdapter {
 

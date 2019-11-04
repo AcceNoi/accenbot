@@ -36,7 +36,12 @@ public interface CfgQuickReplyMapper {
 	
 	@ResultMap("cfgQuickReplyResultMapper")
 	@Select("select * from cfg_quick_reply where status = 1 and (apply_target=#{applyTarget} or apply_target = '0') and pattern = #{pattern}  order by id asc limit #{offset},#{pageSize} ")
-	public List<CfgQuickReply> queryByTargetAndPattern(@Param("applyTarget") String applyTarget,@Param("pattern")String pattern,@Param("offset") int offset,@Param("pageSize") int pageSize);
+	public List<CfgQuickReply> queryByTargetAndPatternLimit(@Param("applyTarget") String applyTarget,@Param("pattern")String pattern,@Param("offset") int offset,@Param("pageSize") int pageSize);
+	
+	@ResultMap("cfgQuickReplyResultMapper")
+	@Select("select * from cfg_quick_reply where status = 1 and (apply_target=#{applyTarget} or apply_target = '0') and pattern = #{pattern}  order by id asc ")
+	public List<CfgQuickReply> queryByTargetAndPattern(@Param("applyTarget") String applyTarget,@Param("pattern")String pattern);
+	
 	
 	@Select("select count(1) from cfg_quick_reply where status = 1 and (apply_target=#{applyTarget} or apply_target = '0') and pattern = #{pattern} ")
 	public int queryCountByTargetAndPattern(@Param("applyTarget") String applyTarget,@Param("pattern")String pattern);

@@ -3,6 +3,7 @@ package org.accen.dmzj.core.handler.cmd;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.handler.callbacker.CallbackListener;
 import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.handler.listen.GroupRepeatListener;
@@ -18,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
+@FuncSwitch("cmd_img_search")
 @Component
 @Transactional
 public class ImageSearchCmd implements CmdAdapter,CallbackListener {

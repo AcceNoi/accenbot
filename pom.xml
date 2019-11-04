@@ -88,6 +88,19 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+		
+		<!-- baidu ai -->
+		<dependency>
+    		<groupId>com.baidu.aip</groupId>
+    		<artifactId>java-sdk</artifactId>
+    		<version>4.12.0</version>
+		</dependency>
+		<dependency>
+    		<groupId>net.coobird</groupId>
+    		<artifactId>thumbnailator</artifactId>
+    		<version>0.4.8</version>
+		</dependency>
+		
 	</dependencies>
 	
 	<build>

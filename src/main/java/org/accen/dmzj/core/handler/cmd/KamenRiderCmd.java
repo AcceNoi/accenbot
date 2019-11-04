@@ -3,6 +3,7 @@ package org.accen.dmzj.core.handler.cmd;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.CQUtil;
@@ -11,7 +12,9 @@ import org.accen.dmzj.web.vo.CfgResource;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import org.springframework.transaction.annotation.Transactional;
+@FuncSwitch("cmd_henshin")
+@Transactional
 @Component
 public class KamenRiderCmd implements CmdAdapter{
 

@@ -150,3 +150,13 @@ create table cmd_my_card(
 	create_time datetime,
 	update_time datetime
 );
+
+create table cfg_config_value(
+	id bigint not null primary key auto_increment,
+	target_type varchar(10) not null,
+	target varchar(20) not null,
+	config_key varchar(50) not null,
+	config_value varchar(2000) not null,
+	update_user_id varchar(20) ,
+	update_time datetime
+);

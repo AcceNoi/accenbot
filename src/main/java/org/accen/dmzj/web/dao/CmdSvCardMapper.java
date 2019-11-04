@@ -111,6 +111,13 @@ public interface CmdSvCardMapper {
 	@Select("select csc.* from cmd_sv_card csc,cmd_my_card cmc where cmc.card_id = csc.id and  cmc.pk_id = #{pkId} and cmc.target_type = #{targetType} and cmc.target_id = #{targetId} and cmc.user_id = #{userId} and cmc.is_deleted = 0 order by csc.id asc ")
 	public List<CmdSvCard> findCardMyCardByPkId(@Param("pkId")long pkId,@Param("targetType")String targetType,@Param("targetId")String targetId,@Param("userId")String userId);
 	
+	@ResultMap("cmdSvCardMapper")
+	@Select("select csc.* from cmd_sv_card csc,cmd_my_card cmc where cmc.card_id = csc.id and  cmc.pk_id = #{pkId} and cmc.target_type = #{targetType} and cmc.target_id = #{targetId} and cmc.user_id = #{userId} and cmc.is_deleted = 0 order by csc.id asc limit #{offset},#{pageSize}")
+	public List<CmdSvCard> findCardMyCardByPkIdLimit(@Param("pkId")long pkId,@Param("targetType")String targetType,@Param("targetId")String targetId,@Param("userId")String userId,@Param("offset")int offset,@Param("pageSize")int pageSize);
+	
+	@Select("select count(1) from cmd_sv_card csc,cmd_my_card cmc where cmc.card_id = csc.id and  cmc.pk_id = #{pkId} and cmc.target_type = #{targetType} and cmc.target_id = #{targetId} and cmc.user_id = #{userId} and cmc.is_deleted = 0 ")
+	public int countCardMyCardByPkId(@Param("pkId")long pkId,@Param("targetType")String targetType,@Param("targetId")String targetId,@Param("userId")String userId);
+	
 	
 	@Insert("insert into cmd_my_card(target_type,target_id,user_id,pk_id,card_id,is_deleted,create_time,update_time) "
 			+ " values(#{targetType},#{targetId},#{userId},#{pkId},#{cardId},#{isDeleted},#{createTime},#{updateTime} )")

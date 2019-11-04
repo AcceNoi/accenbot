@@ -3,6 +3,7 @@ package org.accen.dmzj.core.handler.cmd;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.api.baidu.BaikeApicClientPk;
 import org.accen.dmzj.core.task.api.vo.BaikeResult;
@@ -11,6 +12,7 @@ import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+@FuncSwitch("cmd_baike")
 @Component
 public class BaiduBaikeCmd implements CmdAdapter{
 

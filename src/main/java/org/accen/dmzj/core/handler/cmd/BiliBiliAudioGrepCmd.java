@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.exception.BiliBiliCookieNeverInit;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
@@ -21,8 +22,11 @@ import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+@FuncSwitch("cmd_audio_grep")
+@Transactional
 @Component
 public class BiliBiliAudioGrepCmd implements CmdAdapter {
 
@@ -79,8 +83,10 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 			int curCoin = checkinCmd.getCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 			if(curCoin<0) {
 				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还未绑定哦，暂时无法添加歌曲，发送[绑定]即可绑定个人信息喵~");
+				return task;
 			}else if(curCoin-coinDescrease<0) {
 				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您库存金币不够了哦，暂无法添加词条喵~");
+				return task;
 			}else {
 				String url = matcher.group(1);
 				String ss = matcher.group(2);

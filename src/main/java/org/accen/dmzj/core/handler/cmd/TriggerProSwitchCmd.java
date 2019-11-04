@@ -5,11 +5,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.stereotype.Component;
-
+@FuncSwitch("cmd_trigger")
 @Component
 public class TriggerProSwitchCmd implements CmdAdapter {
 
