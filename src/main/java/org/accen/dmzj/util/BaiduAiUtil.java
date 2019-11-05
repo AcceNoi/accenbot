@@ -2,6 +2,7 @@ package org.accen.dmzj.util;
 
 
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,8 +79,14 @@ public class BaiduAiUtil {
 		
 	}
 	
-	
-	public JSONObject contentCensor(String url) {
+	/**
+	 * 组合图像审核
+	 * @see https://ai.baidu.com/docs#/ImageCensoring-API/top
+	 * @param url
+	 * @param demensions 审核维度包含： politician（政治敏感）、antiporn（色情识别）、terror（暴恐识别）、disgust（恶心图像）、watermark（广告）
+	 * @return
+	 */
+	public JSONObject contentCensor(String url,String... demensions) {
 		if(!inited) {
 			init();
 		}
@@ -89,6 +96,8 @@ public class BaiduAiUtil {
 		AipContentCensor client = new AipContentCensor(appId, apiKey, secretKey);
 //		HashMap<String, String> options = new HashMap<String, String>();
 //		options.put("", value)
-		return client.imageCensorUserDefined(url, EImgType.URL, null);
+		JSONObject rs = client.imageCensorComb(url, EImgType.URL,Arrays.asList(demensions), null);
+		logger.info(rs.toString(2));
+		return rs;
 	}
 }

@@ -4,8 +4,10 @@ import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.handler.cmd.CmdAdapter;
 import org.accen.dmzj.web.dao.CfgConfigValueMapper;
 import org.accen.dmzj.web.vo.CfgConfigValue;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,10 @@ public class FuncSwitchUtil {
 	private CfgConfigValueMapper configMapper;
 	@Autowired
 	private BaiduAiUtil baiduAiUtil;
+	@Value("${coolq.judge.maxpornpro:0.3}")
+	private double maxPornPro;//最高能容忍的（不含）
+	@Value("${coolq.judge.minnormalpro:0.85}")
+	private double minNormalPro;//最低能接受的（含），以上两者加起来必须大于1，否则就没意义
 	/**
 	 * 功能是否被允许的配置key前缀
 	 */
@@ -59,17 +65,44 @@ public class FuncSwitchUtil {
 			return false;
 		}else if("strong".equals(mode)||"normal".equals(mode)) {
 			//这两者会调用百度ai的图像审核api
-			JSONObject json = baiduAiUtil.contentCensor(url);
-			if(json==null||json.get("error_code")!=null) {
+			JSONObject json = baiduAiUtil.contentCensor(url,"antiporn");
+			JSONObject antiporn = json.getJSONObject("result").getJSONObject("antiporn");
+			if(antiporn==null||antiporn.has("error_code")) {
 				return true;
 			}else {
-				int conclusionType = json.getInt("conclusionType");
-				if(conclusionType==1||conclusionType==4) {
+				String conclusion = antiporn.getString("conclusion");
+				String confidenceCoefficient = antiporn.getString("confidence_coefficient");//确定度
+				/*if("正常".equals(conclusion)) {
 					return true;//合规
-				}else if(conclusionType==3&&"normal".equals(mode)) {
+				}else if("性感".equals(conclusion)&&"normal".equals(mode)) {
+					return true;//疑是，但模式是正常/宽松策略
+				}else if("色情".equals(conclusion)&&"确定".equals(confidenceCoefficient)&&"normal".equals(mode)) {
 					return true;//疑是，但模式是正常/宽松策略
 				}else {
 					return false;
+				}*/
+				if("确定".equals(confidenceCoefficient)) {
+					//确定
+					if("正常".equals(conclusion)) {
+						return true;//合规
+					}else if(("性感".equals(conclusion)&&"normal".equals(mode))){
+						return true;//合规
+					}else {
+						return false;
+					}
+				}else {
+					//不确定，则先拿到结果集
+					JSONArray result = antiporn.getJSONArray("result");
+					double pornPro = result.getJSONObject(1).getDouble("probability");
+					double normalPro = result.getJSONObject(2).getDouble("probability");
+					if(pornPro<maxPornPro&&"normal".equals(mode)) {
+						return true;
+					}else if(normalPro>=minNormalPro&&"strong".equals(mode)) {
+						return true;
+					}else {
+						return false;
+					}
+					
 				}
 			}
 		}else {
