@@ -160,3 +160,12 @@ create table cfg_config_value(
 	update_user_id varchar(20) ,
 	update_time datetime
 );
+
+create table cmd_tips(
+	id bigint not null primary key auto_increment,
+	module_code varchar(20),
+	module_name varchar(50),
+	cmd_func varchar(20),
+	content varchar(500),
+	status smallint not null default 1
+);
