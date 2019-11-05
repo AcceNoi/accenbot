@@ -24,6 +24,8 @@ public class CmdManageCmd implements CmdAdapter {
 	private ReportTimeSchedule rtc;
 	@Autowired
 	private TriggerProSwitchCmd tpsc;
+	@Autowired
+	private RepeatModeSwitchCmd rmsc;
 	
 	@Override
 	public String describe() {
@@ -136,12 +138,15 @@ public class CmdManageCmd implements CmdAdapter {
 				.append(StringUtil.SPLIT)
 				.append("2. 关闭报时>>发送【关闭报时】\n")
 				.append(StringUtil.SPLIT)
-				.append("3. 设置词条触发几率>>发送【设置几率\\d%】\n")
+				.append("3. 设置词条触发几率>>发送【设置几率d%】\n")
+				.append(StringUtil.SPLIT)
+				.append("4. 复读模式>>发送【(开启|关闭)复读模式】\n")
 				.append("\n")
 				.append("当前群状态:\n")
 				.append("报时：           "+(clock==null?"未开启":clock)+"\n")
 				.append("词条触发率：  "+tpsc.triggerPro(qmessage.getGroupId())+"%\n")
 				.append("风纪模式:       "+funcSwitchUtil.judgeModeCn(qmessage.getMessageType(), qmessage.getGroupId())+"\n")
+				.append("复读模式:       "+(rmsc.modeOpen(qmessage.getGroupId())?"开启\n":"关闭\n"))
 				.append(StringUtil.SPLIT_FOOT)
 				.append("Copyright クロノス/Accen\n")
 				.append(StringUtil.SPLIT_FOOT);

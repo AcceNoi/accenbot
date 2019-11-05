@@ -18,6 +18,7 @@ import org.accen.dmzj.core.handler.callbacker.CallbackListener;
 import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.handler.cmd.CmdAdapter;
 import org.accen.dmzj.core.handler.cmd.TriggerProSwitchCmd;
+import org.accen.dmzj.core.handler.listen.ListenAdpter;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.ApplicationContextUtil;
@@ -166,6 +167,15 @@ public class GroupMessageEventhandler implements EventHandler{
 				
 			}
 			//4.监听型（匹配所有消息，但满足特定条件后产生复杂的回复的任务）
+			Map<String,ListenAdpter> listens = ApplicationContextUtil.getBeans(ListenAdpter.class);
+			for(String listenName:listens.keySet()) {
+				ListenAdpter listen = listens.get(listenName);
+				List<GeneralTask> rs = listen.listen(qmessage, event.get("selfQnum").toString());
+				if(rs!=null) {
+					tasks.addAll(rs);
+				}
+				
+			}
 			//4.5 回调监听型
 			
 //			CallbackManager cm = ApplicationContextUtil.getBean(CallbackManager.class);
