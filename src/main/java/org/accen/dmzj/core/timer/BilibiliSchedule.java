@@ -14,6 +14,8 @@ import org.accen.dmzj.core.task.api.vo.BilibliVideoInfo;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.dao.CmdBuSubMapper;
 import org.accen.dmzj.web.vo.CmdBuSub;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,6 +32,8 @@ public class BilibiliSchedule {
 	
 	@Value("${coolq.bot}")
 	private String botId;
+	
+	private static final Logger logger = LoggerFactory.getLogger(BilibiliSchedule.class);
 	/**
 	 * 每15分钟执行一次，也就是说最糟糕情况下，会有153*订阅up总数分钟的延迟。但是由于api是<a href="http://docs.kaaass.net/showdoc/web/#/2?page_id=3">Kaass</a>提供的，还是不要调用过于频繁
 	 */
@@ -59,6 +63,7 @@ public class BilibiliSchedule {
 			//========开始调用
 			subMap.forEach((key,value)->{
 				List<BilibliVideoInfo>  infos = bilibiliSearchApiClientPk.searchUpVideo(Long.parseLong(key));
+				logger.info(infos.toString());
 				if(infos!=null&&!infos.isEmpty()) {
 					infos.forEach(info->{
 						if(curTimestamp-info.getPostTime()<=15*60*1000) {
