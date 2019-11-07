@@ -21,7 +21,7 @@ public class RepeatModeListener implements ListenAdpter {
 	private Map<RepeatMsg,Integer> repeatCounter = new HashMap<RepeatMsg, Integer>();
 	
 	//触发复读时的次数，也就是说，如果连续发送triggerTime次同样的信息，就会触发复读
-	@Value("${coolq.repeatmode.time:3}")
+	@Value("${coolq.repeatmode.time:2}")
 	private int triggerTime;
 	@Autowired
 	private RepeatModeSwitchCmd repeatModeSwitchCmd;
@@ -74,7 +74,10 @@ class RepeatMsg{
 	private String targetId;
 	
 	public RepeatMsg(Qmessage qmessage) {
-		new RepeatMsg(qmessage.getMessage(),qmessage.getMessageType(),qmessage.getGroupId());
+		super();
+		this.message = qmessage.getMessage();
+		this.targetType = qmessage.getMessageType();
+		this.targetId = qmessage.getGroupId();
 	}
 	public RepeatMsg(String message, String targetType, String targetId) {
 		super();
