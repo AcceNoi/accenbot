@@ -63,8 +63,9 @@ public class BilibiliSchedule {
 			//========开始调用
 			subMap.forEach((key,value)->{
 				List<BilibliVideoInfo>  infos = bilibiliSearchApiClientPk.searchUpVideo(Long.parseLong(key));
-				logger.info(infos.toString());
+				
 				if(infos!=null&&!infos.isEmpty()) {
+					logger.info(infos.toString());
 					infos.forEach(info->{
 						if(curTimestamp-info.getPostTime()<=15*60*1000) {
 							//15分钟以内，则认为是最新投稿的视频
