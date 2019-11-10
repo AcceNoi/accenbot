@@ -61,6 +61,9 @@ public class ReportTimeSchedule {
 		case "响":
 			key = KEY_PREFFIX+"Hibiki_"+hour;
 			break;
+		case "吹雪":
+			key = KEY_PREFFIX+"Fubuki_"+hour;
+			break;
 		default:
 			break;
 		}

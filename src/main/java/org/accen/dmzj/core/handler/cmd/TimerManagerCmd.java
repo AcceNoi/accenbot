@@ -87,6 +87,17 @@ public class TimerManagerCmd implements CmdAdapter {
 					taskOpn2.setMessage(CQUtil.recordUrl("https://img.moegirl.org/common/5/55/%D0%92%D0%B5%D1%80%D0%BD%D1%8B%D0%B91.mp3"));
 					TaskManager.addGeneralTask(taskOpn2);
 					return task;
+				case "吹雪":
+					timeSchedule.openClock(qmessage.getGroupId(), "吹雪");
+					task.setMessage((isHaveOpened?"切换":"开启")+"报时成功喵！[吹雪]将为您报时~");
+					
+					GeneralTask taskOpn3 = new GeneralTask();
+					taskOpn3.setSelfQnum(selfQnum);
+					taskOpn3.setType(qmessage.getMessageType());
+					taskOpn3.setTargetId(qmessage.getGroupId());
+					taskOpn3.setMessage(CQUtil.recordUrl("https://img.moegirl.org/common/d/d6/Fubuki1.mp3"));
+					TaskManager.addGeneralTask(taskOpn3);
+					return task;
 				default:
 					task.setMessage("找不到此闹钟，这一定不是我的错喵~");
 					return task;
