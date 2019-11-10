@@ -5,13 +5,14 @@ import java.util.Map;
 
 import org.accen.dmzj.core.annotation.HandlerChain;
 import org.accen.dmzj.core.task.GeneralTask;
+import org.accen.dmzj.core.task.TaskManager;
+import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.dao.CfgConfigValueMapper;
 import org.accen.dmzj.web.vo.CfgConfigValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-@Transactional
 @HandlerChain(postType = "notice")
 public class NoticeEventHandler implements EventHandler{
 
@@ -26,6 +27,8 @@ public class NoticeEventHandler implements EventHandler{
 	
 	@Autowired
 	private CfgConfigValueMapper configMapper;
+	@Autowired
+	private TaskManager taskManager;
 	@Override
 	public void handle(Map<String, Object> event) {
 		String noticeType = event.get("notice_type").toString();
@@ -33,10 +36,14 @@ public class NoticeEventHandler implements EventHandler{
 			//新人加群
 			CfgConfigValue config = configMapper.selectByTargetAndKey("group", new BigDecimal((Double)event.get("group_id")).stripTrailingZeros().toPlainString(), REPLY_GROUP_INCREASE);
 			if(config!=null&&!StringUtils.isEmpty(config.getConfigValue())) {
+				String userId = new BigDecimal((Double)event.get("user_id")).stripTrailingZeros().toPlainString();
+				
 				GeneralTask task = new GeneralTask();
 				task.setSelfQnum(event.get("selfQnum").toString());
-				task.setTargetId(qmessage.getGroupId());
+				task.setTargetId(new BigDecimal((Double)event.get("group_id")).stripTrailingZeros().toPlainString());
 				task.setType("group");
+				task.setMessage(CQUtil.at(userId)+" "+config.getConfigValue());
+				taskManager.addGeneralTask(task);
 			}
 		}
 	}
