@@ -5,13 +5,17 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
+import org.accen.dmzj.core.handler.NoticeEventHandler;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.timer.ReportTimeSchedule;
 import org.accen.dmzj.util.ApplicationContextUtil;
 import org.accen.dmzj.util.FuncSwitchUtil;
 import org.accen.dmzj.util.StringUtil;
+import org.accen.dmzj.web.dao.CfgConfigValueMapper;
+import org.accen.dmzj.web.vo.CfgConfigValue;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +38,12 @@ public class CmdManageCmd implements CmdAdapter {
 
 	@Autowired
 	private FuncSwitchUtil funcSwitchUtil;
+	
+	@Autowired
+	private CfgConfigValueMapper configMapper;
+	
+	@Value("${coolq.welcom.maxlength:15}")
+	private int welcomLength;
 	
 	@Override
 	public String example() {
@@ -132,21 +142,25 @@ public class CmdManageCmd implements CmdAdapter {
 			break;
 		case "/系统":
 			String clock = rtc.getClock(qmessage.getGroupId());
+			CfgConfigValue increaseNotice = configMapper.selectByTargetAndKey(qmessage.getMessageType(), qmessage.getGroupId(), NoticeEventHandler.REPLY_GROUP_INCREASE);
 			func.append("#系统#\n")
 				.append(StringUtil.SPLIT)
-				.append("1. 开启报时>>发送【开启(哓|响)报时】\n")
+				.append("1. 开启报时>>发送【开启(晓|响|吹雪)报时】\n")
 				.append(StringUtil.SPLIT)
 				.append("2. 关闭报时>>发送【关闭报时】\n")
 				.append(StringUtil.SPLIT)
 				.append("3. 设置词条触发几率>>发送【设置几率d%】\n")
 				.append(StringUtil.SPLIT)
 				.append("4. 复读模式>>发送【(开启|关闭)复读模式】\n")
+				.append(StringUtil.SPLIT)
+				.append("5. 新人加群欢迎>>发送【设置欢迎词+[欢迎词]】（不要超过"+welcomLength+"个汉字哦）\n")
 				.append("\n")
 				.append("当前群状态:\n")
 				.append("报时：           "+(clock==null?"未开启":clock)+"\n")
 				.append("词条触发率：  "+tpsc.triggerPro(qmessage.getGroupId())+"%\n")
 				.append("风纪模式:       "+funcSwitchUtil.judgeModeCn(qmessage.getMessageType(), qmessage.getGroupId())+"\n")
 				.append("复读模式:       "+(rmsc.modeOpen(qmessage.getGroupId())?"开启\n":"关闭\n"))
+				.append("加群欢迎： "+(increaseNotice==null?"未设置":increaseNotice.getConfigValue()))
 				.append(StringUtil.SPLIT_FOOT)
 				.append("Copyright クロノス/Accen\n")
 				.append(StringUtil.SPLIT_FOOT);

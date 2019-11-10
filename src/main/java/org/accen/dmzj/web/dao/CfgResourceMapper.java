@@ -47,4 +47,12 @@ public interface CfgResourceMapper {
 	@Select("select count(1) from cfg_resource where cfg_key like 'audio_bilibiliG_%' escape 'G' ")
 	public int countBMusic();
 	
+	@ResultMap("cfgResourceMapper")
+	@Select("select * from cfg_resource where cfg_key = #{cfgKey} and resource_type = 'image' ")
+	public List<CfgResource> findCollectByKey(@Param("cfgKey")String cfgKey);
+	
+	@ResultMap("cfgResourceMapper")
+	@Select("select * from cfg_resource where cfg_key = #{cfgKey} and resource_type = 'image' order by rand() limit 1")
+	public CfgResource selectRandomCollectByKey(@Param("cfgKey")String cfgKey);
+	
 }

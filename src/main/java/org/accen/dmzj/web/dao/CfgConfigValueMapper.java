@@ -1,12 +1,15 @@
 package org.accen.dmzj.web.dao;
 
 import org.accen.dmzj.web.vo.CfgConfigValue;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface CfgConfigValueMapper {
@@ -28,5 +31,12 @@ public interface CfgConfigValueMapper {
 			,@Param("target")String target
 			,@Param("configKey")String configKey);
 	
+	@Insert("insert into cfg_config_value(target_type,target,config_key,config_value,update_user_id,update_time) "
+			+ " values(#{targetType},#{target},#{configKey},#{configValue},#{updateUserId},#{updateTime})")
+	@Options(useGeneratedKeys = true,keyProperty = "id")
+	public long insert(CfgConfigValue config);
 	
+	@Update("update cfg_config_value set config_value = #{configValue},update_user_id = #{updateUserId},update_time=#{updateTime} "
+			+ " where target_type = #{targetType} and target = #{target}  and config_key = #{configKey}  ")
+	public int updateValue(CfgConfigValue config);
 }
