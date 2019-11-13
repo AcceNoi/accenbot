@@ -138,10 +138,18 @@ public class SvDrawCardCmd implements CmdAdapter {
 								break;
 							}*/
 							if(rs.get(i).getCardRarity()==4||rs.get(i).getCardRarity()==5) {
-								CmdMyCard mycard = new CmdMyCard();
-								mycard.setPkId(rs.get(i).getPkId());mycard.setCardId(rs.get(i).getId());mycard.setTargetType(qmessage.getMessageType());mycard.setTargetId(qmessage.getGroupId());
-								mycard.setUserId(qmessage.getUserId());mycard.setCreateTime(new Date());mycard.setIsDeleted((short) 0);
-								cmdSvCardMapper.insertMyCard(mycard);
+								CmdMyCard mycard = cmdSvCardMapper.selectMyCardBySelf(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), rs.get(i).getId());
+								if(mycard!=null) {
+									//已有这张卡，更新
+									cmdSvCardMapper.updateMyCardTime(mycard.getId(), new Date());
+								}else {
+									//没有，则插入
+									mycard = new CmdMyCard();
+									mycard.setPkId(rs.get(i).getPkId());mycard.setCardId(rs.get(i).getId());mycard.setTargetType(qmessage.getMessageType());mycard.setTargetId(qmessage.getGroupId());
+									mycard.setUserId(qmessage.getUserId());mycard.setCreateTime(new Date());mycard.setIsDeleted((short) 0);
+									cmdSvCardMapper.insertMyCard(mycard);
+								}
+								
 							}
 							cdrrts[rs.get(i).getCardRarity()-1]++;
 							

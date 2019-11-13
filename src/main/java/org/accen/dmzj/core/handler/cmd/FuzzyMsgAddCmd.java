@@ -99,7 +99,7 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 					
 					CfgQuickReply cfgReply = new CfgQuickReply();
 					cfgReply.setMatchType(isPrecise?1:2);
-					cfgReply.setPattern(isPrecise?ask:".*?"+StringUtil.transferPattern(ask)+".*");
+					cfgReply.setPattern(ask);
 					cfgReply.setReply(reply);
 					
 					switch (task.getType()) {

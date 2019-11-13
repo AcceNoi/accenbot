@@ -285,7 +285,7 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 					pokerMap.remove(qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId()+"_Touhou");
 					//正确选择
 					CmdSvCard card = poker.get(choose.trim());
-					CmdMyCard mycard = cmdSvCardMapper.selectMyCardBySelf(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getGroupId(), card.getId());
+					CmdMyCard mycard = cmdSvCardMapper.selectMyCardBySelf(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), card.getId());
 					if(mycard!=null) {
 						//已有这张卡，更新
 						cmdSvCardMapper.updateMyCardTime(mycard.getId(), new Date());
