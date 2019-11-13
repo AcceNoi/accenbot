@@ -74,7 +74,7 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 	private int myListSize;
 	
 	private static final Pattern drawPattern = Pattern.compile("^东方(十连|单抽|翻牌)$");
-	private static final Pattern myPattern = Pattern.compile("^我的图鉴(\\d*)$");
+	private static final Pattern myPattern = Pattern.compile("^我的(东方){0,1}图鉴(\\d*)$");
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
@@ -231,7 +231,7 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 				return task;
 			}
 			
-			String pageNoStr = myMatcher.group(1);
+			String pageNoStr = myMatcher.group(2);
 			int pageNo = StringUtils.isEmpty(pageNoStr)?1:Integer.parseInt(pageNoStr);
 			int offset = (pageNo-1)*myListSize;
 			
