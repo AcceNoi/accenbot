@@ -130,4 +130,19 @@ public interface CmdSvCardMapper {
 	
 	@Update("update cmd_my_card set update_time = #{updateTime} where id = #{id} ")
 	public int updateMyCardTime(@Param("id")long id,@Param("updateTime")Date updateTime);
+	
+	/**
+	 * 获取按pk_seq降序的卡包，order为offset
+	 * @param order 记住这个order从0开始排序
+	 * @return
+	 */
+	@ResultMap("cmdSvPkMapper")
+	@Select("select * from cmd_sv_pk where pk_seq>0 order by pk_seq desc limit #{order},1")
+	public CmdSvPk selectSvPkOrder(@Param("order")int order);
+	/**
+	 * 获取影之诗卡包的数量
+	 * @return
+	 */
+	@Select("select count(*) from cmd_sv_pk where pk_seq>0 ")
+	public int countSvPk();
 }
