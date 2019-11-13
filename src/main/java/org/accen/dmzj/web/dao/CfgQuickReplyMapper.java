@@ -60,4 +60,16 @@ public interface CfgQuickReplyMapper {
 	
 	@Update("update cfg_quick_reply set match_type = #{matchType},pattern = #{pattern},apply_type = #{applyType},apply_target=#{applyTarget},need_at=#{needAt},reply=#{reply},create_user_id = #{createUserId},create_time=#{createTime},status=#{status} where id=#{id}")
 	public void update(CfgQuickReply cfgQuickReply);
+	
+	@ResultMap("cfgQuickReplyResultMapper")
+	@Select("<script>select * from cfg_quick_reply "
+			+ " where status = 1 and apply_type=#{applyType} and (apply_target=#{applyTarget} or apply_target = '0') "
+			+ "  and match_type = #{matchType} "
+			+ " <choose>"
+			+ "    <when test='matchType==1'> and pattern = #{pattern}</when>"
+			+ "    <when test='matchType==2'> and instr(#{pattern},pattern)>0</when>"
+			+ "    <otherwise> and 1=1 </otherwise>"
+			+ " </choose>"
+			+ " order by rand() limit 1 </script>")
+	public CfgQuickReply queryByApplyRandom(@Param("applyType") int applyType,@Param("applyTarget") String applyTarget,@Param("matchType") int matchType,@Param("pattern") String pattern);
 }

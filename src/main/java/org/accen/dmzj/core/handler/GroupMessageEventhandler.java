@@ -117,7 +117,7 @@ public class GroupMessageEventhandler implements EventHandler{
 			if(tgt<pro) {
 				
 			
-				List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByApply(2, qmessage.getGroupId());
+				/*List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByApply(2, qmessage.getGroupId());
 				if(replys!=null&&!replys.isEmpty()) {
 					List<CfgQuickReply> pReplys = replys.stream().filter(reply->1==reply.getMatchType()).collect(Collectors.toList());
 					List<GeneralTask> pTasks = pReplys.stream()
@@ -155,7 +155,34 @@ public class GroupMessageEventhandler implements EventHandler{
 					}
 					
 					
+				}*/
+				
+				//accen@20191113重新实现快速回复功能
+				CfgQuickReply aReply = cfgQuickReplyMapper.queryByApplyRandom(2, qmessage.getGroupId(), 1, qmessage.getMessage().trim());
+				if(aReply!=null) {
+					//匹配到精确词条
+					GeneralTask task = new GeneralTask();
+					task.setSelfQnum(event.get("selfQnum").toString());
+					task.setTargetId(qmessage.getGroupId());
+					task.setType("group");
+					task.setMessage((1==aReply.getNeedAt()?CQUtil.at(qmessage.getUserId().toString()):"")
+						+aReply.getReply());
+					tasks.add(task);
+				}else {
+					//没有精确词条，则取找模糊词条
+					CfgQuickReply fReply = cfgQuickReplyMapper.queryByApplyRandom(2, qmessage.getGroupId(), 2, qmessage.getMessage().trim());
+					if(fReply!=null) {
+						//模糊匹配到了
+						GeneralTask task = new GeneralTask();
+						task.setSelfQnum(event.get("selfQnum").toString());
+						task.setTargetId(qmessage.getGroupId());
+						task.setType("group");
+						task.setMessage((1==fReply.getNeedAt()?CQUtil.at(qmessage.getUserId().toString()):"")
+							+fReply.getReply());
+						tasks.add(task);
+					}
 				}
+				
 			}
 			//3.功能型（对系统功能进行操作，或对确定的消息匹配并产生复杂的回复的任务）
 			Map<String, CmdAdapter> cmds = ApplicationContextUtil.getBeans(CmdAdapter.class); 
