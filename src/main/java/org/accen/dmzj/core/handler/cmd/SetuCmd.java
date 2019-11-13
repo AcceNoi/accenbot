@@ -14,10 +14,12 @@ import org.accen.dmzj.core.task.api.LoliconApiClientPk;
 import org.accen.dmzj.core.timer.CacheMap;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.FuncSwitchUtil;
+import org.accen.dmzj.util.RandomUtil;
 import org.accen.dmzj.web.dao.CfgResourceMapper;
 import org.accen.dmzj.web.vo.CfgResource;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 @FuncSwitch("cmd_setu")
@@ -46,6 +48,11 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	@Autowired
 	private TaskManager taskManager;
 	
+	@Value("${coolq.setu.coin.decrease:-3}")
+	private int decrease ;
+	@Autowired
+	private CheckinCmd checkinCmd;
+	
 	private static final Pattern pattern = Pattern.compile("^随机(色图|瑟图|涩图)$");
 	private static final Pattern collectPattern = Pattern.compile("^随机收藏$");
 	
@@ -65,25 +72,43 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 //					return null;
 //				}else {
 //					locked = true;
+		//金币检验
+		
 					String message = qmessage.getMessage().trim();
 					Matcher matcher = pattern.matcher(message);
 					if(matcher.matches()) {
-						String imageUrl = loliconApiClientPk.setu();
-						if(imageUrl!=null&&funcSwitchUtil.isImgReviewPass(imageUrl, qmessage.getMessageType(), qmessage.getGroupId())) {
-							GeneralTask task =  new GeneralTask();
-							
-							task.setSelfQnum(selfQnum);
-							task.setType(qmessage.getMessageType());
-							task.setTargetId(qmessage.getGroupId());
-							task.setMessage(CQUtil.imageUrl(imageUrl));
-							
-							//添加到收藏监听
-							waitingCollect.put(qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId(), imageUrl,15000);
-							callbackManager.addCallbackListener(this, qmessage);
-							
-//							locked = false;
+						GeneralTask task =  new GeneralTask();
+						
+						task.setSelfQnum(selfQnum);
+						task.setType(qmessage.getMessageType());
+						task.setTargetId(qmessage.getGroupId());
+						
+						int curCoin = checkinCmd.getCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+						if(curCoin<0) {
+							task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还未绑定哦，暂时无法查看涩图，发送[绑定]即可绑定个人信息喵~");
 							return task;
+						}else if(curCoin-Math.abs(decrease)<0) {
+							task.setMessage(CQUtil.at(qmessage.getUserId())+" 金币不够啦，没钱就别看涩图喵~");
+							return task;
+						}else {
+							String imageUrl = loliconApiClientPk.setu();
+							if(imageUrl!=null&&funcSwitchUtil.isImgReviewPass(imageUrl, qmessage.getMessageType(), qmessage.getGroupId())) {
+								int factDecrease = Math.abs(decrease);
+								if(decrease<0) {
+									factDecrease = RandomUtil.randomInt(factDecrease+1);
+								}
+								int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -factDecrease);
+								task.setMessage(CQUtil.imageUrl(imageUrl)+"\n"+CQUtil.at(qmessage.getUserId())+"无尽的欲望消耗了您"+factDecrease+"枚金币~");
+								//添加到收藏监听
+								waitingCollect.put(qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId(), imageUrl,15000);
+								callbackManager.addCallbackListener(this, qmessage);
+								
+//								locked = false;
+								return task;
+							}
 						}
+						
+						
 						
 						
 						
