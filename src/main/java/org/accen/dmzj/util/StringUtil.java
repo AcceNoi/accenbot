@@ -87,4 +87,25 @@ public class StringUtil {
 	
 	public static final String SPLIT = "--------------------\n";
 	public static final String SPLIT_FOOT = "====================\n";
+	
+	/**
+	 * 渲染消息的分页展示
+	 * @param maxPage
+	 * @param msgBuff
+	 */
+	public static void drawPageFoot(int maxPage,StringBuffer msgBuff) {
+		if(maxPage>5) {
+			//大于5，则中间以省略号展示
+			msgBuff.append("[1] [2]···["+(maxPage-1)+"] ["+maxPage+"]");
+		}else {
+			//小于等于5，就全部展示了
+			for(int i=1;i<=maxPage;i++) {
+				msgBuff.append("["+i+"]");
+				if(i<maxPage) {
+					msgBuff.append(" ");
+				}
+			}
+		}
+		
+	}
 }
