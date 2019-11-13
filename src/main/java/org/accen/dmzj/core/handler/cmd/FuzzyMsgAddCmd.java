@@ -35,7 +35,7 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 	@Autowired
 	private CheckinCmd checkinCmd;
 	@Value("${coolq.fuzzymsg.coin.decrease:3}")
-	private int decrease = 3;//
+	private int decrease ;//
 	
 	@Override
 	public String describe() {
