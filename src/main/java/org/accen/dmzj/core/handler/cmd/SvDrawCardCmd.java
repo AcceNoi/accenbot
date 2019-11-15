@@ -41,7 +41,7 @@ public class SvDrawCardCmd implements CmdAdapter {
 
 	@Override
 	public String example() {
-		return "影之诗抽卡森林咆哮";
+		return "影之诗抽卡森罗咆哮";
 	}
 	@Value("${coolq.sv.drawcount:8}")
 	private int drawCount = 8;//单次抽取张数
@@ -244,7 +244,7 @@ public class SvDrawCardCmd implements CmdAdapter {
 				if(myCards!=null&&!myCards.isEmpty()) {
 					//有抽到卡
 					msgBuf.append(" 您在【"+curPk.getPkName()+"】["+pageNo+"]抽到了：\n");
-					int index = 1;
+					int index = 0;
 					for(CmdSvCard card:myCards) {
 						String desc =card.getCareer()
 								+" "
