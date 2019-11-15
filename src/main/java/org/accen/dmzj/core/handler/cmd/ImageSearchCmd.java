@@ -12,6 +12,7 @@ import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.core.task.api.SaucenaoApiClientPk;
 import org.accen.dmzj.core.task.api.vo.ImageResult;
 import org.accen.dmzj.util.CQUtil;
+import org.accen.dmzj.util.RandomUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,9 @@ public class ImageSearchCmd implements CmdAdapter,CallbackListener {
 	
 	private final static Logger logger = LoggerFactory.getLogger(GroupRepeatListener.class);
 	@Value("${coolq.imagesearch.fav.increase:1}")
-	private int increase = 1;
+	private int increase ;
+	@Value("${coolq.imagesearch.coin.increase:-3}")
+	private int coinIncr ;
 	
 	@Autowired
 	private TaskManager taskManager;
@@ -99,6 +102,12 @@ public class ImageSearchCmd implements CmdAdapter,CallbackListener {
 						//增加好感度
 						int curFav = checkinCmd.modifyFav(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), increase);
 						
+						int trueCoinIncr = Math.abs(coinIncr);
+						if(coinIncr<0) {
+							trueCoinIncr = RandomUtil.randomInt(trueCoinIncr+1);
+						}
+						int curCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), trueCoinIncr);
+						
 						task.setMessage(CQUtil.at(qmessage.getUserId())
 								+"检索到图片喵！"
 								+CQUtil.imageUrl(imageResult.getUrl())
@@ -108,7 +117,7 @@ public class ImageSearchCmd implements CmdAdapter,CallbackListener {
 								+imageResult.getTitle()
 								+"。来源："
 								+imageResult.getContent()
-								+(curFav<0?"（绑定可以增加好感度哦喵~）":("增加"+increase+"点好感喵~，当前好感度:"+curFav)));
+								+(curFav<0?"（绑定可以增加好感度哦喵~）":("增加"+increase+"点好感和"+trueCoinIncr+"枚金币喵~，当前好感度:"+curFav)));
 					}
 					return task;
 				}else {
