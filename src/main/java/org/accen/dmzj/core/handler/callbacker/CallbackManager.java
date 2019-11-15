@@ -1,7 +1,5 @@
 package org.accen.dmzj.core.handler.callbacker;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;

@@ -1,6 +1,7 @@
 package org.accen.dmzj.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -79,5 +80,19 @@ public class RandomUtil {
 		}
 		return null;
 		
+	}
+	/**
+	 * 随机生成简体汉字小写数字（可排除）
+	 * @param length
+	 * @param excludes
+	 * @return
+	 */
+	public static String randZhNumExclude(int length,Collection<String> excludes) {
+		String rd = randZhNum(length);
+		if(excludes!=null&&excludes.contains(rd)) {
+			return randZhNumExclude(length, excludes);
+		}else {
+			return rd;
+		}
 	}
 }

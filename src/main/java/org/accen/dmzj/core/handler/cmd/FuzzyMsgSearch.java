@@ -68,13 +68,14 @@ public class FuzzyMsgSearch implements CmdAdapter {
 			int offset = (pageNo-1)*listSize;
 			*/
 			String pt = null;
-			if(StringUtils.isEmpty(cttMatcher.group(1))) {
+			/*if(StringUtils.isEmpty(cttMatcher.group(1))) {
 				//模糊
 				pt = ".*?"+cttMatcher.group(2)+".*";
 			}else {
 				//精确
 				pt = cttMatcher.group(2);
-			}
+			}*/
+			pt = cttMatcher.group(2);
 //			List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByTargetAndPattern( qmessage.getGroupId(), pt,offset,listSize);
 			List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByTargetAndPattern( qmessage.getGroupId(), pt);
 			if(replys!=null&&!replys.isEmpty()) {
