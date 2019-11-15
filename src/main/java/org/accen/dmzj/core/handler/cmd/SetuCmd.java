@@ -1,7 +1,9 @@
 package org.accen.dmzj.core.handler.cmd;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,8 +58,8 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	private static final Pattern pattern = Pattern.compile("^随机(色图|瑟图|涩图)$");
 	private static final Pattern collectPattern = Pattern.compile("^随机收藏$");
 	
-	
-	private CacheMap<String, String> waitingCollect = new CacheMap<String, String>();
+	//待收藏的map  type_group-> randomZh -> imageUrl
+	private Map<String, Map<String,String>> waitingCollect = new HashMap<String, Map<String,String>>();
 	
 //	private Boolean locked = false;//未知原因使得此功能被滥用则回系统崩溃，可能是coolq pro接收数据的超时设置问题，这里为了防止滥用，同一时间段只接收一个请求。
 	
@@ -97,10 +99,20 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 								if(decrease<0) {
 									factDecrease = RandomUtil.randomInt(factDecrease+1);
 								}
+								//消耗金币
 								int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -factDecrease);
-								task.setMessage(CQUtil.imageUrl(imageUrl)+"\n"+CQUtil.at(qmessage.getUserId())+"无尽的欲望消耗了您"+factDecrease+"枚金币~");
+								
 								//添加到收藏监听
-								waitingCollect.put(qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId(), imageUrl,15000);
+								if(!waitingCollect.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId())) {
+									waitingCollect.put(qmessage.getMessageType()+"_"+qmessage.getGroupId(), new HashMap<String, String>());
+								}
+								//当前群所等待收藏的图片
+								Map<String,String> curGroupWaitingCollectImags = waitingCollect.get(qmessage.getMessageType()+"_"+qmessage.getGroupId());
+								//随机一个不在等待map中的随机数字
+								String rdZh = RandomUtil.randZhNumExclude(2, curGroupWaitingCollectImags.keySet());
+								curGroupWaitingCollectImags.put(rdZh, imageUrl);
+								//把收藏的提示放上去
+								task.setMessage(CQUtil.imageUrl(imageUrl)+"\n"+CQUtil.at(qmessage.getUserId())+"无尽的欲望消耗了您"+factDecrease+"枚金币~收藏此涩图请发送[收藏"+rdZh+"]喵~");
 								callbackManager.addCallbackListener(this, qmessage);
 								
 //								locked = false;
@@ -138,18 +150,23 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 		
 	}
 
-	private static final String COLLECT_PTRN = "收藏";
+	private static final Pattern COLLECT_PTRN = Pattern.compile("^收藏(.+)");
 	@Override
 	public boolean listen(Qmessage originQmessage, Qmessage qmessage, String selfQnum) {
-		if(originQmessage!=qmessage&&originQmessage.getGroupId().equals(qmessage.getGroupId())&&originQmessage.getUserId().equals(qmessage.getUserId())) {
-			if(COLLECT_PTRN.equals(qmessage.getMessage().trim())&&waitingCollect.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId())) {
-				String imgResource = waitingCollect.get(qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId());
-				CfgResource rsc = new CfgResource();
-				rsc.setCfgKey("collect"+"_"+qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId());
-				rsc.setCfgResource(imgResource);
-				rsc.setResourceType("image");
-				cfgResourceMapper.insert(rsc);
-				taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), CQUtil.at(qmessage.getUserId())+" 收藏成功喵，发送[随机收藏]就有机会随机到这张图喵！");
+		if(originQmessage!=qmessage&&originQmessage.getGroupId().equals(qmessage.getGroupId())) {
+			Matcher clctMatcher = COLLECT_PTRN.matcher(qmessage.getMessage().trim());
+			if(clctMatcher.matches()&&waitingCollect.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId())) {
+				String rdZh = clctMatcher.group(1).trim();
+				if(waitingCollect.get(qmessage.getMessageType()+"_"+qmessage.getGroupId()).containsKey(rdZh)) {
+					String imgResource = waitingCollect.get(qmessage.getMessageType()+"_"+qmessage.getGroupId()).get(rdZh);
+					CfgResource rsc = new CfgResource();
+					rsc.setCfgKey("collect"+"_"+qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId());
+					rsc.setCfgResource(imgResource);
+					rsc.setResourceType("image");
+					cfgResourceMapper.insert(rsc);
+					taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), CQUtil.at(qmessage.getUserId())+" 收藏成功喵，发送[随机收藏]就有机会随机到这张图喵！");
+				}
+				
 			}
 			return true;
 		}
