@@ -149,5 +149,78 @@ INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarit
 INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '*绯红抗争者·莫诺*', '吸血鬼', '5', '0.001', '1');
 
 
+--------------------------------------------
+----ROG
+INSERT INTO `dmzjbot`.`cmd_sv_pk` (`pk_name`, `pk_alias`, `pk_seq`, `create_user_id`) VALUES ('荣耀再临', 'ROG', '14', '1339633536');
+---=异画
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '*冥守之巅·爱夏*', '死灵', '5', '0.0005', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '*黑暗剑士·梅丽莎*', '吸血鬼', '5', '0.0005', '1');
 
+--虹
+----妖
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '爱之奇迹', '妖精', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '慈爱之翅·媞丝塔', '妖精', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '始祖的 巨狼·奥姆尼斯', '妖精', '4', '0.001', '1');
+----皇
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '不朽的王城', '皇室', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '雷维翁英雄·阿尔贝尔', '皇室', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '海贼女王·亚尔丽妲', '皇室', '4', '0.001', '1');
 
+----法
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '究极炼成术', '巫师', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '老练的大魔法师·伊斯拉莫斯', '巫师', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '厄咒言灵·洋荷', '巫师', '4', '0.001', '1');
+----龙
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '羁绊龙剑士·艾拉', '龙族', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '巨威龙人', '龙族', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '天厄的创世龙', '龙族', '4', '0.001', '1');
+----死
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '冥守之巅·爱夏', '死灵', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '狩魂者·菈菈', '死灵', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '冥界之神·黑帝斯', '死灵', '4', '0.001', '1');
+----鬼
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '恶逆公爵·尤里乌斯', '吸血鬼', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '绚烂的妖艳吸血鬼', '吸血鬼', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '覆天之深渊来访者', '吸血鬼', '4', '0.001', '1');
+----教
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '天命翼骑', '主教', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '清纯祈祷者·耶拉', '主教', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '咏赞的魔神像·壹米纳', '主教', '4', '0.001', '1');
+----仇
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '回响之心·枷薇', '复仇者', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '神伟的巨人', '复仇者', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '连接之心·奥契丝', '复仇者', '4', '0.001', '1');
+----中立
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '暗之翼·奥莉薇', '中立', '4', '0.001', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '至高之神·宙斯', '中立', '4', '0.001', '1');
+
+--------------------
+--金
+----妖
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '豪风破魔虫', '妖精', '3', '0.0033', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '活泼的精灵·小梅', '妖精', '3', '0.0033', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '机械树守卫', '妖精', '3', '0.0033', '1');
+---皇
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '机械刃斥候', '皇室', '3', '0.0033', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('3', '荣耀的铁卫战将', '皇室', '3', '0.0033', '1');
+----法
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '混沌巫术师', '巫师', '3', '0.0033', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '元素萨满·莱莉', '巫师', '3', '0.0033', '1');
+----龙
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '不死鸟之啸', '龙族', '3', '0.0033', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '雾冰三角龙', '龙族', '3', '0.0033', '1');
+----死
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '不容侵犯之死灵·黑里欧', '死灵', '3', '0.0033', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '不灭巨象', '死灵', '3', '0.0033', '1');
+----鬼
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '蒙面斗士·莎兰婕亚', '吸血鬼', '3', '0.0033', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '夜袭的吸血鬼', '吸血鬼', '3', '0.0033', '1');
+----教
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '审判之圣枪执行者', '主教', '3', '0.0033', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '复仇的白刃·阿尼耶丝', '主教', '3', '0.0033', '1');
+----仇
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '创造物的呼唤', '复仇者', '3', '0.0033', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '加农炮寄居蟹', '复仇者', '3', '0.0033', '1');
+----中立
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '荒野领路人', '中立', '3', '0.0033', '1');
+INSERT INTO `dmzjbot`.`cmd_sv_card` (`pk_id`, `card_name`, `career`, `card_rarity`, `probability`, `status`) VALUES ('1', '霸食帝的厨技', '中立', '3', '0.0033', '1');
