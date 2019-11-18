@@ -20,7 +20,7 @@ public class CacheMap<K,V> implements Map<K, V>{
 				register4TimerClearSet.forEach(cacheMap->{
 					cacheMap.forEach((k,v)->{
 						long[] times = cacheMap.getTime(k);
-						if(times!=null&&times[0]+times[1]>=curTime) {
+						if(times!=null&&times[0]+times[1]<=curTime) {
 							cacheMap.remove(k);
 						}
 					});
