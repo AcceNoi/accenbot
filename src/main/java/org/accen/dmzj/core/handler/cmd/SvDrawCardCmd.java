@@ -203,7 +203,7 @@ public class SvDrawCardCmd implements CmdAdapter {
 						if(type==1&&RandomUtil.randomInt(2)==1) {
 							msgBuf.append("\n")
 								.append(StringUtil.SPLIT_FOOT)
-								.append("Tips：现已支持十连抽卡了喵~发送[影之诗十连抽卡]看看喵~");
+								.append("Tips：现已支持其他卡包了喵~发送[影之诗抽卡扭曲次元]或[/抽卡]看看喵~");
 						}else {
 							msgBuf.append("\n")
 							.append(StringUtil.SPLIT_FOOT)
