@@ -176,7 +176,7 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 					//金币消耗
 					int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -decrease*10);
 					//task.setMessage(CQUtil.at(qmessage.getUserId())+" 抽卡成功！\n"+careers[rs.getCardRarity()-1]+" "+rs.getCardName()+"\n本次抽卡消耗金币："+decrease+"，剩余："+newCoin);
-					msgBuff.append("\n\n本次抽卡消耗金币："+decrease+"，剩余："+newCoin);
+					msgBuff.append("\n\n本次抽卡消耗金币："+decrease*10+"，剩余："+newCoin);
 					task.setMessage(msgBuff.toString());
 					return task;
 				}else {
