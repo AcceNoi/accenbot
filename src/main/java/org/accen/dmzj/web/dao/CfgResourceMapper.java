@@ -33,6 +33,7 @@ public interface CfgResourceMapper {
 	@Select("select * from cfg_resource where cfg_key = #{key} limit 1")
 	public CfgResource selectByKey(@Param("key")String key);
 	
+	
 	@ResultMap("cfgResourceMapper")
 	@Select("select * from cfg_resource where cfg_key like 'audio_bilibiliG_%' escape 'G' and  title like concat('%',concat(#{key},'%')) ")
 	public List<CfgResource> findByKey(@Param("preffix")String preffix ,@Param("key")String key);
@@ -54,5 +55,13 @@ public interface CfgResourceMapper {
 	@ResultMap("cfgResourceMapper")
 	@Select("select * from cfg_resource where cfg_key = #{cfgKey} and resource_type = 'image' order by rand() limit 1")
 	public CfgResource selectRandomCollectByKey(@Param("cfgKey")String cfgKey);
+	/**
+	 * 查找相同记录的数量
+	 * @param cfgKey
+	 * @param cfgResource
+	 * @return
+	 */
+	@Select("select count(*) from cfg_resource where cfg_key = #{cfgKey} and cfg_resource = #{cfgResource}")
+	public int countByKeyAndResource(@Param("cfgKey")String cfgKey,@Param("cfgResource")String cfgResource);
 	
 }

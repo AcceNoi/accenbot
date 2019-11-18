@@ -29,7 +29,10 @@ public class CacheMap<K,V> implements Map<K, V>{
 			
 		},"static cache map clear ").start();
 	}
-	
+	public CacheMap(){
+		//注册一个到这里
+		register4TimerClearSet.add(this);
+	}
 	private ConcurrentHashMap<K, V> map = new ConcurrentHashMap<K, V>();
 	/**
 	 * long[0]put time,long[1] timeout
