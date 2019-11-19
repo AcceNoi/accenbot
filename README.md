@@ -1,7 +1,7 @@
 **基于[酷Q机器人](https://cqp.cc/) ![酷Q](https://sr.cqp.me/template/dightnew/ex/logo-common.png "酷Q")和[CoolQ HTTP API 插件](https://github.com/richardchien/coolq-http-api/)实现的QQ群聊天机器人。**
 ---
 
-[![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot)[![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)
+[![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)
 
 ## 主页（建设中） - [bot.accen.wiki](http://bot.accen.wiki)
 
