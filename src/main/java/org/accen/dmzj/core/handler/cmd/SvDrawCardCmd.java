@@ -274,5 +274,27 @@ public class SvDrawCardCmd implements CmdAdapter {
 		
 		return null;
 	}
+	/**
+	 * 获取格式化的图鉴收集程度 卡包名： 集卡数/卡总数
+	 * @param targetType
+	 * @param targetId
+	 * @param userId
+	 * @return
+	 */
+	public String formatMyCardCompletion(String targetType,String targetId,String userId) {
+		List<CmdSvPk> pks = cmdSvCardMapper.findSvPk();
+		if(pks!=null&&!pks.isEmpty()) {
+			StringBuffer fmtBuf = new StringBuffer();
+			pks.forEach(pk->{
+				fmtBuf.append(pk.getPkName())
+						.append(": ");
+				int mine = cmdSvCardMapper.countCardMyCardByPkId(pk.getId(), targetType, targetId, userId);
+				int all = cmdSvCardMapper.countCardByPkAndCareerAndRarity(pk.getId(), null, "4")+cmdSvCardMapper.countCardByPkAndCareerAndRarity(pk.getId(), null, "5");
+				fmtBuf.append(mine).append("/").append(all).append("\n");
+			});
+			return fmtBuf.toString();
+		}
+		return null;
+	}
 
 }

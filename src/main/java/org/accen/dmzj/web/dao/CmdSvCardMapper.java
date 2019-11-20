@@ -85,6 +85,16 @@ public interface CmdSvCardMapper {
 	@Select("select * from cmd_sv_card where pk_id = #{pkId} and status = 1 ")
 	public List<CmdSvCard> findCardByPk(@Param("pkId")long pkId);
 	
+	@Select("<script>select count(1) from cmd_sv_card where pk_id = #{pkId} and status = 1 "
+			+ " <if test='career != null'>"
+			+ " and career = #{career} "
+			+ " </if>"
+			+ " <if test='rarity != null'>"
+			+ " and card_rarity = #{rarity} "
+			+ " </if>"
+			+ " </script>")
+	public int countCardByPkAndCareerAndRarity(@Param("pkId")long pkId,@Param("career")String career,@Param("rarity")String rarity);
+	
 	@Insert("insert into cmd_sv_card(pk_id,card_name,card_name_jp,career,card_rarity,probability,create_time,create_user_id,status) "
 			+ "values(#{pkId},#{cardName},#{cardNameJp},#{career},#{cardRarity},#{probability},#{create_time},#{create_user_id},#{status})")
 	@Options(useGeneratedKeys = true,keyProperty = "id")
@@ -110,6 +120,11 @@ public interface CmdSvCardMapper {
 	@ResultMap("cmdSvCardMapper")
 	@Select("select csc.* from cmd_sv_card csc,cmd_my_card cmc where cmc.card_id = csc.id and  cmc.pk_id = #{pkId} and cmc.target_type = #{targetType} and cmc.target_id = #{targetId} and cmc.user_id = #{userId} and cmc.is_deleted = 0 order by csc.id asc ")
 	public List<CmdSvCard> findCardMyCardByPkId(@Param("pkId")long pkId,@Param("targetType")String targetType,@Param("targetId")String targetId,@Param("userId")String userId);
+	
+	@ResultMap("cmdSvCardMapper")
+	@Select("select distinct csc.* from cmd_sv_card csc,cmd_my_card cmc where cmc.card_id = csc.id  and cmc.target_type = #{targetType} and cmc.target_id = #{targetId} and cmc.user_id = #{userId} and cmc.is_deleted = 0 order by csc.id asc ")
+	public List<CmdSvCard> findAllCardMyCard(@Param("targetType")String targetType,@Param("targetId")String targetId,@Param("userId")String userId);
+	
 	
 	@ResultMap("cmdSvCardMapper")
 	@Select("select csc.* from cmd_sv_card csc,cmd_my_card cmc where cmc.card_id = csc.id and  cmc.pk_id = #{pkId} and cmc.target_type = #{targetType} and cmc.target_id = #{targetId} and cmc.user_id = #{userId} and cmc.is_deleted = 0 order by csc.id asc limit #{offset},#{pageSize}")
@@ -145,4 +160,11 @@ public interface CmdSvCardMapper {
 	 */
 	@Select("select count(*) from cmd_sv_pk where pk_seq>0 ")
 	public int countSvPk();
+	/**
+	 * 获取所有影之诗卡包
+	 * @return
+	 */
+	@ResultMap("cmdSvPkMapper")
+	@Select("select * from cmd_sv_pk where pk_seq>0 order by pk_seq desc ")
+	public List<CmdSvPk> findSvPk();
 }
