@@ -169,3 +169,6 @@ create table cmd_tips(
 	content varchar(500),
 	status smallint not null default 1
 );
+
+ALTER TABLE `dmzjbot`.`sys_group_member` 
+ADD COLUMN `repeat_count` INT(11) NULL DEFAULT 0 AFTER `status`;

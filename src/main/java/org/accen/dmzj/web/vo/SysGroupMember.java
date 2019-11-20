@@ -13,6 +13,7 @@ public class SysGroupMember {
 	private Date createTime;
 	private Date lastCheckinTime;//上次签到时间
 	private int status;//0-无效 1-有效 2禁用
+	private int repeatCount;//复读次数
 	public long getId() {
 		return id;
 	}
@@ -72,6 +73,12 @@ public class SysGroupMember {
 	}
 	public void setLastCheckinTime(Date lastCheckinTime) {
 		this.lastCheckinTime = lastCheckinTime;
+	}
+	public int getRepeatCount() {
+		return repeatCount;
+	}
+	public void setRepeatCount(int repeatCount) {
+		this.repeatCount = repeatCount;
 	}
 	
 }

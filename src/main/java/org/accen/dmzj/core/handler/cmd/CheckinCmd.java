@@ -11,6 +11,7 @@ import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomUtil;
+import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.SysGroupMemberMapper;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.accen.dmzj.web.vo.SysGroupMember;
@@ -34,6 +35,8 @@ public class CheckinCmd implements CmdAdapter {
 	
 	@Autowired
 	private SysGroupMemberMapper sysGroupMember; 
+	@Autowired
+	private SvDrawCardCmd svCmd;
 	
 	@Override
 	public String describe() {
@@ -105,7 +108,9 @@ public class CheckinCmd implements CmdAdapter {
 							mem.setFavorability(mem.getFavorability()+favorabilityIncr);
 							mem.setLastCheckinTime(new Date());
 							sysGroupMember.updateCheckin(mem);
-							task.setMessage(CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")");
+							String msg = CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")，复读次数："+mem.getRepeatCount()+"次。";
+							String svCompletion = svCmd.formatMyCardCompletion(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+							task.setMessage(svCompletion==null?msg:(msg+"\n"+StringUtil.SPLIT_FOOT+"影之诗图鉴完成度：\n"+svCompletion));
 						}
 					}else {
 						SysGroupMember mem = mems.get(0);
@@ -122,7 +127,9 @@ public class CheckinCmd implements CmdAdapter {
 						mem.setFavorability(mem.getFavorability()+favorabilityIncr);
 						mem.setLastCheckinTime(new Date());
 						sysGroupMember.updateCheckin(mem);
-						task.setMessage(CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")");
+						String msg = CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")，复读次数："+mem.getRepeatCount()+"次。";
+						String svCompletion = svCmd.formatMyCardCompletion(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+						task.setMessage(svCompletion==null?msg:(msg+"\n"+StringUtil.SPLIT_FOOT+"影之诗图鉴完成度：\n"+svCompletion));
 					}
 					
 				}else {
@@ -130,7 +137,9 @@ public class CheckinCmd implements CmdAdapter {
 				}
 			}else if("个人信息".equals(matcher.group(1))) {
 				if(mems!=null&&!mems.isEmpty()) {
-					task.setMessage(CQUtil.at(qmessage.getUserId())+" 库存金币："+mems.get(0).getCoin()+"枚，好感度："+mems.get(0).getFavorability()+"，签到次数："+mems.get(0).getCheckinCount());
+					String msg = CQUtil.at(qmessage.getUserId())+" 库存金币："+mems.get(0).getCoin()+"枚，好感度："+mems.get(0).getFavorability()+"，签到次数："+mems.get(0).getCheckinCount()+"，复读次数："+mems.get(0).getRepeatCount()+"次。";
+					String svCompletion = svCmd.formatMyCardCompletion(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+					task.setMessage(svCompletion==null?msg:(msg+"\n"+StringUtil.SPLIT_FOOT+"影之诗图鉴完成度：\n"+svCompletion));
 				}else {
 					task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还没绑定个人信息哦，请发送[绑定]进行绑定喵~");
 				}
@@ -211,5 +220,24 @@ public class CheckinCmd implements CmdAdapter {
 			return mems.get(0).getFavorability();
 		}
 	}
-	
+	/**
+	 * 消耗或补充复读次数
+	 * @param type
+	 * @param targetId
+	 * @param userId
+	 * @param diff 需要变化金币数
+	 * @return 剩余金币数 如果喂绑定，则返回-999
+	 */
+	public int modifyRepeat(String type,String targetId,String userId,int diff) {
+		List<SysGroupMember> mems = sysGroupMember.selectByTarget(type, targetId, userId);
+		if(mems==null||mems.isEmpty()) {
+			return -999;
+		}else {
+			SysGroupMember mem = mems.get(0);
+//			sysGroupMember.updateCoinByTarget(mem.getCoin()+diff, type, targetId, userId);
+			mem.setRepeatCount(mem.getRepeatCount()+diff);;
+			sysGroupMember.updateCheckin(mem);
+			return mem.getRepeatCount();
+		}
+	}
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.accen.dmzj.core.handler.cmd.CheckinCmd;
 import org.accen.dmzj.core.handler.cmd.RepeatModeSwitchCmd;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
@@ -26,6 +27,8 @@ public class RepeatModeListener implements ListenAdpter {
 	@Autowired
 	private RepeatModeSwitchCmd repeatModeSwitchCmd;
 	@Autowired
+	private CheckinCmd checkinCmd;
+	@Autowired
 	private TaskManager taskManager;
 	@Override
 	public List<GeneralTask> listen(Qmessage qmessage, String selfQnum) {
@@ -36,6 +39,9 @@ public class RepeatModeListener implements ListenAdpter {
 			if(repeatMap.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId())) {
 				if(repeatCounter.containsKey(repeatMsg)) {
 					//上一条与本条信息是同一条（内容一致）
+					//加上复读次数
+					checkinCmd.modifyRepeat(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), 1);
+					
 					int lastCount = repeatCounter.get(repeatMsg);
 					if(lastCount==triggerTime-1) {
 						//算上这次，就达到了临界值，注意是刚好达到而不是超过
