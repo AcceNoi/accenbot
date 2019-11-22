@@ -10,8 +10,10 @@ import java.util.stream.Collectors;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.core.task.api.BilibiliSearchApiClientPk;
+import org.accen.dmzj.core.task.api.bilibili.ApiVcBilibiliApiClient;
 import org.accen.dmzj.core.task.api.vo.BilibliVideoInfo;
 import org.accen.dmzj.util.CQUtil;
+import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CmdBuSubMapper;
 import org.accen.dmzj.web.vo.CmdBuSub;
 import org.slf4j.Logger;
@@ -20,6 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.LongSerializationPolicy;
 
 @Component
 public class BilibiliSchedule {
@@ -27,8 +34,10 @@ public class BilibiliSchedule {
 	private TaskManager taskManager;
 	@Autowired
 	private CmdBuSubMapper cmdBuSubMapper;
+	//@Autowired
+	//private BilibiliSearchApiClientPk bilibiliSearchApiClientPk;
 	@Autowired
-	private BilibiliSearchApiClientPk bilibiliSearchApiClientPk;
+	private ApiVcBilibiliApiClient apiVc;
 	
 	@Value("${coolq.bot}")
 	private String botId;
@@ -61,7 +70,7 @@ public class BilibiliSchedule {
 			//========初始化结束
 			
 			//========开始调用
-			subMap.forEach((key,value)->{
+			/*subMap.forEach((key,value)->{
 				List<BilibliVideoInfo>  infos = bilibiliSearchApiClientPk.searchUpVideo(Long.parseLong(key));
 				
 				if(infos!=null&&!infos.isEmpty()) {
@@ -85,7 +94,81 @@ public class BilibiliSchedule {
 						}
 					});
 				}
+			});*/
+			
+			//accen@20191122不再使用各个分散的API，统一使用动态
+			GsonBuilder gb = new GsonBuilder()
+					.setLongSerializationPolicy(LongSerializationPolicy.STRING);
+			Gson gson = gb.create();
+			subMap.forEach((key,value)->{
+				Map<String, Object> dynHises = apiVc.dynamic(null, key, 0);
+				if((Double)dynHises.get("code")==0) {
+					@SuppressWarnings("unchecked")
+					List<Map<String, Object>> cards = (List<Map<String, Object>>) dynHises.get("data");
+					if(cards!=null&&!cards.isEmpty()) {
+						for(Map<String,Object> card:cards) {
+							@SuppressWarnings("unchecked")
+							Map<String, Object> desc = (Map<String, Object>) card.get("desc");
+							long timestamp = (long) desc.get("timestamp")*1000;
+							if(curTimestamp-timestamp<=5*60*1000) {
+								int type = (int) desc.get("type");
+								String cardJson = ((String) card.get("card")).replaceAll("\\", "").replaceAll("“", "\"");
+								Map<String, Object> cardMap = gson.fromJson(cardJson, Map.class);
+								StringBuffer msgBuf = new StringBuffer();
+								if(type>>1==1) {
+									String description = (String) ((Map<String,Object>)cardMap.get("item")).get("description");
+									description = description.length()>53?(description.substring(0, 50)+"..."):description;
+									String description1 = description;
+									List<Map<String,Object>> pics = (List<Map<String, Object>>) ((Map<String,Object>)cardMap.get("item")).get("pictures");
+									//动态
+									value.forEach((targetId,subscribers)->{
+										String ats = subscribers.stream()
+												.map(subscri->CQUtil.at(subscri.getSubscriber()))
+												.collect(Collectors.joining(""));
+										msgBuf.append(ats).append(" ").append("您订阅的B站up主").append(subscribers.get(0).getSubObjMark())
+												.append("更新了一条动态：")
+												.append(description1)
+												.append((pics!=null&&!pics.isEmpty())?CQUtil.imageUrl((String) pics.get(0).get("img_src")):"")
+												.append("快去看看吧喵~");
+										taskManager.addGeneralTaskQuick(botId, "group", targetId, msgBuf.toString());
+									});
+								}else if(type>>3==1) {
+									//视频
+									String aid = (String)cardMap.get("aid");
+									String description = (String) cardMap.get("desc");
+									description = description.length()>53?(description.substring(0, 50)+"..."):description;
+									String description1 = description;
+									String pic = (String) cardMap.get("pic");
+									value.forEach((targetId,subscribers)->{
+										String ats = subscribers.stream()
+												.map(subscri->CQUtil.at(subscri.getSubscriber()))
+												.collect(Collectors.joining(""));
+										msgBuf.append(ats).append(" ").append("您订阅的B站up主").append(subscribers.get(0).getSubObjMark())
+												.append("更新了一条视频：")
+												.append(description1)
+												.append("[")
+												.append("https://www.bilibili.com/video/av")
+												.append(aid)
+												.append("]")
+												.append(StringUtils.isEmpty(pic)?"":CQUtil.imageUrl(pic))
+												.append("快去看看吧喵~");
+										taskManager.addGeneralTaskQuick(botId, "group", targetId, msgBuf.toString());
+									});
+								}else if(type>>6==1) {
+									//专栏
+								}
+							}else {
+								//如果更新的都在5分钟之后，后面直接跳出
+								break;
+							}
+							
+						}
+						
+					}
+				}
 			});
+			
+			
 		}
 		
 	}

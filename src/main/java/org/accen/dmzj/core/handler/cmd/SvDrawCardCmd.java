@@ -292,7 +292,7 @@ public class SvDrawCardCmd implements CmdAdapter {
 				int all = cmdSvCardMapper.countCardByPkAndCareerAndRarity(pk.getId(), null, "4")+cmdSvCardMapper.countCardByPkAndCareerAndRarity(pk.getId(), null, "5");
 				fmtBuf.append(mine).append("/").append(all).append("\n");
 			});
-			return fmtBuf.toString();
+			return fmtBuf.substring(0, fmtBuf.length());
 		}
 		return null;
 	}
