@@ -76,7 +76,9 @@ public class CmdManageCmd implements CmdAdapter {
 				.append(StringUtil.SPLIT)
 				.append("6. /百科\n")
 				.append(StringUtil.SPLIT)
-				.append("7. /系统");
+				.append("7. /订阅\n")
+				.append(StringUtil.SPLIT)
+				.append("8. /系统");
 			break;
 		case "/搜图":
 			func.append("#搜图#\n")
@@ -140,6 +142,16 @@ public class CmdManageCmd implements CmdAdapter {
 				.append(StringUtil.SPLIT)
 				.append("1. 百科>>发送【了解+[想了解的内容]】");
 			break;
+		case "/订阅":
+			func.append("#订阅#\n")
+				.append(StringUtil.SPLIT)
+				.append("1. 订阅B站UP主>>发送【订阅B站UP+[要订阅的Up]】\n")
+				.append(StringUtil.SPLIT)
+				.append("2. 查看我的订阅>>发送【我的订阅】\n")
+				.append(StringUtil.SPLIT)
+				.append("3. 取消订阅>>发送【取消订阅B站UP+[Up主名字或前面的id]】\n")
+				.append(StringUtil.SPLIT)
+				.append("4. 订阅成功后会推送up的动态、视频以及专栏，其他功能敬请期待...");
 		case "/系统":
 			String clock = rtc.getClock(qmessage.getGroupId());
 			CfgConfigValue increaseNotice = configMapper.selectByTargetAndKey(qmessage.getMessageType(), qmessage.getGroupId(), NoticeEventHandler.REPLY_GROUP_INCREASE);
