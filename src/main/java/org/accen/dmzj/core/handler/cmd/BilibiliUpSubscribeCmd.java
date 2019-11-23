@@ -38,12 +38,14 @@ public class BilibiliUpSubscribeCmd implements CmdAdapter{
 	@Autowired
 	private BilibiliSearchApiClientPk bilibiliSearchApiClientPk;
 	
-	private final static Pattern pattern = Pattern.compile("^(取消)?订阅B站(UP|番剧)(.*)");
+	private final static Pattern pattern = Pattern.compile("^(取消)?订阅B站(UP|Up|up|番剧)(.*)");
+	private final static Pattern myPattern = Pattern.compile("^我的订阅$");
 	
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
 		Matcher matcher = pattern.matcher(message);
+		Matcher myMatcher = myPattern.matcher(message);
 		if(matcher.matches()) {
 			String subTarget = "bilibili";
 			String subType = matcher.group(2).equals("番剧")?"bangumi":"up";
@@ -157,6 +159,38 @@ public class BilibiliUpSubscribeCmd implements CmdAdapter{
 				}
 			}
 			
+		}else if(myMatcher.matches()) {
+			//我的订阅
+			GeneralTask task =  new GeneralTask();
+			task.setSelfQnum(selfQnum);
+			task.setType(qmessage.getMessageType());
+			task.setTargetId(qmessage.getGroupId());
+			
+			List<CmdBuSub> mySubs = cmdBuSubMapper.findBySubscriber(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+			if(null!=mySubs&&!mySubs.isEmpty()) {
+				StringBuffer msgBuf = new StringBuffer(CQUtil.at(qmessage.getUserId()));
+				msgBuf.append(" 您在本群一共有"+mySubs.size()+"个订阅喵：\n");
+				for(int index=0;index<mySubs.size();index++) {
+					if(index>0) {
+						msgBuf.append("\n");
+					}
+					CmdBuSub mySub = mySubs.get(index);
+					msgBuf.append(index+1)
+							.append(". ")
+							.append("bilibili".equals(mySub.getSubTarget())?"B站":"")
+							.append(mySub.getSubType())
+							.append("[")
+							.append(mySub.getSubObj())
+							.append("]")
+							.append(mySub.getSubObjMark());
+					
+				}
+				task.setMessage(msgBuf.toString());
+				return task;
+			}else {
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您当前还没订阅喵~发送[订阅B站UP陈睿]试试喵~");
+				return task;
+			}
 		}
 		return null;
 	}
