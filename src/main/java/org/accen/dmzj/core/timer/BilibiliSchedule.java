@@ -109,9 +109,9 @@ public class BilibiliSchedule {
 							Map<String, Object> desc = (Map<String, Object>) card.get("desc");
 							long timestamp = (long) ((double)desc.get("timestamp"))*1000;
 							if(curTimestamp-timestamp<=2*60*1000) {
-								StringBuffer msg = new StringBuffer();
 								String cardContent = parseDynamicCard(card);//更新的内容
 								subTarget.forEach((targetId,subscribers)->{
+									StringBuffer msg = new StringBuffer();
 									String ats = subscribers.stream()
 											.map(subscri->CQUtil.at(subscri.getSubscriber()))
 											.collect(Collectors.joining(""));
@@ -120,6 +120,7 @@ public class BilibiliSchedule {
 										.append(subscribers.get(0).getSubObjMark())
 										.append("】")
 										.append(cardContent)
+										.append("\n")
 										.append(" 快点去看看吧喵~");
 									logger.debug(msg.toString());
 									taskManager.addGeneralTaskQuick(botId, "group", targetId, msg.toString());
@@ -175,7 +176,7 @@ public class BilibiliSchedule {
 			//转发动态
 			String content = (String) ((Map<String,Object>)cardMap.get("item")).get("content");
 			if(depth==0) {
-				msgBuf.append("转发了一条动态\n");
+				msgBuf.append("转发了动态：\n");
 			}
 			msgBuf.append(content)
 					.append("//");
@@ -199,7 +200,7 @@ public class BilibiliSchedule {
 				msgBuf.append(nextUname)
 						.append("：");
 			}else if(depth==0) {
-				msgBuf.append("发布了一条动态\n");
+				msgBuf.append("发布了新动态：\n");
 			}
 			
 			msgBuf.append(description)
@@ -212,7 +213,7 @@ public class BilibiliSchedule {
 				msgBuf.append(nextUname)
 						.append("：");
 			}else if(depth==0) {
-				msgBuf.append("更新了一个视频\n");
+				msgBuf.append("更新了一个视频：\n");
 			}
 			long aid = ((Double)cardMap.get("aid")).longValue();
 			String description = (String) cardMap.get("desc");
@@ -232,7 +233,7 @@ public class BilibiliSchedule {
 				msgBuf.append(nextUname)
 						.append("：");
 			}else if(depth==0) {
-				msgBuf.append("发布了一条专栏\n");
+				msgBuf.append("发布了一则专栏：\n");
 			}
 			long cvId = ((Double)cardMap.get("id")).longValue();
 			String title = (String) cardMap.get("title");
