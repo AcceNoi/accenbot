@@ -19,7 +19,7 @@ public interface ApiVcBilibiliApiClient {
 	 * @param hostUid up uid
 	 * @param offsetDynamicId 起始id（不含）
 	 * @return 主要解析card字段的json，和desc-timestamp 注意这个timestamp需要*1000才是UNIX时间戳<br>
-	 * type 8:视频  2：动态 64：专栏  （估计还有1,16,32，暂时没看出来，估计有投稿音乐啥的）
+	 * type 8:视频 <br> 2：普通动态<br> 64：专栏<br>  1：转发动态<br>（估计还有16,32，暂时没看出来，估计有投稿音乐啥的）
 	 */
 	@RequestLine("GET /dynamic_svr/v1/dynamic_svr/space_history?visitor_uid={visitorUid}&host_uid={hostUid}&offset_dynamic_id={offsetDynamicId}")
 	public Map<String, Object> dynamic(@Param("visitorUid")String visitorUid,@Param("hostUid")String hostUid,@Param("offsetDynamicId")long offsetDynamicId);
