@@ -7,11 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
-import org.accen.dmzj.core.task.api.BilibiliSearchApiClientPk;
 import org.accen.dmzj.core.task.api.bilibili.ApiVcBilibiliApiClient;
-import org.accen.dmzj.core.task.api.vo.BilibliVideoInfo;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CmdBuSubMapper;
@@ -121,7 +118,7 @@ public class BilibiliSchedule {
 										.append("】")
 										.append(cardContent)
 										.append("\n")
-										.append(" 快点去看看吧喵~");
+										.append(" 快去看看吧喵~");
 									logger.debug(msg.toString());
 									taskManager.addGeneralTaskQuick(botId, "group", targetId, msg.toString());
 								});
@@ -202,9 +199,20 @@ public class BilibiliSchedule {
 			}else if(depth==0) {
 				msgBuf.append("发布了新动态：\n");
 			}
-			
 			msgBuf.append(description)
 					.append((pics!=null&&!pics.isEmpty())?CQUtil.imageUrl((String) pics.get(0).get("img_src")):"");
+			return msgBuf.toString();
+		}else if(type>>2==1){
+			//也是普通动态
+			String content = (String) ((Map<String,Object>)cardMap.get("item")).get("content");
+			if(depth>0) {
+				//如果深度>=1，也就是我关注的这个人不是第一发布者，则带上当前发布者名
+				msgBuf.append(nextUname)
+						.append("：");
+			}else if(depth==0) {
+				msgBuf.append("发布了新动态：\n");
+			}
+			msgBuf.append(content);
 			return msgBuf.toString();
 		}else if(type>>3==1) {
 			//视频
@@ -247,6 +255,28 @@ public class BilibiliSchedule {
 						.append(cvId)
 						.append("]")
 						.append((pics!=null&&!pics.isEmpty())?CQUtil.imageUrl( pics.get(0)):"");
+			return msgBuf.toString();
+		}else if(type>>8==1){
+			//音乐
+			if(depth>0) {
+				//如果深度>=1，也就是我关注的这个人不是第一发布者，则带上当前发布者名
+				msgBuf.append(nextUname)
+						.append("：");
+			}else if(depth==0) {
+				msgBuf.append("发布了一首音乐：\n");
+			}
+			long mId = ((Double)cardMap.get("id")).longValue();
+			String title = (String) cardMap.get("title");
+			String intro = (String) cardMap.get("intro");
+			String description = title.trim()+"\n"+intro.trim();
+			String description1 = description.length()>83?(description.substring(0, 80)+"..."):description;
+			String cover = (String) cardMap.get("cover");
+			msgBuf.append(description1)
+					.append("[")
+					.append("https://www.bilibili.com/audio/au")
+					.append(mId)
+					.append("]")
+					.append(StringUtils.isEmpty(cover)?"":CQUtil.at(cover));
 			return msgBuf.toString();
 		}else {
 			return msgBuf.toString();
