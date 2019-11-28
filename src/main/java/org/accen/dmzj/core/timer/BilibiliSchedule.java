@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.core.task.api.bilibili.ApiVcBilibiliApiClient;
+import org.accen.dmzj.core.task.api.bilibili.LiveBilibiliApiClient;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CmdBuSubMapper;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.google.gson.Gson;
@@ -26,6 +28,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.LongSerializationPolicy;
 
 @Component
+@Transactional
 public class BilibiliSchedule {
 	@Autowired
 	private TaskManager taskManager;
@@ -35,6 +38,8 @@ public class BilibiliSchedule {
 	//private BilibiliSearchApiClientPk bilibiliSearchApiClientPk;
 	@Autowired
 	private ApiVcBilibiliApiClient apiVc;
+	@Autowired
+	private LiveBilibiliApiClient apiLive;
 	
 	@Value("${coolq.bot}")
 	private String botId;
@@ -45,7 +50,7 @@ public class BilibiliSchedule {
 	 */
 	@Scheduled(cron = "0 */2 * * * *")
 	public void bilibiUpScan() {
-		//先获取当前时间戳，用于15min内投稿即为新投稿
+		//先获取当前时间戳，用于2min内投稿即为新投稿
 		long curTimestamp=new Date().getTime();
 		
 		List<CmdBuSub> subs = cmdBuSubMapper.findBySubType("group", "bilibili", "up");
@@ -282,5 +287,64 @@ public class BilibiliSchedule {
 			return msgBuf.toString();
 		}
 		
+	}
+	/**
+	 * b站直播扫描，每5分钟扫描一次
+	 */
+	@SuppressWarnings("unchecked")
+	@Scheduled(cron = "0 */5 * * * *")
+	public void bilibiliLiveScan() {
+		List<CmdBuSub> subs = cmdBuSubMapper.findBySubType("group", "bilibili", "up");
+		if(subs!=null&&!subs.isEmpty()) {
+			//形如CmdBuSub.roomId#roomStatus -> CmdBuSub.targetId->List<CmdBuSub>
+			Map<String, Map<String,List<CmdBuSub>>> subMap = new HashMap<String, Map<String,List<CmdBuSub>>>();
+			subs.stream().filter(sub->botId.equals(sub.getBotId())).collect(Collectors.toList());
+			subs.forEach(sub->{
+				String key = sub.getAttr1();
+				
+				if(!subMap.containsKey(key)) {
+					subMap.put(key, new HashMap<String, List<CmdBuSub>>());
+				}
+				if(!subMap.get(key).containsKey(sub.getTargetId())) {
+					subMap.get(key).put(sub.getTargetId(), new LinkedList<CmdBuSub>());
+				}
+				subMap.get(key).get(sub.getTargetId()).add(sub);
+			});
+			//========初始化结束
+			//========开始调用
+			subMap.forEach((roomIdStts,subTarget)->{
+				String[] roomIdSttsArr = roomIdStts.split("#");
+				Map<String,Object> roomInfo = apiLive.infoByRoom(roomIdSttsArr[0]);
+				if((int)roomInfo.get("code")==0) {
+					int liveStatus = (int)((Map<String, Object>)((Map<String,Object>)roomInfo.get("data")).get("room_info")).get("live_status");
+					if(Integer.parseInt(roomIdSttsArr[1])==0&&liveStatus==1) {
+						//开播了
+						String title =  (String)((Map<String, Object>)((Map<String,Object>)roomInfo.get("data")).get("room_info")).get("title");
+						String cover = (String)((Map<String, Object>)((Map<String,Object>)roomInfo.get("data")).get("room_info")).get("cover");
+						subTarget.forEach((targetId,subscribers)->{
+							StringBuffer msg = new StringBuffer();
+							String ats = subscribers.stream()
+									.map(subscri->CQUtil.at(subscri.getSubscriber()))
+									.collect(Collectors.joining(""));
+							msg.append(ats);
+							msg.append(" 您订阅的B站up主【")
+								.append(subscribers.get(0).getSubObjMark())
+								.append("】开播啦：\n")
+								.append(title)
+								.append("[")
+								.append("https://live.bilibili.com/")
+								.append(roomIdSttsArr[0])
+								.append("]")
+								.append(StringUtils.isEmpty(cover)?"":CQUtil.imageUrl(cover))
+								.append(" 快去围观吧喵~");
+							logger.debug(msg.toString());
+							taskManager.addGeneralTaskQuick(botId, "group", targetId, msg.toString());
+						});
+					}
+					//其他情况可是是已经开播了或者还未开播或者下播，只关注开播这么个动作
+					cmdBuSubMapper.updateRoomStatusByRoomId(roomIdSttsArr[0]+"#"+liveStatus, roomIdSttsArr[0]);
+				}
+			});
+		}
 	}
 }

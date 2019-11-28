@@ -172,3 +172,7 @@ create table cmd_tips(
 
 ALTER TABLE `dmzjbot`.`sys_group_member` 
 ADD COLUMN `repeat_count` INT(11) NULL DEFAULT 0 AFTER `status`;
+
+ALTER TABLE `dmzjbot`.`cmd_bu_sub` 
+ADD COLUMN `attr1` VARCHAR(45) NULL AFTER `status`,
+ADD COLUMN `attr2` VARCHAR(45) NULL AFTER `attr1`;

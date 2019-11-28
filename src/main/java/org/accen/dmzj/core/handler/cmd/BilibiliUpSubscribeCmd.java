@@ -119,9 +119,11 @@ public class BilibiliUpSubscribeCmd implements CmdAdapter{
 							sub.setSubType(subType);
 							sub.setType("group");
 							sub.setSubTime(new Date());
+							sub.setAttr1(uInfo+"#0");//默认为0
 							cmdBuSubMapper.insert(sub);
 							
-							task.setMessage(CQUtil.at(qmessage.getUserId())+" 已成功订阅B站"+matcher.group(2)+":"+bInfo.getName()+"("+bInfo.getMediaId()+")喵~");
+							task.setMessage(CQUtil.at(qmessage.getUserId())+" 成功订阅B站"+matcher.group(2)+":"+bInfo.getName()+"("+bInfo.getMediaId()+")喵~\n"
+									+StringUtil.SPLIT+uInfo.getUsign());
 							return task;
 						}else {
 							task.setMessage(CQUtil.at(qmessage.getUserId())+" 未找到此B站"+matcher.group(2)+"信息哦，请核对名称或id喵~");

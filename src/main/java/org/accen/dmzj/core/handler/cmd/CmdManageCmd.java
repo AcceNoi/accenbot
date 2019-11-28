@@ -152,6 +152,7 @@ public class CmdManageCmd implements CmdAdapter {
 				.append("3. 取消订阅>>发送【取消订阅B站UP+[Up主名字或前面的id]】\n")
 				.append(StringUtil.SPLIT)
 				.append("4. 订阅成功后会推送up的动态、视频以及专栏，其他功能敬请期待...");
+			break;
 		case "/系统":
 			String clock = rtc.getClock(qmessage.getGroupId());
 			CfgConfigValue increaseNotice = configMapper.selectByTargetAndKey(qmessage.getMessageType(), qmessage.getGroupId(), NoticeEventHandler.REPLY_GROUP_INCREASE);
