@@ -25,7 +25,9 @@ public interface CmdBuSubMapper {
 			@Result(property = "subObj",column = "sub_obj"),
 			@Result(property = "subObjMark",column = "sub_obj_mark"),
 			@Result(property = "subTime",column = "sub_time"),
-			@Result(property = "status",column = "status")
+			@Result(property = "status",column = "status"),
+			@Result(property = "attr1",column = "attr1"),
+			@Result(property = "attr2",column = "attr2")
 	})
 	@Select("select * from cmd_bu_sub where id = #{id}")
 	public CmdBuSub selectById(@Param("id")long id);
@@ -45,8 +47,8 @@ public interface CmdBuSubMapper {
 	@Select("select * from cmd_bu_sub where type=#{type} and target_id=#{targetId} and subscriber=#{subscriber} and sub_target=#{subTarget} and sub_type=#{subType} and sub_obj_mark = #{subObjMark} and status = 1")
 	public List<CmdBuSub> findBySubscriberAndObjMark(@Param("type")String type,@Param("targetId")String targetId,@Param("subscriber")String subscriber,@Param("subTarget")String subTarget, @Param("subType")String subType,@Param("subObjMark")String subObjMark);
 	
-	@Insert("insert into cmd_bu_sub(type,target_id,subscriber,sub_target,sub_type,sub_obj,sub_obj_mark,sub_time,status) values"
-			+ " (#{type},#{targetId},#{subscriber},#{subTarget},#{subType},#{subObj},#{subObjMark},#{subTime},#{status}) ")
+	@Insert("insert into cmd_bu_sub(type,target_id,subscriber,sub_target,sub_type,sub_obj,sub_obj_mark,sub_time,status,attr1,attr2) values"
+			+ " (#{type},#{targetId},#{subscriber},#{subTarget},#{subType},#{subObj},#{subObjMark},#{subTime},#{status},#{attr1},#{attr2}) ")
 	@Options(useGeneratedKeys = true,keyProperty = "id")
 	public long insert(CmdBuSub sub);
 	

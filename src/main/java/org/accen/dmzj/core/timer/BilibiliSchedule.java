@@ -187,9 +187,12 @@ public class BilibiliSchedule {
 				msgBuf.append(nextUname)
 						.append("：");
 			}
-			String originUname = (String) ((Map<String,Object>) ((Map<String,Object>)cardMap.get("origin_user")).get("info")).get("uname");
+			
 			//转发的动态拿到原始的动态
 			int originType = (int) ((double)((Map<String,Object>)cardMap.get("item")).get("orig_type"));
+			String originUname = (String) ((Map<String,Object>) ((Map<String,Object>)cardMap.get("origin_user")).get("info")).get("uname");
+			//番剧是没有上传者名字的，用标题代替，不过在上一级无所谓，拿到的反正是空
+			
 			String orginJson = (String)cardMap.get("origin");
 			return msgBuf.append(parseDynamicCardMap(gson.fromJson(orginJson, Map.class),originType, ++depth,originUname)).toString();
 		}else if(type>>1==1) {
@@ -281,7 +284,29 @@ public class BilibiliSchedule {
 					.append("https://www.bilibili.com/audio/au")
 					.append(mId)
 					.append("]")
-					.append(StringUtils.isEmpty(cover)?"":CQUtil.at(cover));
+					.append(StringUtils.isEmpty(cover)?"":CQUtil.imageUrl(cover));
+			return msgBuf.toString();
+		}else if(type>>9==1){
+			//512番剧，名字取番剧标题而不是上传者名
+			String title =(String)((Map<String, Object>)cardMap.get("apiSeasonInfo")).get("title");
+			String cover = (String)cardMap.get("cover");
+			String indexTitle = (String)cardMap.get("new_desc");
+			String url = (String)cardMap.get("url");
+			if(depth>0) {
+				//如果深度>=1，也就是我关注的这个人不是第一发布者，则带上当前发布者名
+				msgBuf.append(title)
+						.append("：");
+			}else if(depth==0) {
+				msgBuf.append("【")
+						.append(title)
+						.append("】")
+						.append("更新了：\n");
+			}
+			msgBuf.append(indexTitle)
+					.append("[")
+					.append(url)
+					.append("]")
+					.append(StringUtils.isEmpty(cover)?"":CQUtil.imageUrl(cover));
 			return msgBuf.toString();
 		}else {
 			return msgBuf.toString();
