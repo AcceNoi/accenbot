@@ -58,6 +58,6 @@ public interface CmdBuSubMapper {
 	@Update("update cmd_bu_sub set attr1 = #{attr1} where id = #{id}")
 	public void updateRoomStatus(@Param("attr1") String attr1,@Param("id")long id);
 	
-	@Update("update cmd_bu_sub set attr1 = #{attr1} where attr1 like #{roomId}||'#%' and status =1 ")
+	@Update("update cmd_bu_sub set attr1 = #{attr1} where attr1 like concat(#{roomId},'#%') and status =1 ")
 	public void updateRoomStatusByRoomId(@Param("attr1") String attr1,@Param("roomId")String roomId);
 }

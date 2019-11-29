@@ -341,7 +341,7 @@ public class BilibiliSchedule {
 				String[] roomIdSttsArr = roomIdStts.split("#");
 				Map<String,Object> roomInfo = apiLive.infoByRoom(roomIdSttsArr[0]);
 				if((int)roomInfo.get("code")==0) {
-					int liveStatus = (int)((Map<String, Object>)((Map<String,Object>)roomInfo.get("data")).get("room_info")).get("live_status");
+					int liveStatus =(int) ((double)((Map<String, Object>)((Map<String,Object>)roomInfo.get("data")).get("room_info")).get("live_status"));
 					if(Integer.parseInt(roomIdSttsArr[1])==0&&liveStatus==1) {
 						//开播了
 						String title =  (String)((Map<String, Object>)((Map<String,Object>)roomInfo.get("data")).get("room_info")).get("title");
