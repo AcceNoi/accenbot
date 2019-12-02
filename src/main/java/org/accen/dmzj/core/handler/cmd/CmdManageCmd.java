@@ -85,7 +85,11 @@ public class CmdManageCmd implements CmdAdapter {
 				.append(StringUtil.SPLIT)
 				.append("1. 查找图片>>发送【老婆找图+[图片]】 \n")
 				.append(StringUtil.SPLIT)
-				.append("2. 随机图片>>发送【随机瑟图】");
+				.append("2. 随机图片>>发送【随机瑟图】\n")
+				.append(StringUtil.SPLIT)
+				.append("3. P站搜图>>发送【p站搜图+[搜索关键字]】\n")
+				.append(StringUtil.SPLIT)
+				.append("4. 我收藏的涩图>>发送【随机收藏】");
 			break;
 		case "/词条":
 			func.append("#词条#\n")

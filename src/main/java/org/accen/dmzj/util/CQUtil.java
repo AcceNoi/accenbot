@@ -1,7 +1,16 @@
 package org.accen.dmzj.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
+import java.util.Base64.Decoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 
 import ch.qos.logback.core.pattern.parser.Parser;
 
@@ -39,9 +48,30 @@ public class CQUtil {
 	public static String selfMusic(String url,String audio,String title,String content,String imageUrl) {
 		return "[CQ:music,type=custom,url="+url+",audio="+audio+",title="+title+",content="+content+",image="+imageUrl+"]";
 	}
-	
+	public static String image(String url) {
+		return "[CQ:image,file="+url+"]";
+	}
 	public static String imageUrl(String url) {
 		return "[CQ:image,cache=0,file="+url+"]";
+	}
+	public static String imageBs64(String encodedStr) {
+		return "[CQ:image,file=base64://"+encodedStr+"]";
+	}
+	public static String imageUrlBase64(InputStream is) {
+		String bs64 = StringUtil.is2Base64(is);
+		if(bs64!=null) {
+			return "[CQ:image,file=base64://"+bs64+"]";
+		}else {
+			return null;
+		}
+	}
+	public static String imageUrlBase64(File file) {
+		try {
+			return imageUrlBase64(new FileInputStream(file));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	/**
 	 * 网络语音

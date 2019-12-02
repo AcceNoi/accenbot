@@ -1,10 +1,14 @@
 package org.accen.dmzj.core.handler.cmd;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64.Encoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.handler.callbacker.CallbackListener;
@@ -12,11 +16,14 @@ import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.core.task.api.LoliconApiClientPk;
+import org.accen.dmzj.core.task.api.PixivcatApiClient;
 import org.accen.dmzj.core.task.api.PixivicApiClient;
 import org.accen.dmzj.core.timer.CacheMap;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.FuncSwitchUtil;
+import org.accen.dmzj.util.RandomMeta;
 import org.accen.dmzj.util.RandomUtil;
+import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CfgResourceMapper;
 import org.accen.dmzj.web.vo.CfgResource;
 import org.accen.dmzj.web.vo.Qmessage;
@@ -24,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 @FuncSwitch("cmd_setu")
 @Component
 @Transactional
@@ -50,6 +58,8 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	private PixivicApiClient pixivicApiClient;
 	@Autowired
 	private TaskManager taskManager;
+	@Autowired
+	private PixivcatApiClient pixivcatApiClient;
 	
 	@Value("${coolq.setu.coin.decrease:-3}")
 	private int decrease ;
@@ -58,8 +68,8 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	
 	private static final Pattern pattern = Pattern.compile("^随机(色图|瑟图|涩图)$");
 	private static final Pattern collectPattern = Pattern.compile("^随机收藏$");
-	private static final Pattern searchPattern = Pattern.compile("^(P|p)站搜索(.+)");
-	private static final String proxyPreffix = "https://img.cheerfun.dev:23334/get/";
+	private static final Pattern searchPattern = Pattern.compile("^(P|p)站搜图(.+)");
+	private static final String proxyPreffix = "https://i.pixiv.cat";
 	
 	//待收藏的map  type_group-> randomZh -> imageUrl
 	private Map<String, CacheMap<String, String>> waitingCollect = new HashMap<String, CacheMap<String,String>>();
@@ -140,7 +150,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 						if(collect==null) {
 							task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还未收藏过图片喵~");
 						}else {
-							task.setMessage(CQUtil.imageUrl(collect.getCfgResource()));
+							task.setMessage(CQUtil.image(collect.getCfgResource()));
 						}
 						return task;
 					}
@@ -151,30 +161,51 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 						task.setSelfQnum(selfQnum);
 						task.setType(qmessage.getMessageType());
 						task.setTargetId(qmessage.getGroupId());
-						Map<String,Object> rs = pixivicApiClient.search(message, 1);
+						Map<String,Object> rs = pixivicApiClient.search(searchMatcher.group(2).trim(), 1);
 						int total = (int)((double)((Map<String, Object>)rs.get("data")).get("total"));
-						total = total<20?total:20;//只取前20个
-						int rdIndex = RandomUtil.randomInt(total);
-						Map<String,Object> rdRs = ((List<Map<String,Object>>)((Map<String, Object>)rs.get("data")).get("illustrations")).get(rdIndex);
-						String largeImgUrl = (String)((List<Map<String,Object>>)rdRs.get("imageUrls")).get(0).get("large");
-						long pid = (long)((double)rdRs.get("70964333"));
-						String author = (String) ((Map<String,Object>)rdRs.get("artistPreView")).get("name");
-						String proxyLargeImgUrl = proxyPreffix+largeImgUrl;
-						//添加到收藏监听
-						if(!waitingCollect.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId())) {
-							waitingCollect.put(qmessage.getMessageType()+"_"+qmessage.getGroupId(), new CacheMap<String, String>());
+						if(total>0) {
+							total = total<20?total:20;//只取前20个
+							int rdIndex = RandomUtil.randomInt(total);
+							Map<String,Object> rdRs = ((List<Map<String,Object>>)((Map<String, Object>)rs.get("data")).get("illustrations")).get(rdIndex);
+							String largeImgUrl = (String)((List<Map<String,Object>>)rdRs.get("imageUrls")).get(0).get("original");
+							long pid = (long)((double)rdRs.get("id"));
+							String author = (String) ((Map<String,Object>)rdRs.get("artistPreView")).get("name");
+							String[] fmtPixivImgUrl = StringUtil.formatUrl(largeImgUrl);
+							String proxyLargeImgUrl = proxyPreffix+fmtPixivImgUrl[3];
+							/*try {
+								InputStream is = pixivcatApiClient.pixivImage(fmtPixivImgUrl[3]).body().asInputStream();
+								String bs64Img = StringUtil.is2Base64(is);*/
+								//添加到收藏监听
+								if(!waitingCollect.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId())) {
+									waitingCollect.put(qmessage.getMessageType()+"_"+qmessage.getGroupId(), new CacheMap<String, String>());
+								}
+								//当前群所等待收藏的图片
+								CacheMap<String,String> curGroupWaitingCollectImags = waitingCollect.get(qmessage.getMessageType()+"_"+qmessage.getGroupId());
+								//随机一个不在等待map中的随机数字
+								String rdZh = RandomUtil.randZhNumExclude(2, curGroupWaitingCollectImags.keySet());
+								curGroupWaitingCollectImags.put(rdZh, proxyLargeImgUrl,60000);
+								
+								
+								callbackManager.addResidentListener(this);
+								
+								//搜索建议
+								String[] sugArr = suggestions(searchMatcher.group(2).trim());
+								
+								//图片使用base64
+								
+								task.setMessage(CQUtil.imageUrl(proxyLargeImgUrl)+CQUtil.at(qmessage.getUserId())+"\nPID："+pid+"，Author："+author+"。收藏此图片请发送[收藏"+rdZh+"]喵~"+(sugArr==null?"":("\n更多搜索建议："+String.join("、",sugArr))));
+//								locked = false;
+								return task;
+							/*} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}*/
+							
+							
+						}else {
+							//未检索到
 						}
-						//当前群所等待收藏的图片
-						CacheMap<String,String> curGroupWaitingCollectImags = waitingCollect.get(qmessage.getMessageType()+"_"+qmessage.getGroupId());
-						//随机一个不在等待map中的随机数字
-						String rdZh = RandomUtil.randZhNumExclude(2, curGroupWaitingCollectImags.keySet());
-						curGroupWaitingCollectImags.put(rdZh, proxyLargeImgUrl,60000);
 						
-						task.setMessage(CQUtil.imageUrl(proxyLargeImgUrl)+"\nPID："+pid+" Author："+author+"。收藏此图片请发送[收藏"+rdZh+"]喵~");
-						callbackManager.addResidentListener(this);
-						
-//						locked = false;
-						return task;
 						
 					}
 //					locked = false;
@@ -213,6 +244,27 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 		}
 		//这里返回true or false没有意义，但是为了以后考虑，建议返回false
 		return false;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private String[] suggestions(String keyword) {
+		Map<String,Object> sug = pixivicApiClient.suggestions(keyword);
+		if(sug.containsKey("data")) {
+			List<Map<String,Object>> sugs = (List<Map<String, Object>>) sug.get("data");
+			if(sugs.size()>0) {
+				//一般都是16个，随机取5个好了
+				int total = sugs.size()<5?sugs.size():5;
+				List<RandomMeta<Map<String,Object>>> tdMetas = sugs.stream().map(su->new RandomMeta<Map<String,Object>>(su, 1)).collect(Collectors.toList());
+				List<Map<String, Object>> rdRses = RandomUtil.randomObjWeight(tdMetas, total);//随机出的结果
+				return rdRses.stream().map(rsRs->(String)rsRs.get("keyword")).toArray(String[]::new);
+			}else {
+				return null;
+			}
+			
+			
+		}else {
+			return null;
+		}
 	}
 
 }

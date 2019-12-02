@@ -5,8 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.SwitchPoint;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -127,5 +129,51 @@ public class StringUtil {
 			str = str.replace(group1, ch + "");
 		}
 		return str;
+	}
+	
+	private static final Pattern URL_PATTERN=Pattern.compile("^(http://|https://|ftp://)?([a-zA-Z0-9\\.\\-]+)\\.([a-zA-Z]{2,4})?(:(\\d+))?(.*)");
+	/**
+	 * 格式化url（暂不支持file）
+	 * @param url
+	 * @return 0-protocol，1-host，2-port，3-path
+	 */
+	public static String[] formatUrl(String url) {
+		Matcher urlMatcher = URL_PATTERN.matcher(url);
+		if(urlMatcher.matches()) {
+			String[] fmt = new String[4] ;
+			fmt[0] = StringUtils.isEmpty(urlMatcher.group(1))?"http":urlMatcher.group(1).replaceAll("://", "");//protocol
+			fmt[1] = urlMatcher.group(2)+"."+urlMatcher.group(3);//host
+			String port = urlMatcher.group(5);
+			if(StringUtils.isEmpty(port)) {
+				switch (fmt[0]) {
+				case "http":
+					port = "80";
+					break;
+				case "https":
+					port = "443";
+					break;
+				case "ftp":
+					port = "21";
+					break;
+				default:
+					break;
+				}
+			}
+			fmt[2] = port;
+			fmt[3] = urlMatcher.group(6);
+			return fmt;
+		}else {
+			return null;
+		}
+	}
+	public static String is2Base64(InputStream is) {
+		try {
+			String bs64 = Base64.getEncoder().encodeToString(is.readAllBytes());
+			is.close();
+			return bs64;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
