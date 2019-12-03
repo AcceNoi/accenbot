@@ -69,6 +69,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	private static final Pattern pattern = Pattern.compile("^随机(色图|瑟图|涩图)$");
 	private static final Pattern collectPattern = Pattern.compile("^随机收藏$");
 	private static final Pattern searchPattern = Pattern.compile("^(P|p)站搜图(.+)");
+	private static final Pattern searchPattern2 = Pattern.compile("^随机(.+)");
 	private static final String proxyPreffix = "https://i.pixiv.cat";
 	
 	//待收藏的map  type_group-> randomZh -> imageUrl
@@ -155,13 +156,15 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 						return task;
 					}
 					Matcher searchMatcher = searchPattern.matcher(message);
-					if(searchMatcher.matches()) {
+					Matcher searchMatcher2 = searchPattern2.matcher(message);
+					if(searchMatcher.matches()||searchMatcher2.matches()) {
+						String keyword = searchMatcher.matches()?searchMatcher.group(2).trim():searchMatcher2.group(1).trim();
 						GeneralTask task =  new GeneralTask();
 						
 						task.setSelfQnum(selfQnum);
 						task.setType(qmessage.getMessageType());
 						task.setTargetId(qmessage.getGroupId());
-						Map<String,Object> rs = pixivicApiClient.search(searchMatcher.group(2).trim(), 1);
+						Map<String,Object> rs = pixivicApiClient.search(keyword, 1);
 						int total = (int)((double)((Map<String, Object>)rs.get("data")).get("total"));
 						if(total>0) {
 							total = total<20?total:20;//只取前20个
