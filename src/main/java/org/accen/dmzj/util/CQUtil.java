@@ -110,4 +110,15 @@ public class CQUtil {
 		}
 		return null;
 	}
+	/**
+	 * 链接分享
+	 * @param url
+	 * @param title
+	 * @param content
+	 * @param image
+	 * @return
+	 */
+	public static String share(String url,String title,String content,String image) {
+		return "[CQ:share,url="+url+",title="+title+",content="+content+",image="+image+"]";
+	}
 }
