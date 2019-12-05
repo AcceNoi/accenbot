@@ -70,6 +70,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	private static final Pattern collectPattern = Pattern.compile("^随机收藏$");
 	private static final Pattern searchPattern = Pattern.compile("^(P|p)站搜图(.+)");
 	private static final Pattern searchPattern2 = Pattern.compile("^随机(.+)");
+	private static final Pattern getPattern = Pattern.compile("^(P|p)站找图(\\d+)");
 	private static final String proxyPreffix = "https://i.pixiv.cat";
 	
 	//待收藏的map  type_group-> randomZh -> imageUrl
@@ -172,6 +173,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 							Map<String,Object> rdRs = ((List<Map<String,Object>>)((Map<String, Object>)rs.get("data")).get("illustrations")).get(rdIndex);
 							String largeImgUrl = (String)((List<Map<String,Object>>)rdRs.get("imageUrls")).get(0).get("original");
 							long pid = (long)((double)rdRs.get("id"));
+							String title = (String)rdRs.get("title");
 							String author = (String) ((Map<String,Object>)rdRs.get("artistPreView")).get("name");
 							String[] fmtPixivImgUrl = StringUtil.formatUrl(largeImgUrl);
 							String proxyLargeImgUrl = proxyPreffix+fmtPixivImgUrl[3];
@@ -192,11 +194,11 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 								callbackManager.addResidentListener(this);
 								
 								//搜索建议
-								String[] sugArr = suggestions(searchMatcher.group(2).trim());
+								String[] sugArr = suggestions(keyword);
 								
 								//图片使用base64
 								
-								task.setMessage(CQUtil.imageUrl(proxyLargeImgUrl)+CQUtil.at(qmessage.getUserId())+"\nPID："+pid+"，Author："+author+"。收藏此图片请发送[收藏"+rdZh+"]喵~"+(sugArr==null?"":("\n更多搜索建议："+String.join("、",sugArr))));
+								task.setMessage(CQUtil.imageUrl(proxyLargeImgUrl)+CQUtil.at(qmessage.getUserId())+"\n标题："+title+"，PID："+pid+"，Author："+author+"。收藏此图片请发送[收藏"+rdZh+"]喵~"+(sugArr==null?"":("\n更多搜索建议："+String.join("、",sugArr))));
 //								locked = false;
 								return task;
 							/*} catch (IOException e) {
@@ -210,6 +212,17 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 						}
 						
 						
+					}
+					Matcher getMatcher = getPattern.matcher(message);
+					if(getMatcher.matches()) {
+						String pid = getMatcher.group(1);
+						GeneralTask task =  new GeneralTask();
+						
+						task.setSelfQnum(selfQnum);
+						task.setType(qmessage.getMessageType());
+						task.setTargetId(qmessage.getGroupId());
+						task.setMessage(CQUtil.image("https://pixiv.cat/"+pid+".jpg"));
+						return task;
 					}
 //					locked = false;
 					return null;
