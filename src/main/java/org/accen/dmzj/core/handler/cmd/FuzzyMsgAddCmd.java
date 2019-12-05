@@ -67,12 +67,15 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 			isPrecise |= matcher.group(1)!=null;
 			isNeedReply |= matcher.group(3)!=null;
 			
-			String ask = matcher.group(2);
+			String ask = matcher.group(2).trim();
 			String reply = matcher.group(4);
 			//3.1处理
 			
 			if(StringUtils.isEmpty(ask)||StringUtils.isEmpty(reply)) {
 				task.setMessage(CQUtil.at(qmessage.getUserId())+"添加失败，示例："+example());
+			}else if(!isPrecise&&ask.length()<2) {
+				//如果是模糊词条，则需要两个字匹配
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 为避免刷屏，模糊词条请不要少于两个字喵~");
 			}else {
 				
 				//金币检验
