@@ -1,5 +1,6 @@
 package org.accen.dmzj.core.handler.cmd;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,6 +9,9 @@ import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.api.baidu.BaikeApicClientPk;
 import org.accen.dmzj.core.task.api.vo.BaikeResult;
 import org.accen.dmzj.util.CQUtil;
+import org.accen.dmzj.util.RandomUtil;
+import org.accen.dmzj.web.dao.CmdWikiMapper;
+import org.accen.dmzj.web.vo.CmdWiki;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,7 +32,9 @@ public class BaiduBaikeCmd implements CmdAdapter{
 	
 	@Autowired
 	private BaikeApicClientPk baikeApicClientPk;
-
+	@Autowired
+	private CmdWikiMapper cmdWikiMapper;
+	
 	private final static Pattern pattern = Pattern.compile("^了解(.+)");
 	
 	@Override
@@ -41,12 +47,30 @@ public class BaiduBaikeCmd implements CmdAdapter{
 			task.setType(qmessage.getMessageType());
 			task.setTargetId(qmessage.getGroupId());
 			
-			BaikeResult br = baikeApicClientPk.baike(matcher.group(1));
-			if(br!=null) {
-				task.setMessage(CQUtil.imageUrl(br.getImageUrl())+br.getTitle()+"\n"+br.getSummary()+"["+br.getUrl()+"]喵~");
-			}else {
-				task.setMessage("抱歉，我太弱了，找不到该词条喵~");
+			String kw = matcher.group(1).trim();
+			//1.先在wiki中查
+			CmdWiki wiki = cmdWikiMapper.selectByName(kw);
+			if(wiki==null) {
+				//名字没匹配到，再去找关键字
+				List<CmdWiki> wikis = cmdWikiMapper.findByKeyword(kw);
+				if(wikis!=null) {
+					wiki = wikis.get(RandomUtil.randomInt(wikis.size()));
+				}
 			}
+			if(wiki==null) {
+				//2.找不到则去百度百科查
+				BaikeResult br = baikeApicClientPk.baike(kw);
+				if(br!=null) {
+					task.setMessage(CQUtil.imageUrl(br.getImageUrl())+br.getTitle()+"\n"+br.getSummary()+"["+br.getUrl()+"]喵~");
+				}else {
+					task.setMessage("抱歉，我太弱了，找不到该词条喵~");
+				}
+			}else {
+				
+				task.setMessage((wiki.getImage()==null?"":CQUtil.imageUrl(RandomUtil.randomStringSplit(wiki.getImage())))
+						+wiki.getWikiName()+"\n"+wiki.getContent());
+			}
+			
 			return task;
 		}
 		return null;
