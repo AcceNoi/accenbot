@@ -95,4 +95,21 @@ public class RandomUtil {
 			return rd;
 		}
 	}
+	/**
+	 * 随机从可切分的字符串中取子串
+	 * @param origin
+	 * @param split
+	 * @return
+	 */
+	public static String randomStringSplit(String origin,String split) {
+		String[] origins = origin.split(split);
+		return origins[randomInt(origins.length)];
+	}/**
+	 * 随机从可切分的字符串中取子串，默认西文逗号,
+	 * @param origin
+	 * @return
+	 */
+	public static String randomStringSplit(String origin) {
+		return randomStringSplit(origin, ",");
+	}
 }
