@@ -176,3 +176,13 @@ ADD COLUMN `repeat_count` INT(11) NULL DEFAULT 0 AFTER `status`;
 ALTER TABLE `dmzjbot`.`cmd_bu_sub` 
 ADD COLUMN `attr1` VARCHAR(45) NULL AFTER `status`,
 ADD COLUMN `attr2` VARCHAR(45) NULL AFTER `attr1`;
+
+create table cmd_wiki(
+	id bigint not null primary key auto_increment,
+	article varchar(50),
+	wiki_name varchar(50),
+	keywords varchar(100),
+	content varchar(2000),
+	image varchar(50),
+	status smallint not null default 1
+);

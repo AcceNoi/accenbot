@@ -3,6 +3,7 @@ package org.accen.dmzj.web.dao;
 import java.util.List;
 
 import org.accen.dmzj.web.vo.CmdWiki;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Results;
@@ -10,6 +11,7 @@ import org.apache.ibatis.annotations.Select;
 
 import feign.Param;
 
+@Mapper
 public interface CmdWikiMapper {
 	@Results(id = "cmdWikiMapper",value = {
 			@Result(property = "id",column = "id"),
@@ -20,6 +22,7 @@ public interface CmdWikiMapper {
 			@Result(property = "image",column = "image"),
 			@Result(property = "status",column = "status")
 	})
+	@Select("select * from cmd_wiki where id = #{id}")
 	public CmdWiki selectById(@Param("id")long id);
 	
 	@ResultMap("cmdWikiMapper")
