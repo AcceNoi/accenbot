@@ -129,7 +129,7 @@ public class BilibiliSchedule {
 									logger.debug(msg.toString());
 									taskManager.addGeneralTaskQuick(botId, "group", targetId, msg.toString());
 									if(share!=null) {
-										taskManager.addGeneralTaskQuick(botId, "group", targetId, share);
+//										taskManager.addGeneralTaskQuick(botId, "group", targetId, share);
 									}
 								});
 								
@@ -250,6 +250,21 @@ public class BilibiliSchedule {
 						.append("]")
 						.append(StringUtils.isEmpty(pic)?"":CQUtil.imageUrl(pic));
 			return new String[] {msgBuf.toString(),CQUtil.share("https://www.bilibili.com/video/av"+aid, title, description, pic)};
+		}else if(type>>4==1) {
+			//小视频
+			if(depth>0) {
+				//如果深度>=1，也就是我关注的这个人不是第一发布者，则带上当前发布者名
+				msgBuf.append(nextUname)
+						.append("：");
+			}else if(depth==0) {
+				msgBuf.append("发布了一个小视频：\n");
+			}
+			String description = (String) ((Map<String,Object>)cardMap.get("item")).get("description");
+			String description1 = description.length()>83?(description.substring(0, 80)+"..."):description;
+			String imgUrl = (String) ((Map<String,Object>)((Map<String,Object>)cardMap.get("item")).get("cover")).get("unclipped");
+			msgBuf.append(description1)
+				.append(StringUtils.isEmpty(imgUrl)?"":CQUtil.imageUrl(imgUrl));
+			return new String[] {msgBuf.toString(),null};
 		}else if(type>>6==1) {
 			//专栏
 			if(depth>0) {
