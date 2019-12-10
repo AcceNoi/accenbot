@@ -199,7 +199,7 @@ public class BilibiliSchedule {
 			//番剧是没有上传者名字的，用标题代替，不过在上一级无所谓，拿到的反正是空
 			
 			String orginJson = (String)cardMap.get("origin");
-			return new String[] {msgBuf.append(parseDynamicCardMap(gson.fromJson(orginJson, Map.class),originType, ++depth,originUname)).toString(),null};
+			return new String[] {msgBuf.append(parseDynamicCardMap(gson.fromJson(orginJson, Map.class),originType, ++depth,originUname)[0]).toString(),null};
 		}else if(type>>1==1) {
 			String description = (String) ((Map<String,Object>)cardMap.get("item")).get("description");
 			description = description.length()>83?(description.substring(0, 80)+"..."):description;
