@@ -53,7 +53,7 @@ public class BaiduBaikeCmd implements CmdAdapter{
 			if(wiki==null) {
 				//名字没匹配到，再去找关键字
 				List<CmdWiki> wikis = cmdWikiMapper.findByKeyword(kw);
-				if(wikis!=null) {
+				if(wikis!=null&&!wikis.isEmpty()) {
 					wiki = wikis.get(RandomUtil.randomInt(wikis.size()));
 				}
 			}
