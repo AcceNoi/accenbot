@@ -215,7 +215,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 					}
 					Matcher getMatcher = getPattern.matcher(message);
 					if(getMatcher.matches()) {
-						String pid = getMatcher.group(1);
+						String pid = getMatcher.group(2);
 						GeneralTask task =  new GeneralTask();
 						
 						task.setSelfQnum(selfQnum);
