@@ -18,4 +18,13 @@ public interface PixivicApiClient {
 	 */
 	@RequestLine("GET /keywords/{keyword}/pixivSuggestions")
 	public Map<String,Object> suggestions(@Param("keyword")String keyword);
+	/**
+	 * 排行榜
+	 * @param page
+	 * @param date
+	 * @param mode 支持day,week,month
+	 * @return
+	 */
+	@RequestLine("GET /ranks?page={page}&date={date}&mode={mode}")
+	public Map<String,Object> rank(@Param("page")int page,@Param("date")String date,@Param("mode")String mode);
 }
