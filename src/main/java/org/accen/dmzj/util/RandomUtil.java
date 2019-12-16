@@ -18,6 +18,20 @@ public class RandomUtil {
 		return rd.nextInt(max);
 	}
 	/**
+	 * 百分比几率随机是否通过。
+	 * @param prob 通过率，大于等于1则返回true，小于等于0则返回false，其他按几率返回
+	 * @return
+	 */
+	public static boolean randomPass(double prob) {
+		if(prob>=1) {
+			return true;
+		}else if(prob<=0) {
+			return false;
+		}else {
+			return rd.nextDouble()<prob;
+		}
+	}
+	/**
 	 * 暂时只支持有放回的随机抽取算法
 	 * @param <T>
 	 * @param objs

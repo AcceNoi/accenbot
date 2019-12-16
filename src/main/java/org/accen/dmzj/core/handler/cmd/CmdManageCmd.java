@@ -122,11 +122,13 @@ public class CmdManageCmd implements CmdAdapter {
 				.append(StringUtil.SPLIT)
 				.append("1. 影之诗抽卡>>发送【影之诗(十连)抽卡】\n")
 				.append(StringUtil.SPLIT)
-				.append("2. 东方Project抽卡>>>发送【东方(单抽|十连|翻牌)】\n")
+				.append("2. 影之诗卡券抽卡>>发送【影之诗翻牌】\n")
 				.append(StringUtil.SPLIT)
-				.append("3. 东方Project图鉴>>发送【我的图鉴】\n")
+				.append("3. 东方Project抽卡>>>发送【东方(单抽|十连|翻牌)】\n")
 				.append(StringUtil.SPLIT)
-				.append("4. 现支持的影之诗卡包有[森罗咆哮]、[荣耀再临]、[钢铁的反叛者]、[扭曲次元]。其他卡包 敬请期待...");
+				.append("4. 东方Project图鉴>>发送【我的图鉴】\n")
+				.append(StringUtil.SPLIT)
+				.append("5. 现支持的影之诗卡包有[森罗咆哮]、[荣耀再临]、[钢铁的反叛者]、[扭曲次元]。其他卡包 敬请期待...");
 			break;
 		case "/提醒与复读":
 			func.append("#提醒&复读#\n")

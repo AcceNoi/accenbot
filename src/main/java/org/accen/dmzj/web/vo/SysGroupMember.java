@@ -14,6 +14,13 @@ public class SysGroupMember {
 	private Date lastCheckinTime;//上次签到时间
 	private int status;//0-无效 1-有效 2禁用
 	private int repeatCount;//复读次数
+	private int cardTicket;//卡券
+	public int getCardTicket() {
+		return cardTicket;
+	}
+	public void setCardTicket(int cardTicket) {
+		this.cardTicket = cardTicket;
+	}
 	public long getId() {
 		return id;
 	}

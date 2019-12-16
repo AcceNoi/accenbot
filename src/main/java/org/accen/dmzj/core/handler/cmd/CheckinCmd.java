@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
+import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomUtil;
 import org.accen.dmzj.util.StringUtil;
@@ -32,11 +33,15 @@ public class CheckinCmd implements CmdAdapter {
 	private int iniFavorability = 0;//初始好感
 	@Value("${coolq.mem.favorabilityIncr}")
 	private int favorabilityIncr = 1;//好感递增
+	@Value("${coolq.mem.ticketProb:0.05}")
+	private double ticketProb ;//卡券获取概率
 	
 	@Autowired
 	private SysGroupMemberMapper sysGroupMember; 
 	@Autowired
 	private SvDrawCardCmd svCmd;
+	@Autowired
+	private TaskManager taskManager;
 	
 	@Override
 	public String describe() {
@@ -90,6 +95,8 @@ public class CheckinCmd implements CmdAdapter {
 								&&now.getDayOfMonth()==last.getDayOfMonth()) {
 							task.setMessage(CQUtil.at(qmessage.getUserId())+" 您今天已经签到过了喵~");
 						}else {
+							gainCardTicket(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+							
 							SysGroupMember mem = mems.get(0);
 							int ci = coinIncr;
 							if(coinIncr<0) {
@@ -108,11 +115,13 @@ public class CheckinCmd implements CmdAdapter {
 							mem.setFavorability(mem.getFavorability()+favorabilityIncr);
 							mem.setLastCheckinTime(new Date());
 							sysGroupMember.updateCheckin(mem);
-							String msg = CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")，复读次数："+mem.getRepeatCount()+"次。";
+							String msg = CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")。";
 							String svCompletion = svCmd.formatMyCardCompletion(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
 							task.setMessage(svCompletion==null?msg:(msg+"\n"+StringUtil.SPLIT_FOOT+"影之诗图鉴完成度：\n"+svCompletion));
 						}
 					}else {
+						gainCardTicket(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+						
 						SysGroupMember mem = mems.get(0);
 						int ci = coinIncr;
 						if(coinIncr<0) {
@@ -127,7 +136,7 @@ public class CheckinCmd implements CmdAdapter {
 						mem.setFavorability(mem.getFavorability()+favorabilityIncr);
 						mem.setLastCheckinTime(new Date());
 						sysGroupMember.updateCheckin(mem);
-						String msg = CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")，复读次数："+mem.getRepeatCount()+"次。";
+						String msg = CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")。";
 						String svCompletion = svCmd.formatMyCardCompletion(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
 						task.setMessage(svCompletion==null?msg:(msg+"\n"+StringUtil.SPLIT_FOOT+"影之诗图鉴完成度：\n"+svCompletion));
 					}
@@ -137,7 +146,7 @@ public class CheckinCmd implements CmdAdapter {
 				}
 			}else if("个人信息".equals(matcher.group(1))) {
 				if(mems!=null&&!mems.isEmpty()) {
-					String msg = CQUtil.at(qmessage.getUserId())+" 库存金币："+mems.get(0).getCoin()+"枚，好感度："+mems.get(0).getFavorability()+"，签到次数："+mems.get(0).getCheckinCount()+"，复读次数："+mems.get(0).getRepeatCount()+"次。";
+					String msg = CQUtil.at(qmessage.getUserId())+" 库存金币："+mems.get(0).getCoin()+"枚，好感度："+mems.get(0).getFavorability()+"，签到次数："+mems.get(0).getCheckinCount()+"，复读次数："+mems.get(0).getRepeatCount()+"次，影之诗传说卡券："+mems.get(0).getCardTicket()+"。";
 					String svCompletion = svCmd.formatMyCardCompletion(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
 					task.setMessage(svCompletion==null?msg:(msg+"\n"+StringUtil.SPLIT_FOOT+"影之诗图鉴完成度：\n"+svCompletion));
 				}else {
@@ -225,8 +234,8 @@ public class CheckinCmd implements CmdAdapter {
 	 * @param type
 	 * @param targetId
 	 * @param userId
-	 * @param diff 需要变化金币数
-	 * @return 剩余金币数 如果喂绑定，则返回-999
+	 * @param diff 需要变化复读次金币数
+	 * @return 剩余复读金币数 如果未绑定，则返回-999
 	 */
 	public int modifyRepeat(String type,String targetId,String userId,int diff) {
 		List<SysGroupMember> mems = sysGroupMember.selectByTarget(type, targetId, userId);
@@ -238,6 +247,57 @@ public class CheckinCmd implements CmdAdapter {
 			mem.setRepeatCount(mem.getRepeatCount()+diff);;
 			sysGroupMember.updateCheckin(mem);
 			return mem.getRepeatCount();
+		}
+	}
+	/**
+	 * 消耗或补充卡券
+	 * @param type
+	 * @param targetId
+	 * @param userId
+	 * @param diff 需要变化的卡券数
+	 * @return 剩余卡券数，如果未绑定，则返回-999
+	 */
+	public int modifyCardTicket(String type,String targetId,String userId,int diff) {
+		List<SysGroupMember> mems = sysGroupMember.selectByTarget(type, targetId, userId);
+		if(mems==null||mems.isEmpty()) {
+			return -999;
+		}else {
+			SysGroupMember mem = mems.get(0);
+//			sysGroupMember.updateCoinByTarget(mem.getCoin()+diff, type, targetId, userId);
+			mem.setRepeatCount(mem.getCardTicket()+diff);;
+			sysGroupMember.updateCheckin(mem);
+			return mem.getCardTicket();
+		}
+	}
+	/**
+	 * 获取一名用户的卡券，如果为负数，则表示还未绑定
+	 * @param type
+	 * @param targetId
+	 * @param userId
+	 * @return
+	 */
+	public int getTicket(String type,String targetId,String userId) {
+		List<SysGroupMember> mems = sysGroupMember.selectByTarget(type, targetId, userId);
+		if(mems==null||mems.isEmpty()) {
+			return -999;
+		}else {
+			return mems.get(0).getCardTicket();
+		}
+	}
+	/**&
+	 * 单独的获取卡券的功能
+	 * @param botId
+	 * @param type
+	 * @param targetId
+	 * @param userId
+	 */
+	public void gainCardTicket(String botId,String type,String targetId,String userId) {
+		if(RandomUtil.randomPass(ticketProb)) {
+			int curTicket = modifyCardTicket(type, targetId, userId, 1);
+			if(curTicket>0) {
+				taskManager.addGeneralTaskQuick(botId, type, targetId, CQUtil.at(userId)+" 恭喜获得1张传说卡券，现共有"+curTicket+"张券，发送影之诗翻牌+[卡包名]消耗卡券可开出虹卡以上的卡喵~");
+			}//未绑定不做处理 
+			
 		}
 	}
 }

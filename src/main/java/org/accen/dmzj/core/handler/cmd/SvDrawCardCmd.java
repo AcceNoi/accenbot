@@ -11,7 +11,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
+import org.accen.dmzj.core.handler.callbacker.CallbackListener;
+import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.task.GeneralTask;
+import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomMeta;
 import org.accen.dmzj.util.RandomUtil;
@@ -29,11 +32,13 @@ import org.springframework.util.StringUtils;
 @FuncSwitch("cmd_sv_draw")
 @Transactional
 @Component
-public class SvDrawCardCmd implements CmdAdapter {
+public class SvDrawCardCmd implements CmdAdapter,CallbackListener {
 	@Autowired
 	private CheckinCmd checkinCmd;
 	@Autowired
 	private CmdSvCardMapper cmdSvCardMapper;
+	@Autowired
+	private TaskManager taskManager;
 	@Override
 	public String describe() {
 		return "影之诗卡包抽卡";
@@ -50,15 +55,29 @@ public class SvDrawCardCmd implements CmdAdapter {
 	
 	private String[] careers = new String[] {"铜","银","金","虹","异画"};
 
-	private int[] returnCoin = new int[] {0,1,3,8,16};
+	private int[] returnCoin = new int[] {0,0,1,3,8};
 	
 	private final static Pattern pattern = Pattern.compile("^影之诗(十连)?抽卡(.*)");
+	private final static Pattern selectPattern = Pattern.compile("^影之诗翻牌(.*)");
 	private static final Pattern myPattern = Pattern.compile("^我的影之诗图鉴(\\d*)$");
+	
+	/**
+	 * 翻牌所用的map，targetType_targetId_userId_SV->(随机串->上次随机出来待选择的card)
+	 */
+	private static Map<String, Map<String,CmdSvCard>> pokerMap = new HashMap<String, Map<String,CmdSvCard>>();
+	/**
+	 * 翻牌的张数
+	 */
+	@Value("${coolq.sv.pokersize:3}")
+	private int pokerSize;
+	@Autowired
+	private CallbackManager callbackManager;
 	
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
 		Matcher matcher = pattern.matcher(message);
+		Matcher selectMatcher = selectPattern.matcher(message);
 		Matcher myMatcher = myPattern.matcher(message);
 		if(matcher.matches()) {
 			GeneralTask task =  new GeneralTask();
@@ -186,6 +205,9 @@ public class SvDrawCardCmd implements CmdAdapter {
 										
 								msgBuf.append(++index+". ["+desc+"]"+card.getCardName()+" * "+cardCountMap.get(card)+"\n");
 							}
+							
+							//十连有几率获得卡券
+							checkinCmd.gainCardTicket(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 						}
 						
 						
@@ -224,6 +246,69 @@ public class SvDrawCardCmd implements CmdAdapter {
 			
 			return task;
 			
+		}else if(selectMatcher.matches()){
+			GeneralTask task =  new GeneralTask();
+			task.setSelfQnum(selfQnum);
+			task.setType(qmessage.getMessageType());
+			task.setTargetId(qmessage.getGroupId());
+			int ticketCount = checkinCmd.getTicket(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+			if(ticketCount<0) {
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还未绑定哦，暂时无法抽卡，发送[绑定]即可绑定个人信息喵~");
+			}else if(ticketCount==0) {
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 传说卡券不足喵~“添加词条”“签到”都有机会获得卡券喵~");
+			}else {
+				String pkName = matcher.group(2);
+				CmdSvPk pk = null;
+				if(StringUtils.isEmpty(pkName)) {
+					//如果没有写卡包名，则取当前最新的
+					pk = cmdSvCardMapper.getTopPk();
+				}else {
+					pk = cmdSvCardMapper.selectPkByName(pkName, pkName, pkName, pkName);
+				}
+				if(pk!=null) {
+					List<CmdSvCard> cards = cmdSvCardMapper.findCardByPk(pk.getId());
+					//抽取,自会选择虹卡和异画
+					List<RandomMeta<CmdSvCard>> cardsO = cards.stream()
+							.filter(card->card.getCardRarity()>=4)
+							.map(card->new RandomMeta<CmdSvCard>(card,(int)(card.getProbability()*10000)))
+							.collect(Collectors.toList());
+					List<CmdSvCard> rss = RandomUtil.randomObjWeight(cardsO, pokerSize);
+					if(rss!=null&&!rss.isEmpty()&&rss.size()==pokerSize) {
+						//即使当前有poker任务，也直接覆盖掉
+						String key = qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId()+"_SV";
+						Map<String, CmdSvCard> myPoker = new HashMap<String, CmdSvCard>(pokerSize);
+						//再随机出等量的字符串，用于唯一标识card
+						String[] pokerKey = RandomUtil.randZhNumEx(2, pokerSize);
+						//再关联这两者
+						
+						if(pokerKey!=null) {
+							StringBuffer msgBuff = new StringBuffer(CQUtil.at(qmessage.getUserId()));
+							msgBuff.append(" 发送@Bot+下面任意字符串进行翻牌：\n");
+							
+							for(int index = 0;index<pokerSize;index++) {
+								myPoker.put(pokerKey[index], rss.get(index));
+								msgBuff.append(pokerKey[index])
+										.append("   ");
+							}
+							pokerMap.put(key, myPoker);
+
+							//添加回调任务听取用户的选择
+							callbackManager.addResidentListener(this);
+							
+							task.setMessage(msgBuff.toString());
+							return task;
+						}
+						
+						
+					}else {
+						task.setMessage(CQUtil.at(qmessage.getUserId())+" 抽卡失败~但我不会道歉的哦");
+						return task;
+					}
+				}else {
+					//没找到
+					task.setMessage(CQUtil.at(qmessage.getUserId())+" 未找到此卡包喵~");
+				}
+			}
 		}else if(myMatcher.matches()) {
 			GeneralTask task =  new GeneralTask();
 			task.setSelfQnum(selfQnum);
@@ -295,6 +380,63 @@ public class SvDrawCardCmd implements CmdAdapter {
 			return fmtBuf.substring(0, fmtBuf.length()-1);
 		}
 		return null;
+	}
+
+	@Override
+	public boolean listen(Qmessage originQmessage, Qmessage qmessage, String selfQnum) {
+		String key = qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId()+"_SV";
+		String choose = CQUtil.subAtAfter(qmessage.getMessage().trim(), selfQnum);
+		if(pokerMap.containsKey(key)&&choose!=null) {
+			Map<String, CmdSvCard> poker = pokerMap.get(key);
+			if(poker.containsKey(choose)) {
+				pokerMap.remove(choose);
+				CmdSvCard card = poker.get(choose.trim());
+				CmdMyCard mycard = cmdSvCardMapper.selectMyCardBySelf(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), card.getId());
+				if(mycard!=null) {
+					//已有这张卡，更新
+					cmdSvCardMapper.updateMyCardTime(mycard.getId(), new Date());
+				}else {
+					//没有，则插入
+					mycard = new CmdMyCard();
+					mycard.setPkId(card.getPkId());mycard.setCardId(card.getId());mycard.setTargetType(qmessage.getMessageType());mycard.setTargetId(qmessage.getGroupId());
+					mycard.setUserId(qmessage.getUserId());mycard.setCreateTime(new Date());mycard.setIsDeleted((short) 0);
+					cmdSvCardMapper.insertMyCard(mycard);
+				}
+				
+				StringBuffer msgBuff = new StringBuffer(CQUtil.at(qmessage.getUserId()));
+				String desc =card.getCareer()
+						+" "
+						+careers[card.getCardRarity()-1];
+						
+				msgBuff.append(" 本次翻到了【")
+						.append(choose.trim())
+						.append("\n")
+						.append("[")
+						.append(desc)
+						.append("] ")
+						.append(card.getCardName())
+						.append("】。其他卡片为：\n")
+						.append(StringUtil.SPLIT_FOOT);
+				String others = poker.keySet().stream().filter(pokerKey->!pokerKey.equals(choose.trim())).map(pokerKey->{
+									CmdSvCard curCard = poker.get(pokerKey);
+									String desc1 =card.getCareer()
+											+" "
+											+careers[card.getCardRarity()-1];
+									return pokerKey+" ["+desc1+"] "+curCard.getCardName();
+								}).collect(Collectors.joining("\n"+StringUtil.SPLIT));
+				//卡券消耗
+				int newTicket = checkinCmd.modifyCardTicket(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId(), -1);
+				msgBuff.append(others).append("\n\n本次抽卡消耗卡券：1，剩余："+newTicket);
+				taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), msgBuff.toString());
+				return false;
+			}else {
+				//选择有误
+				taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), CQUtil.at(qmessage.getUserId())+" 选择有误喵~");
+				return false;
+			}
+		}else {
+			return false;
+		}
 	}
 
 }

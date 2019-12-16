@@ -131,6 +131,9 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 					int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -decrease);
 					
 					task.setMessage(CQUtil.at(qmessage.getUserId())+"添加成功！词条编号："+cfgReply.getId()+"。本次消耗金币："+decrease+"。剩余："+newCoin);
+					
+					//添加词条有几率获得卡券
+					checkinCmd.gainCardTicket(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 				}
 				
 			}

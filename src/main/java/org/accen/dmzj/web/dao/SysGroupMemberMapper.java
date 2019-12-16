@@ -25,7 +25,8 @@ public interface SysGroupMemberMapper {
 		@Result(property = "createTime",column = "create_time"),
 		@Result(property = "lastCheckinTime",column = "last_checkin_time"),
 		@Result(property = "status",column = "status"),
-		@Result(property = "repeatCount",column = "repeat_count")
+		@Result(property = "repeatCount",column = "repeat_count"),
+		@Result(property = "cardTicket",column = "card_ticket")
 	}) 
 	@Select("select * from sys_group_member where id = #{id}")
 	public SysGroupMember selectById(@Param("id")long id);
@@ -39,7 +40,12 @@ public interface SysGroupMemberMapper {
 	@ResultMap("sysGroupMemberMapper")
 	public List<SysGroupMember> selectByTarget(@Param("type")String type,@Param("targetId")String targetId,@Param("userId")String userId);
 	
-	@Update("update sys_group_member set coin = #{coin},checkin_count=#{checkinCount},favorability=#{favorability},last_checkin_time=#{lastCheckinTime},repeat_count=#{repeatCount} where id = #{id}")
+	@Update("update sys_group_member set coin = #{coin}"
+			+ ",checkin_count=#{checkinCount}"
+			+ ",favorability=#{favorability}"
+			+ ",last_checkin_time=#{lastCheckinTime}"
+			+ ",repeat_count=#{repeatCount}"
+			+ ",card_ticket=#{cardTicket} where id = #{id}")
 	public long updateCheckin(SysGroupMember member);
 	@Update("update sys_group_member set coin = #{coin} where type = #{type} and target_id = #{targetId} and user_id = #{userId} and status = 1")
 	public long updateCoinByTarget(@Param("coin")int coin,@Param("type")String type,@Param("targetId")String targetId,@Param("userId")String userId);
