@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,7 @@ public class FuncSwitchUtil {
 		if(targetType==null||targetId==null) {
 			return true;
 		}
-		FuncSwitch fs = cmdClass.getAnnotation(FuncSwitch.class);
+		FuncSwitch fs = AnnotationUtils.findAnnotation(cmdClass,FuncSwitch.class);
 		if(fs==null) {
 			return true;
 		}

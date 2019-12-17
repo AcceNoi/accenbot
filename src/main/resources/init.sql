@@ -186,3 +186,5 @@ create table cmd_wiki(
 	image varchar(50),
 	status smallint not null default 1
 );
+ALTER TABLE `dmzjbot`.`sys_group_member` 
+ADD COLUMN `card_ticket` INT(11) NULL DEFAULT 1 AFTER `repeat_count`;
