@@ -10,10 +10,10 @@ import feign.RequestLine;
 import feign.codec.StringDecoder;
 import feign.form.FormEncoder;
 
-@FeignApi(host = "http://saucenao.com/",encoder = FormEncoder.class,decoder = StringDecoder.class)
+@FeignApi(host = "https://saucenao.com/",encoder = FormEncoder.class,decoder = StringDecoder.class)
 public interface SaucenaoApiClient {
 	/**
-	 * 调用<a href="http://saucenao.com/">saucenao.com</a>进行图片检索
+	 * 调用<a href="https://saucenao.com/">saucenao.com</a>进行图片检索
 	 * @param image
 	 * @return
 	 */
@@ -22,7 +22,7 @@ public interface SaucenaoApiClient {
 	public String search(@Param("file") File image);
 	
 	/**
-	 * 调用<a href="http://saucenao.com/">saucenao.com</a>进行图片检索
+	 * 调用<a href="https://saucenao.com/">saucenao.com</a>进行图片检索
 	 * @param image
 	 * @return
 	 */

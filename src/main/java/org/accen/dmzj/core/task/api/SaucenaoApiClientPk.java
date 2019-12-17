@@ -42,7 +42,7 @@ public class SaucenaoApiClientPk {
 		String resp = apiClient.search(url);
 		return parseSearchResult(resp);
 	}
-	private static final Pattern imageUrlPattern = Pattern.compile("http://saucenao.com/search.php.*?\\&url=(.*)");
+	private static final Pattern imageUrlPattern = Pattern.compile("https://saucenao.com/search.php.*?\\&url=(.*)");
 	private ImageResult parseSearchResult(String responseHtml) {
 		ImageResult imageResult = new ImageResult();
 		Document dom = Jsoup.parse(responseHtml);
