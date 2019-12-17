@@ -75,7 +75,7 @@ public class GroupMessageEventhandler implements EventHandler{
 			qmessage.setSendTime(new Date());
 			qmessage.setFont(new BigDecimal((Double)event.get("font")).stripTrailingZeros().toPlainString());
 			qmessage.setEvent(event);
-			qmessageMapper.insert(qmessage);
+//			qmessageMapper.insert(qmessage);
 			
 			//1.1是否为管理员
 			String role = (String) ((Map<String,Object>)event.get("sender")).get("role");
