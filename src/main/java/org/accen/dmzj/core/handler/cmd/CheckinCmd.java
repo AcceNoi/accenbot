@@ -264,7 +264,7 @@ public class CheckinCmd implements CmdAdapter {
 		}else {
 			SysGroupMember mem = mems.get(0);
 //			sysGroupMember.updateCoinByTarget(mem.getCoin()+diff, type, targetId, userId);
-			mem.setRepeatCount(mem.getCardTicket()+diff);;
+			mem.setCardTicket(mem.getCardTicket()+diff);;
 			sysGroupMember.updateCheckin(mem);
 			return mem.getCardTicket();
 		}
