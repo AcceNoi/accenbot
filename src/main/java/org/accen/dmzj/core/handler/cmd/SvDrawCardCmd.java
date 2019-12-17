@@ -257,7 +257,7 @@ public class SvDrawCardCmd implements CmdAdapter,CallbackListener {
 			}else if(ticketCount==0) {
 				task.setMessage(CQUtil.at(qmessage.getUserId())+" 传说卡券不足喵~“添加词条”“签到”都有机会获得卡券喵~");
 			}else {
-				String pkName = matcher.group(2);
+				String pkName = selectMatcher.group(1);
 				CmdSvPk pk = null;
 				if(StringUtils.isEmpty(pkName)) {
 					//如果没有写卡包名，则取当前最新的
@@ -387,9 +387,10 @@ public class SvDrawCardCmd implements CmdAdapter,CallbackListener {
 		String key = qmessage.getMessageType()+"_"+qmessage.getGroupId()+"_"+qmessage.getUserId()+"_SV";
 		String choose = CQUtil.subAtAfter(qmessage.getMessage().trim(), selfQnum);
 		if(pokerMap.containsKey(key)&&choose!=null) {
+//			choose = choose.trim();
 			Map<String, CmdSvCard> poker = pokerMap.get(key);
-			if(poker.containsKey(choose)) {
-				pokerMap.remove(choose);
+			if(poker.containsKey(choose.trim())) {
+				pokerMap.remove(choose.trim());
 				CmdSvCard card = poker.get(choose.trim());
 				CmdMyCard mycard = cmdSvCardMapper.selectMyCardBySelf(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), card.getId());
 				if(mycard!=null) {
