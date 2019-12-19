@@ -420,9 +420,9 @@ public class SvDrawCardCmd implements CmdAdapter,CallbackListener {
 						.append(StringUtil.SPLIT_FOOT);
 				String others = poker.keySet().stream().filter(pokerKey->!pokerKey.equals(choose.trim())).map(pokerKey->{
 									CmdSvCard curCard = poker.get(pokerKey);
-									String desc1 =card.getCareer()
+									String desc1 =curCard.getCareer()
 											+" "
-											+careers[card.getCardRarity()-1];
+											+careers[curCard.getCardRarity()-1];
 									return pokerKey+" ["+desc1+"] "+curCard.getCardName();
 								}).collect(Collectors.joining("\n"+StringUtil.SPLIT));
 				//卡券消耗
