@@ -3,7 +3,7 @@ package org.accen.dmzj.util.render;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-public abstract class RenderImage {
+public abstract class RenderImage implements Scaleable{
 	public int x;//左上角x坐标
 	public int y;//左上角y坐标
 	/**
@@ -21,5 +21,15 @@ public abstract class RenderImage {
 	public abstract int getWidth() ;
 
 	public abstract int getHeight() ;
+	
+	private double scale;
+	@Override
+	public double getScale() {
+		return scale;
+	}
+	@Override
+	public void setScale(double scale) {
+		this.scale = scale;
+	}
 	
 }

@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -39,47 +37,50 @@ public class Prank {
 	 * @param callback 由于获取榜单比较耗时，使用callback异步通知处理情况 {@link AsyncCallback}
 	 * @return
 	 */
-	public String rank(LocalDate curFactDate,RankType rankType,int offset,int page,AsyncCallback callback) {
+	public String rank(LocalDate curFactDate,RankType rankType,int offset,int page,AsyncCallback callback,Object... callbackParams) {
 		String dateFmt = DateTimeFormatter.ISO_LOCAL_DATE.format(rankType.virtualDate(curFactDate, offset));
 		//图片命名策略，形如../prank/day/2019-12-17_1.jpg
 		String reltivePath = tempDir+rankType.getMode()+"/"+dateFmt+"_"+page+".jpg";
 		File rankFile = new File(rankImageTempHome+reltivePath);
 		if(rankFile.exists()) {
 			//缓存有了
-			return localUrl+rankFile;
+			return localUrl+reltivePath;
 		}else {
+			if(!rankFile.getParentFile().exists()) {
+				rankFile.getParentFile().mkdirs();
+			}
 			//缓存无，需去网络上取
 			new Thread(()-> {
 				Map<String, Object> rs = pixivicApiClient.rank((page-1)%3+1, dateFmt, rankType.getMode());
-				List<Map<String,Object>> dataList = (List<Map<String, Object>>) rs.get("data");
+				List<Map<String,Object>> dataList = (List<Map<String, Object>>) ((Map<String,Object>)rs.get("data")).get("data");
 				if(dataList==null||dataList.isEmpty()) {
 					//失败，通过asyncCallback通知
 					if(callback!=null) {
-						callback.callback("failed",null);
+						callback.callback("failed",null,callbackParams);
 					}
 //					task.setMessage("搜索失败喵~，请稍后尝试");
 				}else {
 					//初始化renderImages
 					List<PixivUrlRenderImage> waitingRenderImages = dataList.stream()
-							 .skip(page/3*10)
-							 .limit(10)
+							 .skip(page/3*9)
+							 .limit(9)
 							 .parallel()
 							 .map(singleData->{
 								List<Map<String,Object>> imageUrls = (List<Map<String,Object>>)singleData.get("imageUrls");
 								Map<String,Object> artistPreView = (Map<String, Object>) singleData.get("artistPreView");
 								try {
-									return new PixivUrlRenderImage(new URL("https://bigimg.cheerfun.dev/get/"+imageUrls.get(0).get("medium"))
-											, (String)singleData.get("id")
+									return new PixivUrlRenderImage(new URL(((String)imageUrls.get(0).get("medium")).replace("i.pximg.net", "i.pixiv.cat"))
+											, ""+(long)((double)singleData.get("id"))
 											, (String)singleData.get("title")
 											, (String)artistPreView.get("name"));
 								} catch (MalformedURLException e) {
 									if(callback!=null) {
-										callback.callback("failed",null);
+										callback.callback("failed",null,callbackParams);
 									}
 									e.printStackTrace();
 								} catch (IOException e) {
 									if(callback!=null) {
-										callback.callback("failed",null);
+										callback.callback("failed",null,callbackParams);
 									}
 									e.printStackTrace();
 								}
@@ -91,10 +92,10 @@ public class Prank {
 					rankRender.setImgs(waitingRenderImages);
 					try {
 						rankRender.render(rankFile);
-						callback.callback("success",localUrl+rankFile);
+						callback.callback("success",localUrl+reltivePath,callbackParams);
 					} catch (DataNeverInitedException e) {
 						if(callback!=null) {
-							callback.callback("failed",null);
+							callback.callback("failed",null,callbackParams);
 						}
 						e.printStackTrace();
 					}

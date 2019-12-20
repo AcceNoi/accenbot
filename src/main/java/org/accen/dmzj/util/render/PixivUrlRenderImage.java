@@ -22,7 +22,9 @@ public class PixivUrlRenderImage extends UrlRenderImage {
 	 */
 	public void customAfterDraw(Graphics2D graph) {
 		graph.setColor(Color.RED);
-		graph.setFont(new Font("Microsoft Yahei", Font.BOLD, 10));
-		graph.drawString("PID："+pid+"\n"+"Title："+title+"\n"+"Author："+author, x, y);
+		graph.setFont(new Font("Microsoft Yahei", Font.BOLD, 15));
+		graph.drawString("PID："+pid, x+10, y+20);
+		graph.drawString("Title："+title, x+10, y+20+20);
+		graph.drawString("Author："+author, x+10, y+20+40);
 	}
 }

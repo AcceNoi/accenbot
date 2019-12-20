@@ -1,27 +1,25 @@
 package org.accen.dmzj.core.handler.cmd;
 
-import java.io.File;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.annotation.FuncSwitch;
+import org.accen.dmzj.core.handler.callbacker.AsyncCallback;
 import org.accen.dmzj.core.task.GeneralTask;
-import org.accen.dmzj.core.task.api.PixivicApiClient;
+import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.core.timer.Prank;
 import org.accen.dmzj.core.timer.RankType;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-public class PixivRankCmd implements CmdAdapter {
+@FuncSwitch("cmd_prank")
+@Component
+public class PixivRankCmd implements CmdAdapter,AsyncCallback {
 
 	@Override
 	public String describe() {
@@ -34,18 +32,14 @@ public class PixivRankCmd implements CmdAdapter {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	@Autowired
-	private PixivicApiClient pixivicApiClient ;
-	@Value("${sys.static.html.upload}")
-	private String rankImageTempHome ;
-	@Value("${sys.static.url.upload}")
-	private String localUrl;
+
 	
 	@Autowired
 	private Prank prank;
-	private static final String tempDir = "prank/";
-	
-	private static final Pattern rankPattern = Pattern.compile("^(p|P)站(上上|前|今|本|当|上|昨){0,1}(日|周|月)榜(1-9){0,1}");
+	@Autowired
+	private TaskManager taskManager;
+
+	private static final Pattern rankPattern = Pattern.compile("^(p|P)站(上上|前|今|本|当|上|昨){0,1}(日|周|月)榜([1-9]{0,1})");
 	private static ArrayList<Set<String>> offsetArr = new ArrayList<Set<String>>(3);
 	static {
 		offsetArr.add(0, Set.of("今","本","当"));
@@ -90,9 +84,33 @@ public class PixivRankCmd implements CmdAdapter {
 			}
 			int page = matcher.group(4)==null?1:Integer.valueOf(matcher.group(4));
 			//TODO 定义callback
-			prank.rank(LocalDate.now(), mode, offsetI, page, null);
+			String prankUrl = prank.rank(LocalDate.now(), mode, offsetI, page, this,qmessage,selfQnum);
+			if(prankUrl==null) {
+				task.setMessage("初次获取榜单需花费较长时间，请稍稍等待喵~");
+			}else {
+				task.setMessage(CQUtil.image(prankUrl)+"\n发送P站找图+pid可以查看大图喵~");
+			}
+			return task;
 		}
 		return null;
+	}
+
+	@Override
+	public void callback(String message, Object detail,Object... callbackParams) {
+		if("failed".equals(message)) {
+			//失败了
+			taskManager.addGeneralTaskQuick((String)callbackParams[1]
+					, ((Qmessage)callbackParams[0]).getMessageType()
+					, ((Qmessage)callbackParams[0]).getGroupId()
+					, "排行榜获取失败！请稍后再试喵~");
+		}else if("success".equals(message)) {
+			//成功了
+			taskManager.addGeneralTaskQuick((String)callbackParams[1]
+					, ((Qmessage)callbackParams[0]).getMessageType()
+					, ((Qmessage)callbackParams[0]).getGroupId()
+					, CQUtil.image((String)detail)+"\n发送P站找图+pid可以查看大图喵~");
+		}
+		return ;
 	}
 
 }
