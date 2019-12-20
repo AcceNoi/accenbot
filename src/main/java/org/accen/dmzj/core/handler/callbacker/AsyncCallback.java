@@ -6,9 +6,10 @@ package org.accen.dmzj.core.handler.callbacker;
  */
 public interface AsyncCallback {
 	/**
-	 * 异步的回调，如果message无法说明，可以使用detail传递，响应地就需要实现了AsyncCallback的类去自己与异步方法沟通（即类型转换）
+	 * 异步的回调，如果message无法说明，可以使用detail传递，相应地就需要实现了AsyncCallback的类去自己与异步方法沟通（即类型转换）
 	 * @param message
 	 * @param detail
+	 * @param callbackParams
 	 */
-	public void callback(String message,Object detail);
+	public void callback(String message,Object detail,Object... callbackParams);
 }
