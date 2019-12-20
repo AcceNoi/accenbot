@@ -23,8 +23,7 @@ import org.springframework.stereotype.Component;
 public class Prank {
 	@Value("${sys.static.html.upload}")
 	private String rankImageTempHome ;
-	@Value("${sys.static.url.upload}")
-	private String localUrl;
+
 	private static final String tempDir = "prank/";
 	@Autowired
 	private PixivicApiClient pixivicApiClient ;
@@ -44,7 +43,7 @@ public class Prank {
 		File rankFile = new File(rankImageTempHome+reltivePath);
 		if(rankFile.exists()) {
 			//缓存有了
-			return localUrl+reltivePath;
+			return "file:///"+rankImageTempHome+reltivePath;
 		}else {
 			if(!rankFile.getParentFile().exists()) {
 				rankFile.getParentFile().mkdirs();
@@ -92,7 +91,7 @@ public class Prank {
 					rankRender.setImgs(waitingRenderImages);
 					try {
 						rankRender.render(rankFile);
-						callback.callback("success",localUrl+reltivePath,callbackParams);
+						callback.callback("success","file:///"+rankImageTempHome+reltivePath,callbackParams);
 					} catch (DataNeverInitedException e) {
 						if(callback!=null) {
 							callback.callback("failed",null,callbackParams);

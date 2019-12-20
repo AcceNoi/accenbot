@@ -39,7 +39,7 @@ public class PixivRankCmd implements CmdAdapter,AsyncCallback {
 	@Autowired
 	private TaskManager taskManager;
 
-	private static final Pattern rankPattern = Pattern.compile("^(p|P)站(上上|前|今|本|当|上|昨){0,1}(日|周|月)榜([1-9]{0,1})");
+	private static final Pattern rankPattern = Pattern.compile("^(p|P)站(上上|前|今|本|当|上|昨){0,1}(日|周|月)榜([1-9]){0,1}");
 	private static ArrayList<Set<String>> offsetArr = new ArrayList<Set<String>>(3);
 	static {
 		offsetArr.add(0, Set.of("今","本","当"));
