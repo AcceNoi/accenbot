@@ -60,6 +60,7 @@ public class Prank {
 //					task.setMessage("搜索失败喵~，请稍后尝试");
 				}else {
 					//初始化renderImages
+					final boolean[] initSuccess = new boolean[] {true};
 					List<PixivUrlRenderImage> waitingRenderImages = dataList.stream()
 							 .skip(page/3*9)
 							 .limit(9)
@@ -68,30 +69,35 @@ public class Prank {
 								List<Map<String,Object>> imageUrls = (List<Map<String,Object>>)singleData.get("imageUrls");
 								Map<String,Object> artistPreView = (Map<String, Object>) singleData.get("artistPreView");
 								try {
-									return new PixivUrlRenderImage(new URL(((String)imageUrls.get(0).get("medium")).replace("i.pximg.net", "i.pixiv.cat"))
+//									return new PixivUrlRenderImage(new URL(((String)imageUrls.get(0).get("large")).replace("i.pximg.net", "i.pixiv.cat"))
+									return new PixivUrlRenderImage(new URL(((String)imageUrls.get(0).get("large")).replace("_webp", "").replace("i.pximg.net", "i.pixiv.cat"))
+//									return new PixivUrlRenderImage(new URL("https://bigimg.cheerfun.dev/get/"+((String)imageUrls.get(0).get("large")))
 											, ""+(long)((double)singleData.get("id"))
 											, (String)singleData.get("title")
 											, (String)artistPreView.get("name"));
 								} catch (MalformedURLException e) {
-									if(callback!=null) {
-										callback.callback("failed",null,callbackParams);
-									}
+									initSuccess[0] = false;
+									
 									e.printStackTrace();
 								} catch (IOException e) {
-									if(callback!=null) {
-										callback.callback("failed",null,callbackParams);
-									}
+									initSuccess[0] = false;
+									
 									e.printStackTrace();
 								}
 								return null ;
 							 })
 							 .collect(Collectors.toList());
+					if(callback!=null&&initSuccess[0]==false) {
+						callback.callback("failed",null,callbackParams);
+					}
 					//使用render去绘制
 					SimpleImageRender rankRender = new SimpleImageRender();
 					rankRender.setImgs(waitingRenderImages);
 					try {
 						rankRender.render(rankFile);
-						callback.callback("success","file:///"+rankImageTempHome+reltivePath,callbackParams);
+						if(callback!=null) {
+							callback.callback("success","file:///"+rankImageTempHome+reltivePath,callbackParams);
+						}
 					} catch (DataNeverInitedException e) {
 						if(callback!=null) {
 							callback.callback("failed",null,callbackParams);

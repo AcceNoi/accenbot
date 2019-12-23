@@ -21,10 +21,10 @@ public class PixivUrlRenderImage extends UrlRenderImage {
 	 * 写完图片后把元信息也一并写上去
 	 */
 	public void customAfterDraw(Graphics2D graph) {
-		graph.setColor(Color.RED);
-		graph.setFont(new Font("Microsoft Yahei", Font.BOLD, 15));
-		graph.drawString("PID："+pid, x+10, y+20);
-		graph.drawString("Title："+title, x+10, y+20+20);
-		graph.drawString("Author："+author, x+10, y+20+40);
+		graph.setColor(Color.RED.darker());
+		graph.setFont(new Font("Microsoft Yahei", Font.BOLD, 25));
+		graph.drawString("PID："+pid, x+10, y+30);
+		graph.drawString("Title："+title, x+10, y+30+30);
+		graph.drawString("Author："+author, x+10, y+30+60);
 	}
 }

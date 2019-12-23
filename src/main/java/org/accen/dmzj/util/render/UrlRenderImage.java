@@ -2,7 +2,7 @@ package org.accen.dmzj.util.render;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
@@ -12,8 +12,11 @@ public class UrlRenderImage extends RenderImage {
 	private BufferedImage buffImage;
 	public UrlRenderImage(URL url) throws IOException {
 		this.imageUrl = url;
-		InputStream is = imageUrl.openStream();
-		buffImage = ImageIO.read(is);
+//		InputStream is = imageUrl.openStream();
+		HttpURLConnection conn = (HttpURLConnection) imageUrl.openConnection();
+		/*conn.setConnectTimeout(20*1000);
+		conn.setReadTimeout(20*1000);*/
+		buffImage = ImageIO.read(conn.getInputStream());
 	}
 	@Override
 	public BufferedImage getBuffer() {

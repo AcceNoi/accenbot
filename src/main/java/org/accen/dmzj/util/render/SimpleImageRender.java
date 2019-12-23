@@ -2,6 +2,7 @@ package org.accen.dmzj.util.render;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -216,6 +217,7 @@ public class SimpleImageRender implements Render{
 		//3.绘制
 		BufferedImage wrapper = new BufferedImage(wrapperWidth, wrapperHeight, BufferedImage.TYPE_INT_RGB);
 		Graphics2D wrapperG = wrapper.createGraphics();
+		wrapperG.setRenderingHint(RenderingHints.KEY_ANTIALIASING , RenderingHints.VALUE_ANTIALIAS_ON);
 		wrapperG.setColor(Color.BLACK);
 		wrapperG.fillRect(0, 0, wrapper.getWidth(), wrapper.getHeight());
 		imgs.forEach(img->{
