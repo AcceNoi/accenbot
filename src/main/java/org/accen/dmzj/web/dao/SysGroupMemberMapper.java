@@ -26,13 +26,14 @@ public interface SysGroupMemberMapper {
 		@Result(property = "lastCheckinTime",column = "last_checkin_time"),
 		@Result(property = "status",column = "status"),
 		@Result(property = "repeatCount",column = "repeat_count"),
-		@Result(property = "cardTicket",column = "card_ticket")
+		@Result(property = "cardTicket",column = "card_ticket"),
+		@Result(property = "remark",column = "remark")
 	}) 
 	@Select("select * from sys_group_member where id = #{id}")
 	public SysGroupMember selectById(@Param("id")long id);
 	
-	@Insert("insert into sys_group_member(type,target_id,user_id,coin,checkin_count,favorability,create_time,last_checkin_time,status,repeat_count)"
-			+ "values(#{type},#{targetId},#{userId},#{coin},#{checkinCount},#{favorability},#{createTime},#{lastCheckinTime},#{status},#{repeatCount}) ")
+	@Insert("insert into sys_group_member(type,target_id,user_id,coin,checkin_count,favorability,create_time,last_checkin_time,status,repeat_count,remark)"
+			+ "values(#{type},#{targetId},#{userId},#{coin},#{checkinCount},#{favorability},#{createTime},#{lastCheckinTime},#{status},#{repeatCount},#{remark}) ")
 	@Options(useGeneratedKeys = true,keyProperty = "id")
 	public long insert(SysGroupMember member);
 	
@@ -45,7 +46,8 @@ public interface SysGroupMemberMapper {
 			+ ",favorability=#{favorability}"
 			+ ",last_checkin_time=#{lastCheckinTime}"
 			+ ",repeat_count=#{repeatCount}"
-			+ ",card_ticket=#{cardTicket} where id = #{id}")
+			+ ",card_ticket=#{cardTicket}"
+			+ ",remark=#{remark} where id = #{id}")
 	public long updateCheckin(SysGroupMember member);
 	@Update("update sys_group_member set coin = #{coin} where type = #{type} and target_id = #{targetId} and user_id = #{userId} and status = 1")
 	public long updateCoinByTarget(@Param("coin")int coin,@Param("type")String type,@Param("targetId")String targetId,@Param("userId")String userId);

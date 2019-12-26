@@ -188,3 +188,6 @@ create table cmd_wiki(
 );
 ALTER TABLE `dmzjbot`.`sys_group_member` 
 ADD COLUMN `card_ticket` INT(11) NULL DEFAULT 1 AFTER `repeat_count`;
+
+ALTER TABLE `dmzjbot`.`sys_group_member` 
+ADD COLUMN `remark` VARCHAR(60) NULL AFTER `card_ticket`;

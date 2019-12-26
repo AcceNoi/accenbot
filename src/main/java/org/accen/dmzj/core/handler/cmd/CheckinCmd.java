@@ -1,9 +1,15 @@
 package org.accen.dmzj.core.handler.cmd;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,6 +19,9 @@ import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomUtil;
 import org.accen.dmzj.util.StringUtil;
+import org.accen.dmzj.util.render.CheckinRender;
+import org.accen.dmzj.util.render.LocalFileRenderImage;
+import org.accen.dmzj.util.render.UrlRenderImage;
 import org.accen.dmzj.web.dao.SysGroupMemberMapper;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.accen.dmzj.web.vo.SysGroupMember;
@@ -20,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @FuncSwitch("cmd_checkin")
 @Component
@@ -36,6 +46,11 @@ public class CheckinCmd implements CmdAdapter {
 	@Value("${coolq.mem.ticketProb:0.05}")
 	private double ticketProb ;//卡券获取概率
 	
+	@Value("${sys.static.html.upload}")
+	private String groundTempHome ;
+
+	private static final String groundDir = "pground/";
+	private static final String tempDir = "checkinTemp/";
 	@Autowired
 	private SysGroupMemberMapper sysGroupMember; 
 	@Autowired
@@ -54,11 +69,13 @@ public class CheckinCmd implements CmdAdapter {
 	}
 
 	private final static Pattern pattern = Pattern.compile("^(个人信息|绑定|签到)$");
+	private final static Pattern remarkPattern = Pattern.compile("^设置留言(.+)");
 	
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
 		Matcher matcher = pattern.matcher(message);
+		Matcher remarkMatcher = remarkPattern.matcher(message);
 		if(matcher.matches()) {
 			
 			GeneralTask task = new GeneralTask();
@@ -96,6 +113,7 @@ public class CheckinCmd implements CmdAdapter {
 							task.setMessage(CQUtil.at(qmessage.getUserId())+" 您今天已经签到过了喵~");
 						}else {
 							gainCardTicket(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+							boolean gained = gainCardTicket2(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 							
 							SysGroupMember mem = mems.get(0);
 							int ci = coinIncr;
@@ -115,12 +133,37 @@ public class CheckinCmd implements CmdAdapter {
 							mem.setFavorability(mem.getFavorability()+favorabilityIncr);
 							mem.setLastCheckinTime(new Date());
 							sysGroupMember.updateCheckin(mem);
-							String msg = CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")。";
+							/*String msg = CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")。";
 							String svCompletion = svCmd.formatMyCardCompletion(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
-							task.setMessage(svCompletion==null?msg:(msg+"\n"+StringUtil.SPLIT_FOOT+"影之诗图鉴完成度：\n"+svCompletion));
+							task.setMessage(svCompletion==null?msg:(msg+"\n"+StringUtil.SPLIT_FOOT+"影之诗图鉴完成度：\n"+svCompletion));*/
+							Map<String, String> memEnhance = new HashMap<String, String>();
+							memEnhance.put("coin", "+"+ci);
+							memEnhance.put("fav", "+"+favorabilityIncr);
+							memEnhance.put("checkin", "+"+1);
+							if(gained) {
+								memEnhance.put("ticket", "+"+1);
+							}
+							
+							String card = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("card");
+							String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
+							String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+							try {
+								CheckinRender render = new CheckinRender(new LocalFileRenderImage(randomGroundFile()), mem, svCompletions, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mem.getUserId()+"&s=640")), StringUtils.isEmpty(card)?nickName:card,memEnhance);
+								String templeFileName = qmessage.getMessageType()+qmessage.getGroupId()+"-"+qmessage.getUserId()+".jpg";
+								File outFile = new File(groundTempHome+tempDir+templeFileName);
+								render.render(outFile);
+								task.setMessage(CQUtil.imageUrl("file:///"+outFile.getAbsolutePath()));
+							} catch (MalformedURLException e) {
+								e.printStackTrace();
+							} catch (IOException e) {
+								e.printStackTrace();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
 					}else {
-						gainCardTicket(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+						//gainCardTicket(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+						boolean gained = gainCardTicket2(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 						
 						SysGroupMember mem = mems.get(0);
 						int ci = coinIncr;
@@ -136,9 +179,34 @@ public class CheckinCmd implements CmdAdapter {
 						mem.setFavorability(mem.getFavorability()+favorabilityIncr);
 						mem.setLastCheckinTime(new Date());
 						sysGroupMember.updateCheckin(mem);
-						String msg = CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")。";
+						/*String msg = CQUtil.at(qmessage.getUserId())+" 签到成功喵！库存金币："+mem.getCoin()+"(+"+ci+")"+"枚，好感度："+mem.getFavorability()+"(+"+favorabilityIncr+")。";
 						String svCompletion = svCmd.formatMyCardCompletion(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
 						task.setMessage(svCompletion==null?msg:(msg+"\n"+StringUtil.SPLIT_FOOT+"影之诗图鉴完成度：\n"+svCompletion));
+						*/
+						Map<String, String> memEnhance = new HashMap<String, String>();
+						memEnhance.put("coin", "+"+ci);
+						memEnhance.put("fav", "+"+favorabilityIncr);
+						memEnhance.put("checkin", "+"+1);
+						if(gained) {
+							memEnhance.put("ticket", "+"+1);
+						}
+						
+						String card = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("card");
+						String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
+						String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+						try {
+							CheckinRender render = new CheckinRender(new LocalFileRenderImage(randomGroundFile()), mem, svCompletions, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mem.getUserId()+"&s=640")), StringUtils.isEmpty(card)?nickName:card,memEnhance);
+							String templeFileName = qmessage.getMessageType()+qmessage.getGroupId()+"-"+qmessage.getUserId()+".jpg";
+							File outFile = new File(groundTempHome+tempDir+templeFileName);
+							render.render(outFile);
+							task.setMessage(CQUtil.imageUrl("file:///"+outFile.getAbsolutePath()));
+						} catch (MalformedURLException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 					
 				}else {
@@ -146,14 +214,54 @@ public class CheckinCmd implements CmdAdapter {
 				}
 			}else if("个人信息".equals(matcher.group(1))) {
 				if(mems!=null&&!mems.isEmpty()) {
-					String msg = CQUtil.at(qmessage.getUserId())+" 库存金币："+mems.get(0).getCoin()+"枚，好感度："+mems.get(0).getFavorability()+"，签到次数："+mems.get(0).getCheckinCount()+"，复读次数："+mems.get(0).getRepeatCount()+"次，影之诗传说卡券："+mems.get(0).getCardTicket()+"。";
+					/*String msg = CQUtil.at(qmessage.getUserId())+" 库存金币："+mems.get(0).getCoin()+"枚，好感度："+mems.get(0).getFavorability()+"，签到次数："+mems.get(0).getCheckinCount()+"，复读次数："+mems.get(0).getRepeatCount()+"次，影之诗传说卡券："+mems.get(0).getCardTicket()+"。";
 					String svCompletion = svCmd.formatMyCardCompletion(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
-					task.setMessage(svCompletion==null?msg:(msg+"\n"+StringUtil.SPLIT_FOOT+"影之诗图鉴完成度：\n"+svCompletion));
+					task.setMessage(svCompletion==null?msg:(msg+"\n"+StringUtil.SPLIT_FOOT+"影之诗图鉴完成度：\n"+svCompletion));*/
+										
+					String card = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("card");
+					String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
+					String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+					try {
+						CheckinRender render = new CheckinRender(new LocalFileRenderImage(randomGroundFile()), mems.get(0), svCompletions, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mems.get(0).getUserId()+"&s=640")), StringUtils.isEmpty(card)?nickName:card,null);
+						String templeFileName = qmessage.getMessageType()+qmessage.getGroupId()+"-"+qmessage.getUserId()+".jpg";
+						File outFile = new File(groundTempHome+tempDir+templeFileName);
+						render.render(outFile);
+						task.setMessage(CQUtil.imageUrl("file:///"+outFile.getAbsolutePath()));
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}else {
 					task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还没绑定个人信息哦，请发送[绑定]进行绑定喵~");
 				}
 			}
 			return task;
+		}
+		if(remarkMatcher.matches()) {
+			GeneralTask task = new GeneralTask();
+			task.setSelfQnum(selfQnum);
+			task.setType(qmessage.getMessageType());
+			task.setTargetId(qmessage.getGroupId());
+			
+			List<SysGroupMember> mems = sysGroupMember.selectByTarget(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+			if(mems==null||mems.isEmpty()) {
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还没绑定个人信息哦，请发送[绑定]进行绑定喵~");
+				return task;
+			}
+			String remark = remarkMatcher.group(1);
+			if(remark.length()>15) {
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 留言不要超过15个字啦，狐狸会坏掉的喵！");
+				return task;
+			}else {
+				SysGroupMember mem = mems.get(0);
+				mem.setRemark(remark);
+				sysGroupMember.updateCheckin(mem);
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 留言设置成功喵！");
+				return task;
+			}
 		}
 		return null;
 	}
@@ -291,6 +399,7 @@ public class CheckinCmd implements CmdAdapter {
 	 * @param targetId
 	 * @param userId
 	 */
+	@Deprecated
 	public void gainCardTicket(String botId,String type,String targetId,String userId) {
 		if(RandomUtil.randomPass(ticketProb)) {
 			int curTicket = modifyCardTicket(type, targetId, userId, 1);
@@ -299,5 +408,34 @@ public class CheckinCmd implements CmdAdapter {
 			}//未绑定不做处理 
 			
 		}
+	}
+	/**
+	 * 获取卡券，true则为获取成功
+	 * @param botId
+	 * @param type
+	 * @param targetId
+	 * @param userId
+	 * @return 
+	 */
+	public boolean gainCardTicket2(String botId,String type,String targetId,String userId) {
+		if(RandomUtil.randomPass(ticketProb)) {
+			int curTicket = modifyCardTicket(type, targetId, userId, 1);
+			if(curTicket>0) {
+				return true;
+//				taskManager.addGeneralTaskQuick(botId, type, targetId, CQUtil.at(userId)+" 恭喜获得1张传说卡券，现共有"+curTicket+"张券，发送影之诗翻牌+[卡包名]消耗卡券可开出虹卡以上的卡喵~");
+			}//未绑定不做处理 
+			
+		}
+		return false;
+	}
+	
+	/**
+	 * 随机从pground中取一张图
+	 * @return
+	 */
+	private File randomGroundFile() {
+		File dir = new File(groundTempHome+groundDir);
+		File[] all = dir.listFiles();
+		return all[RandomUtil.randomInt(all.length)];
 	}
 }

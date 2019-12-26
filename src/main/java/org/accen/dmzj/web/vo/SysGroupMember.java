@@ -15,6 +15,7 @@ public class SysGroupMember {
 	private int status;//0-无效 1-有效 2禁用
 	private int repeatCount;//复读次数
 	private int cardTicket;//卡券
+	private String remark;//留言
 	public int getCardTicket() {
 		return cardTicket;
 	}
@@ -86,6 +87,12 @@ public class SysGroupMember {
 	}
 	public void setRepeatCount(int repeatCount) {
 		this.repeatCount = repeatCount;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 	
 }

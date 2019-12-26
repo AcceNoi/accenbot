@@ -381,6 +381,29 @@ public class SvDrawCardCmd implements CmdAdapter,CallbackListener {
 		}
 		return null;
 	}
+	/**
+	 * 获取格式化的图鉴收集程度 卡包名： 集卡数/卡总数
+	 * @param targetType
+	 * @param targetId
+	 * @param userId
+	 * @return
+	 */
+	public String[][] formatMyCardCompletion2(String targetType,String targetId,String userId) {
+		
+		List<CmdSvPk> pks = cmdSvCardMapper.findSvPk();
+		if(pks!=null&&!pks.isEmpty()) {
+			String[][] fmtRs = new String[pks.size()][2] ;
+			for(int i=0;i<pks.size();i++) {
+				fmtRs[i][0]=pks.get(i).getPkName();
+				int mine = cmdSvCardMapper.countCardMyCardByPkId(pks.get(i).getId(), targetType, targetId, userId);
+				int all = cmdSvCardMapper.countCardByPkAndCareerAndRarity(pks.get(i).getId(), null, "4")+cmdSvCardMapper.countCardByPkAndCareerAndRarity(pks.get(i).getId(), null, "5");
+				fmtRs[i][1]=mine+"/"+all;
+			}
+			
+			return fmtRs;
+		}
+		return null;
+	}
 
 	@Override
 	public boolean listen(Qmessage originQmessage, Qmessage qmessage, String selfQnum) {
