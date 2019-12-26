@@ -88,7 +88,7 @@ public class PixivRankCmd implements CmdAdapter,AsyncCallback {
 			if(prankUrl==null) {
 				task.setMessage("初次获取榜单需花费较长时间，请稍稍等待喵~");
 			}else {
-				task.setMessage(CQUtil.image(prankUrl)+"\n发送P站找图+pid可以查看大图喵~");
+				task.setMessage(CQUtil.image(prankUrl)+"\n发送P站找图+pid可以查看大图喵~，如：P站找图77649836-1");
 			}
 			return task;
 		}

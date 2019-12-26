@@ -72,7 +72,7 @@ public class Prank {
 //									return new PixivUrlRenderImage(new URL(((String)imageUrls.get(0).get("large")).replace("i.pximg.net", "i.pixiv.cat"))
 									return new PixivUrlRenderImage(new URL(((String)imageUrls.get(0).get("large")).replace("_webp", "").replace("i.pximg.net", "i.pixiv.cat"))
 //									return new PixivUrlRenderImage(new URL("https://bigimg.cheerfun.dev/get/"+((String)imageUrls.get(0).get("large")))
-											, ""+(long)((double)singleData.get("id"))
+											, ""+(long)((double)singleData.get("id"))+(imageUrls.size()>1?("[1-"+imageUrls.size()+"]"):"")
 											, (String)singleData.get("title")
 											, (String)artistPreView.get("name"));
 								} catch (MalformedURLException e) {

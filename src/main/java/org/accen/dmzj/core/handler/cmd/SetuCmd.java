@@ -58,8 +58,6 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	private PixivicApiClient pixivicApiClient;
 	@Autowired
 	private TaskManager taskManager;
-	@Autowired
-	private PixivcatApiClient pixivcatApiClient;
 	
 	@Value("${coolq.setu.coin.decrease:-3}")
 	private int decrease ;
@@ -70,7 +68,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	private static final Pattern collectPattern = Pattern.compile("^随机收藏$");
 	private static final Pattern searchPattern = Pattern.compile("^(P|p)站搜图(.+)");
 	private static final Pattern searchPattern2 = Pattern.compile("^随机(.+)");
-	private static final Pattern getPattern = Pattern.compile("^(P|p)站找图(\\d+)");
+	private static final Pattern getPattern = Pattern.compile("^(P|p)站找图((\\d+)?(-){0,1}(\\d*))");
 	private static final String proxyPreffix = "https://i.pixiv.cat";
 	
 	//待收藏的map  type_group-> randomZh -> imageUrl
