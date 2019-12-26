@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 import org.accen.dmzj.core.exception.BiliBiliCookieExpired;
 import org.accen.dmzj.core.exception.BiliBiliCookieNeverInit;
 import org.accen.dmzj.util.StringUtil;
+import org.accen.dmzj.web.dao.CfgConfigValueMapper;
+import org.accen.dmzj.web.vo.CfgConfigValue;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -23,6 +25,7 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +36,32 @@ public class ApiBiliBiliApiClient {
 	@Value("${sys.static.html.mime}")
 	private String tempMimePath;//usr/local/niginx/music/
 
-	public String sessData = null;//登陆cookie的SESSDATA
+	@Autowired
+	private CfgConfigValueMapper configMapper;
+	private final static String B_COOKIE_NAME="SESS_DATA";
+	private String sessData = null;//登陆cookie的SESSDATA
+	
+	public void setSessData(String sessData) {
+		this.sessData = sessData;
+		CfgConfigValue config = configMapper.selectByTargetAndKey("system", "0", B_COOKIE_NAME);
+		if(config==null) {
+			config = new CfgConfigValue();
+			config.setTargetType("system");config.setTarget("0");config.setConfigKey(B_COOKIE_NAME);config.setConfigValue(sessData);
+			configMapper.insert(config);
+		}else {
+			config.setConfigValue(sessData);
+			configMapper.updateValue(config);
+		}
+	}
+	public String getSessData() {
+		if(this.sessData==null) {
+			CfgConfigValue config = configMapper.selectByTargetAndKey("system", "0", B_COOKIE_NAME);
+			if(config!=null) {
+				this.sessData = config.getConfigValue();
+			}
+		}
+		return this.sessData;
+	}
 	
 	public void checkCookie() throws BiliBiliCookieNeverInit {
 		if(sessData==null) {
@@ -43,7 +71,7 @@ public class ApiBiliBiliApiClient {
 	private final HttpClient httpClient = HttpClientBuilder.create().build();
 	private final Gson gson = new Gson();
 	
-	private final static Pattern urlPattern = Pattern.compile(".*?www.bilibili.com/video/av(\\d+)?.*");
+	private final static Pattern urlPattern = Pattern.compile(".*?(bilibili|b23).(com|tv)/(video/){0,1}av(\\d+)?.*");
 	/**
 	 * 
 	 * @param str

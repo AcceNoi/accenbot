@@ -34,7 +34,7 @@ public class BiliBiliCookieCmd implements CmdAdapter {
 		Matcher matcher = grepPattern.matcher(message);
 		if(matcher.matches()) {
 			
-			apiClient.sessData = matcher.group(1);
+			apiClient.setSessData(matcher.group(1));
 			
 			GeneralTask task = new GeneralTask();
 			task.setSelfQnum(selfQnum);
