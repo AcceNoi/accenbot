@@ -3,7 +3,7 @@
 
 [![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)
 
-## 主页（建设中） - [bot.accen.wiki](http://bot.accen.wiki)
+## 主页（鸽置中） - [bot.accen.wiki](http://bot.accen.wiki)
 
 | Author | Accen/クロノス    |
 | ------ | ----------------- |
@@ -25,6 +25,10 @@
 - **随机图片** 借助[随机图片API](https://api.lolicon.app)实现的随机图片功能，该API是由网络上提供的随机（P站）图片API，使用[pixiv.cat](https://pixiv.cat/)作为图片代理。
 
 - **收藏** 在1.2的基础上，获得图片后会触发一次*常驻回调监听*，在指定时间内发送对应指定可保存此图片的索引，并通过“随机收藏”重新展现出来。
+
+- **P站找图** p站找图分为以<u>关键词找图</u>和以<u>pid找图</u>。关键词找图是接入了[pixivic.com][pixivic.com]的搜图功能，其后端项目为[Pixiv-Illustration-Collection-Backend](https://github.com/cheer-fun/Pixiv-Illustration-Collection-Backend)，但是其p站代理不是很稳定，速度也不够，所以建议使用它找到pid后换用其他的p站代理获取图片。
+
+- **P站榜单** 也是依据[pixivic.com][pixivic.com]的榜单功能，但是由于有两天的延迟，为了不至于获取不到榜单，就向前推了两天（会导致周一周二还是获取的上周的榜单，1号2号获取上月的榜单）。获取的源码为Prank.java，还有一个榜单的绘制过程后续再说明。
 
 ### 2. 词条
 
@@ -54,6 +58,7 @@
 
 - **东方卡包**
 - **影之诗卡包**
+- **卡券** 卡券作为金币的替代品
 
 >抽卡功能即是设置卡片的抽取概率，再通过一定的指定随机出来，并保留抽取结果。
 
@@ -103,7 +108,12 @@
 
 - **功能开关** 功能开关用来对bot的某些功能进行限制，现在的功能主要包含：词条回复、系统功能、回调监听、监听。能够被功能开关所限制的是系统功能。通过@FuncSwitch标识这个功能，在CFG_CONFIG_VALUE中对其进行控制，粒度暂时只能精确到群组，详细可看FuncSwitchUtil.java。
 
-  ## 感谢
+- **图片绘制** 图片绘制是系统很重要的一个功能，完成了所有与自定义图片的绘制工作。整体接口是Render.java（完成图片的绘制）、RenderImage.java（负责定义单个图片的元信息和custom绘制）、Scalable（负责图片的缩放）。另外对Render做了两个简单的实现<u>SimpleImageRender（网格式图片绘制，其实就是用来支持p站榜单的绘制，支持设置横向间隔水平间隔，支持设置向上填充或水平对齐）</u>、CheckinRender（个人信息的绘制，由于里面的信息比较复杂，建议不要再更改）。后续可能会将图片绘制的功能全部抽取出来作为一个独立的项目。
+
+## 关于版本
+>现已推出三个版本，最新版Lindworm上线了图片绘制功能。往后也是按照此习惯进行发布（除非有重大代码重构才会考虑切大版本），至于版本命名基本参考自各种神话传说（毕竟cy也喜欢从各种神话中取材）。
+
+## 感谢
 
   - 感谢酷Q项目，各位有兴趣可移步[酷Q社区]( https://cqp.cc/ )
   - 感谢大佬[richardchien](https://github.com/richardchien)的**[coolq-http-api](https://github.com/richardchien/coolq-http-api)**项目，提供了一个第三方公共调用的接口
