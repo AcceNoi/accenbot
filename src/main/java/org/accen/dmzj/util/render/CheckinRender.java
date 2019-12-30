@@ -101,14 +101,14 @@ public class CheckinRender implements Render,Backgroudable{
 	}
 	protected void renderHeader(Graphics2D wrapperG) {
 		int headerSize = 25;
-		Font font = new Font("Microsoft Yahei", Font.BOLD, headerSize);
+		Font font = new Font("微软雅黑", Font.BOLD, headerSize);
 		String headerText = "个人档案 No."+mem.getId();
 		float x = caculateCenterTextX(headerText,font,0,WIDTH,wrapperG);
 		float y = headerSize+5;
 		renderTextOutline(wrapperG, x, y, font, headerText);
 	}
 	protected void renderName(Graphics2D wrapperG) {
-		Font ft16 = new Font("Microsoft Yahei", Font.BOLD, 16);
+		Font ft16 = new Font("微软雅黑", Font.BOLD, 16);
 		String nameText = "【"+qqName+"】";
 		float x = caculateCenterTextX(nameText, ft16, 0, WIDTH, wrapperG);
 		float y = 50;
@@ -118,7 +118,7 @@ public class CheckinRender implements Render,Backgroudable{
 		PixivUrlRenderImage.renderTextAndOutline(0.3f,text,font,wrapperG,x,y,Color.WHITE, Color.BLACK);
 	}
 	protected void renderMem(Graphics2D wrapperG,float x,float y) {
-		Font ft18 = new Font("Microsoft Yahei", Font.BOLD, 18);
+		Font ft18 = new Font("微软雅黑", Font.BOLD, 18);
 		FontMetrics fm = wrapperG.getFontMetrics(ft18);
 		int textLength = fm.stringWidth("签到次数");
 		renderTextOutline(wrapperG, x, y, ft18, "金币");
@@ -130,16 +130,16 @@ public class CheckinRender implements Render,Backgroudable{
 		renderTextOutline(wrapperG, x, y+28+28+28, ft18, "复读次数");
 		renderTextOutline(wrapperG, x+textLength+5, y+28+28+28, ft18, ""+mem.getRepeatCount()+((memEnhance==null||memEnhance.get("repeat")==null)?"":"("+memEnhance.get("repeat")+")"));
 		renderTextOutline(wrapperG, x, y+28+28+28+28, ft18, "卡券");
-		renderTextOutline(wrapperG, x+textLength+5, y+28+28+28+28, ft18, ""+mem.getCardTicket()+((memEnhance==null||memEnhance.get("ticket")==null)?"":"("+memEnhance.get("tiket")+")"));
+		renderTextOutline(wrapperG, x+textLength+5, y+28+28+28+28, ft18, ""+mem.getCardTicket()+((memEnhance==null||memEnhance.get("ticket")==null)?"":"("+memEnhance.get("ticket")+")"));
 	}
 	protected void renderRemark(Graphics2D wrapperG,float y) {
-		Font ft16 = new Font("Microsoft Yahei", Font.BOLD, 16);
+		Font ft16 = new Font("微软雅黑", Font.BOLD, 16);
 		String remark = StringUtils.isEmpty(mem.getRemark())?"↑这个人很懒，还没有设置留言":mem.getRemark();
 		float x = caculateCenterTextX(remark, ft16, 0, WIDTH, wrapperG);
 		renderTextOutline(wrapperG, x, y, ft16, remark);
 	}
 	protected void renderPk(Graphics2D wrapperG,float x1,float x2,float y) {
-		Font ft16 = new Font("Microsoft Yahei", Font.BOLD, 16);
+		Font ft16 = new Font("微软雅黑", Font.BOLD, 16);
 		FontMetrics fm = wrapperG.getFontMetrics(ft16);
 		int textLength = fm.stringWidth("钢铁的反叛者");
 		for(int i=0;i<svCompletions.length;i++) {

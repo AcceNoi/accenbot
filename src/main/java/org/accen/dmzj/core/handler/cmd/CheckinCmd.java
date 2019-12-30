@@ -112,7 +112,7 @@ public class CheckinCmd implements CmdAdapter {
 								&&now.getDayOfMonth()==last.getDayOfMonth()) {
 							task.setMessage(CQUtil.at(qmessage.getUserId())+" 您今天已经签到过了喵~");
 						}else {
-							gainCardTicket(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+//							gainCardTicket(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 							boolean gained = gainCardTicket2(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 							
 							SysGroupMember mem = mems.get(0);
