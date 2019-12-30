@@ -29,8 +29,8 @@ public class CheckinRender implements Render,Backgroudable{
 	private SysGroupMember mem;
 	private Map<String, String> memEnhance;//对mem做的增强，由于mem只能表示当前的状态，无法显示值的变化，使用这个来实现展示
 	private String[][] svCompletions;
-	private final static int WIDTH = 360;
-	private final static int HEIGHT = 400;
+	private final static int WIDTH = 1080;
+	private final static int HEIGHT = 1200;
 	public CheckinRender(RenderImage background,SysGroupMember mem,String[][] svCompletions,RenderImage profileImage,String qqName,Map<String, String> memEnhance) {
 		super();
 		this.backgroundImg = background;
@@ -47,7 +47,7 @@ public class CheckinRender implements Render,Backgroudable{
 		wrapperG.setRenderingHint(RenderingHints.KEY_ANTIALIASING , RenderingHints.VALUE_ANTIALIAS_ON);
 		wrapperG.setColor(Color.BLACK);
 		wrapperG.fillRect(0, 0, wrapper.getWidth(), wrapper.getHeight());
-		int faceRadius = 80;
+		int faceRadius = 240;
 		//1.背景
 		setBackgroud(wrapperG);
 		//2.头
@@ -55,24 +55,24 @@ public class CheckinRender implements Render,Backgroudable{
 		//3.qqname
 		renderName(wrapperG);
 		//4.绘制标线
-		wrapperG.setStroke(new BasicStroke(3));
+		wrapperG.setStroke(new BasicStroke(9));
 		wrapperG.setColor(Color.WHITE);
-		wrapperG.drawLine(190, 100-faceRadius+60, 190, 100+faceRadius);
-		wrapperG.drawLine(100-faceRadius+30, 100+faceRadius+30+50, 350-50, 100+faceRadius+30+50);
+		wrapperG.drawLine((80*2+15*2)*3, 100*3-faceRadius+60*3, (80*2+15*2)*3, 100*3+faceRadius);
+		wrapperG.drawLine(100*3-faceRadius+30*3, 100*3+faceRadius+30*3+50*3, 350*3-50*3, 100*3+faceRadius+30*3+50*3);
 		//5.绘制mem信息
-		renderMem(wrapperG, 200, 158-faceRadius);
+		renderMem(wrapperG, 200*3, 158*3-faceRadius);
 		//6.绘制留言
-		renderRemark(wrapperG, 150+faceRadius);
+		renderRemark(wrapperG, 150*3+faceRadius);
 		//7.绘制卡包
-		renderPk(wrapperG, 100-faceRadius, 100+faceRadius, 208+faceRadius);
+		renderPk(wrapperG, 100*3-faceRadius, 100*3+faceRadius, 208*3+faceRadius);
 		//8.绘制头像
 
 			
-		int border = 1;
+		int border = 1*3;
 //		int radius = 80;
-		Ellipse2D.Double shape = new Ellipse2D.Double(100-faceRadius, 100-faceRadius+30, faceRadius*2-border, faceRadius*2-border);
+		Ellipse2D.Double shape = new Ellipse2D.Double(100*3-faceRadius, 100*3-faceRadius+30*3, faceRadius*2-border, faceRadius*2-border);
 		wrapperG.clip(shape);
-		wrapperG.drawImage(profileImg.getBuffer(), new AffineTransformOp(AffineTransform.getScaleInstance(0.25, 0.25), null), 100-faceRadius, 100-faceRadius+30);
+		wrapperG.drawImage(profileImg.getBuffer(), new AffineTransformOp(AffineTransform.getScaleInstance((float)faceRadius/320, (float)faceRadius/320), null), 100*3-faceRadius, 100*3-faceRadius+30*3);
 
 		try {
 			wrapperG.dispose();
@@ -89,7 +89,7 @@ public class CheckinRender implements Render,Backgroudable{
 		graph.drawImage(backgroundImg.getBuffer(), ato, 0, 0);
 		
 	}
-	
+	@Deprecated
 	protected void renderProfile(Graphics2D wrapperG) {
 		//先把头像裁成160*160
 		
@@ -100,51 +100,51 @@ public class CheckinRender implements Render,Backgroudable{
 		wrapperG.drawImage(profileImg.getBuffer(), null, 100-radius, 100-radius);
 	}
 	protected void renderHeader(Graphics2D wrapperG) {
-		int headerSize = 25;
+		int headerSize = 25*3;
 		Font font = new Font("微软雅黑", Font.BOLD, headerSize);
 		String headerText = "个人档案 No."+mem.getId();
 		float x = caculateCenterTextX(headerText,font,0,WIDTH,wrapperG);
-		float y = headerSize+5;
+		float y = headerSize+5*3;
 		renderTextOutline(wrapperG, x, y, font, headerText);
 	}
 	protected void renderName(Graphics2D wrapperG) {
-		Font ft16 = new Font("微软雅黑", Font.BOLD, 16);
+		Font ft16 = new Font("微软雅黑", Font.BOLD, 16*3);
 		String nameText = "【"+qqName+"】";
 		float x = caculateCenterTextX(nameText, ft16, 0, WIDTH, wrapperG);
-		float y = 50;
+		float y = 50*3;
 		renderTextOutline(wrapperG, x, y, ft16, nameText);
 	}
 	protected void renderTextOutline(Graphics2D wrapperG,float x,float y,Font font,String text) {
-		PixivUrlRenderImage.renderTextAndOutline(0.3f,text,font,wrapperG,x,y,Color.WHITE, Color.BLACK);
+		PixivUrlRenderImage.renderTextAndOutline(1f,text,font,wrapperG,x,y,Color.WHITE, Color.BLACK);
 	}
 	protected void renderMem(Graphics2D wrapperG,float x,float y) {
-		Font ft18 = new Font("微软雅黑", Font.BOLD, 18);
+		Font ft18 = new Font("微软雅黑", Font.BOLD, 18*3);
 		FontMetrics fm = wrapperG.getFontMetrics(ft18);
 		int textLength = fm.stringWidth("签到次数");
 		renderTextOutline(wrapperG, x, y, ft18, "金币");
-		renderTextOutline(wrapperG, x+textLength+5, y, ft18, ""+mem.getCoin()+((memEnhance==null||memEnhance.get("coin")==null)?"":"("+memEnhance.get("coin")+")"));
-		renderTextOutline(wrapperG, x, y+28, ft18, "好感度");
-		renderTextOutline(wrapperG, x+textLength+5, y+28, ft18, ""+mem.getFavorability()+((memEnhance==null||memEnhance.get("fav")==null)?"":"("+memEnhance.get("fav")+")"));
-		renderTextOutline(wrapperG, x, y+28+28, ft18, "签到次数");
-		renderTextOutline(wrapperG, x+textLength+5, y+28+28, ft18, ""+mem.getCheckinCount()+((memEnhance==null||memEnhance.get("checkin")==null)?"":"("+memEnhance.get("checkin")+")"));
-		renderTextOutline(wrapperG, x, y+28+28+28, ft18, "复读次数");
-		renderTextOutline(wrapperG, x+textLength+5, y+28+28+28, ft18, ""+mem.getRepeatCount()+((memEnhance==null||memEnhance.get("repeat")==null)?"":"("+memEnhance.get("repeat")+")"));
-		renderTextOutline(wrapperG, x, y+28+28+28+28, ft18, "卡券");
-		renderTextOutline(wrapperG, x+textLength+5, y+28+28+28+28, ft18, ""+mem.getCardTicket()+((memEnhance==null||memEnhance.get("ticket")==null)?"":"("+memEnhance.get("ticket")+")"));
+		renderTextOutline(wrapperG, x+textLength+5*3, y, ft18, ""+mem.getCoin()+((memEnhance==null||memEnhance.get("coin")==null)?"":"("+memEnhance.get("coin")+")"));
+		renderTextOutline(wrapperG, x, y+28*3, ft18, "好感度");
+		renderTextOutline(wrapperG, x+textLength+5*3, y+28*3, ft18, ""+mem.getFavorability()+((memEnhance==null||memEnhance.get("fav")==null)?"":"("+memEnhance.get("fav")+")"));
+		renderTextOutline(wrapperG, x, y+28*3+28*3, ft18, "签到次数");
+		renderTextOutline(wrapperG, x+textLength+5*3, y+(28+28)*3, ft18, ""+mem.getCheckinCount()+((memEnhance==null||memEnhance.get("checkin")==null)?"":"("+memEnhance.get("checkin")+")"));
+		renderTextOutline(wrapperG, x, y+(28+28+28)*3, ft18, "复读次数");
+		renderTextOutline(wrapperG, x+textLength+5*3, y+(28+28+28)*3, ft18, ""+mem.getRepeatCount()+((memEnhance==null||memEnhance.get("repeat")==null)?"":"("+memEnhance.get("repeat")+")"));
+		renderTextOutline(wrapperG, x, y+(28+28+28+28)*3, ft18, "卡券");
+		renderTextOutline(wrapperG, x+textLength+5*3, y+(28+28+28+28)*3, ft18, ""+mem.getCardTicket()+((memEnhance==null||memEnhance.get("ticket")==null)?"":"("+memEnhance.get("ticket")+")"));
 	}
 	protected void renderRemark(Graphics2D wrapperG,float y) {
-		Font ft16 = new Font("微软雅黑", Font.BOLD, 16);
+		Font ft16 = new Font("微软雅黑", Font.BOLD, 16*3);
 		String remark = StringUtils.isEmpty(mem.getRemark())?"↑这个人很懒，还没有设置留言":mem.getRemark();
 		float x = caculateCenterTextX(remark, ft16, 0, WIDTH, wrapperG);
 		renderTextOutline(wrapperG, x, y, ft16, remark);
 	}
 	protected void renderPk(Graphics2D wrapperG,float x1,float x2,float y) {
-		Font ft16 = new Font("微软雅黑", Font.BOLD, 16);
+		Font ft16 = new Font("微软雅黑", Font.BOLD, 16*3);
 		FontMetrics fm = wrapperG.getFontMetrics(ft16);
 		int textLength = fm.stringWidth("钢铁的反叛者");
 		for(int i=0;i<svCompletions.length;i++) {
-			renderTextOutline(wrapperG, i%2==0?x1:x2, y+28*(i/2), ft16, svCompletions[i][0]);
-			renderTextOutline(wrapperG, (i%2==0?x1:x2)+textLength+10, y+28*(i/2), ft16, svCompletions[i][1]);
+			renderTextOutline(wrapperG, i%2==0?x1:x2, y+28*(i/2)*3, ft16, svCompletions[i][0]);
+			renderTextOutline(wrapperG, (i%2==0?x1:x2)+textLength+10*3, y+28*(i/2)*3, ft16, svCompletions[i][1]);
 		}
 	}
 	/**
