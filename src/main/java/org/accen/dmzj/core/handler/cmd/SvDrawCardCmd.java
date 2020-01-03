@@ -255,7 +255,7 @@ public class SvDrawCardCmd implements CmdAdapter,CallbackListener {
 			if(ticketCount<0) {
 				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还未绑定哦，暂时无法抽卡，发送[绑定]即可绑定个人信息喵~");
 			}else if(ticketCount==0) {
-				task.setMessage(CQUtil.at(qmessage.getUserId())+" 传说卡券不足喵~“添加词条”“签到”都有机会获得卡券喵~");
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 卡券不足喵~“添加词条”“签到”都有机会获得卡券喵~");
 			}else {
 				String pkName = selectMatcher.group(1);
 				CmdSvPk pk = null;
@@ -308,6 +308,7 @@ public class SvDrawCardCmd implements CmdAdapter,CallbackListener {
 					//没找到
 					task.setMessage(CQUtil.at(qmessage.getUserId())+" 未找到此卡包喵~");
 				}
+				return task;
 			}
 		}else if(myMatcher.matches()) {
 			GeneralTask task =  new GeneralTask();
