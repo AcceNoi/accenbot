@@ -1,6 +1,11 @@
 package org.accen.dmzj.util;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,6 +21,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 /**
  * 用于将网络图片持久化到本地
  * @author <a href="1339liu@gmail.com">Accen</a>
@@ -27,6 +33,9 @@ public class FilePersistentUtil {
 	private String localFilePath;
 	@Value("${sys.static.url.upload}")
 	private String localUrl;
+	
+	@Value("${coolq.base.home}")
+	private String coolqHome;
 	
 	private HttpClient httpClient = HttpClientBuilder.create().build();
 	/**
@@ -76,5 +85,74 @@ public class FilePersistentUtil {
 			}
 		}
 		return cqImg;
+	}
+	
+	private final static Pattern patternCqEx = Pattern
+			.compile("^\\[CQ\\:(image|record),file=(.+?)(,url=(.*?))?\\]$");
+	/**
+	 * 将cq image持久化输出，如果不需要持久化，则输出原本的样子
+	 * @param cqImg
+	 * @param isCq 是否以cq码返回
+	 * @return 返回本地文件目录
+	 */
+	public String persistentLocal(String cqImg,boolean isCq) {
+		Matcher matcher = patternCqEx.matcher(cqImg);
+		if(matcher.matches()) {
+			String urlPart = matcher.group(3);
+			if(StringUtils.isEmpty(urlPart)) {
+				//url段没有，说明是本地文件
+				if(isCq) {
+					return cqImg;
+				}else {
+					return coolqHome+"/"+matcher.group(1)+"/"+matcher.group(2);
+				}
+				
+			}else {
+				//url段有，则说明是网路文件
+				String url = matcher.group(4);
+				String fileName = matcher.group(2);
+				String[] persistentResult = persistent(url, fileName);
+				if(persistentResult!=null) {
+					if(isCq) {
+						return String.format("[CQ:image,file=file:///%s]", persistentResult[0]);
+					}else {
+						return persistentResult[0];
+					}
+					
+				}
+			}
+		}
+		return null;
+	}
+	/**
+	 * 获取cqimg格式的图片基本信息
+	 * @param cqImg
+	 * @return 0-md5.1-width,2-height,3-size,4-url,5-addtime
+	 */
+	public String[] getImageMetaInfo(String cqImg) {
+		Matcher matcher = patternCq.matcher(cqImg);
+		if(matcher.matches()) {
+			String fileName = matcher.group(1);
+			try {
+				FileReader cqimgFileReader = new FileReader(coolqHome+"/data/image/"+fileName+".cqimg");
+				BufferedReader cqimgBuf = new BufferedReader(cqimgFileReader);
+				String[] meta = new String[6];
+				cqimgBuf.readLine();
+				meta[0] = cqimgBuf.readLine().substring(4);//md5
+				meta[1] = cqimgBuf.readLine().substring(6);//width
+				meta[2] = cqimgBuf.readLine().substring(7);//height
+				meta[3] = cqimgBuf.readLine().substring(5);//size
+				meta[4] = cqimgBuf.readLine().substring(4);//url
+				meta[5] = cqimgBuf.readLine().substring(8);//addtime
+				cqimgFileReader.close();
+				return meta;
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		return null;
 	}
 }

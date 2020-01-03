@@ -28,10 +28,11 @@ public class CheckinRender implements Render,Backgroudable{
 	private String qqName;
 	private SysGroupMember mem;
 	private Map<String, String> memEnhance;//对mem做的增强，由于mem只能表示当前的状态，无法显示值的变化，使用这个来实现展示
+	private String foot;
 	private String[][] svCompletions;
 	private final static int WIDTH = 1080;
 	private final static int HEIGHT = 1200;
-	public CheckinRender(RenderImage background,SysGroupMember mem,String[][] svCompletions,RenderImage profileImage,String qqName,Map<String, String> memEnhance) {
+	public CheckinRender(RenderImage background,SysGroupMember mem,String[][] svCompletions,RenderImage profileImage,String qqName,Map<String, String> memEnhance,String foot) {
 		super();
 		this.backgroundImg = background;
 		this.mem = mem;
@@ -39,6 +40,7 @@ public class CheckinRender implements Render,Backgroudable{
 		this.profileImg = profileImage;
 		this.qqName = qqName;
 		this.memEnhance = memEnhance;
+		this.foot = foot;
 	}
 	@Override
 	public void render(File outFile) throws Exception {
@@ -65,6 +67,8 @@ public class CheckinRender implements Render,Backgroudable{
 		renderRemark(wrapperG, 150*3+faceRadius);
 		//7.绘制卡包
 		renderPk(wrapperG, 100*3-faceRadius, 100*3+faceRadius, 208*3+faceRadius);
+		//8.绘制foot
+		renderFoot(wrapperG,850,1160);
 		//8.绘制头像
 
 			
@@ -146,6 +150,10 @@ public class CheckinRender implements Render,Backgroudable{
 			renderTextOutline(wrapperG, i%2==0?x1:x2, y+28*(i/2)*3, ft16, svCompletions[i][0]);
 			renderTextOutline(wrapperG, (i%2==0?x1:x2)+textLength+10*3, y+28*(i/2)*3, ft16, svCompletions[i][1]);
 		}
+	}
+	protected void renderFoot(Graphics2D wrapperG,float x,float y) {
+		Font ft8 = new Font("微软雅黑", Font.BOLD, 8*3);
+		renderTextOutline(wrapperG, x, y, ft8, foot);
 	}
 	/**
 	 * 计算文字水平居中时的x坐标

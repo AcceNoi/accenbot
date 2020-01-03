@@ -14,15 +14,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
+import org.accen.dmzj.core.handler.callbacker.CallbackListener;
+import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.CQUtil;
+import org.accen.dmzj.util.FilePersistentUtil;
 import org.accen.dmzj.util.RandomUtil;
-import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.util.render.CheckinRender;
 import org.accen.dmzj.util.render.LocalFileRenderImage;
 import org.accen.dmzj.util.render.UrlRenderImage;
+import org.accen.dmzj.web.dao.CfgResourceMapper;
 import org.accen.dmzj.web.dao.SysGroupMemberMapper;
+import org.accen.dmzj.web.vo.CfgResource;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.accen.dmzj.web.vo.SysGroupMember;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +38,7 @@ import org.springframework.util.StringUtils;
 @FuncSwitch("cmd_checkin")
 @Component
 @Transactional
-public class CheckinCmd implements CmdAdapter {
+public class CheckinCmd implements CmdAdapter,CallbackListener {
 	@Value("${coolq.mem.iniCoin}")
 	private int iniCoin = 20;//初始金币
 	@Value("${coolq.mem.coinIncr}")
@@ -57,7 +61,10 @@ public class CheckinCmd implements CmdAdapter {
 	private SvDrawCardCmd svCmd;
 	@Autowired
 	private TaskManager taskManager;
-	
+	@Autowired
+	private CfgResourceMapper cfgResourceMapper;
+	@Autowired
+	private FilePersistentUtil filePersistentUtil;
 	@Override
 	public String describe() {
 		return "签到或者绑定账号";
@@ -68,8 +75,16 @@ public class CheckinCmd implements CmdAdapter {
 		return "签到";
 	}
 
+	@Autowired
+	private CallbackManager callbackManager;
+	
 	private final static Pattern pattern = Pattern.compile("^(个人信息|绑定|签到)$");
 	private final static Pattern remarkPattern = Pattern.compile("^设置留言(.+)");
+	private static final String KEY_PREFFIX = "image_person_bkgrd_";//背景图保存地址的key
+	@Value("${coolq.mem.bkgrdFav:50}")
+	private int bkgrdFav ;//设置背景好感度要求
+	private final static Pattern bkgrdPattern = Pattern.compile("^设置背景(\\[CQ\\:image,file=.*?\\])?$");
+	private final static Pattern bkgrdRdPattern = Pattern.compile("^设置背景随机$");
 	
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
@@ -148,7 +163,14 @@ public class CheckinCmd implements CmdAdapter {
 							String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
 							String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
 							try {
-								CheckinRender render = new CheckinRender(new LocalFileRenderImage(randomGroundFile()), mem, svCompletions, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mem.getUserId()+"&s=640")), StringUtils.isEmpty(card)?nickName:card,memEnhance);
+								Object[] backgroud = randomGroundFileEx(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+								CheckinRender render = new CheckinRender(new LocalFileRenderImage((File)backgroud[0])
+										, mem
+										, svCompletions
+										, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mem.getUserId()+"&s=640"))
+										, StringUtils.isEmpty(card)?nickName:card
+										, memEnhance
+										, "背景模式："+(String)backgroud[1]);
 								String templeFileName = qmessage.getMessageType()+qmessage.getGroupId()+"-"+qmessage.getUserId()+".jpg";
 								File outFile = new File(groundTempHome+tempDir+templeFileName);
 								render.render(outFile);
@@ -195,7 +217,14 @@ public class CheckinCmd implements CmdAdapter {
 						String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
 						String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
 						try {
-							CheckinRender render = new CheckinRender(new LocalFileRenderImage(randomGroundFile()), mem, svCompletions, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mem.getUserId()+"&s=640")), StringUtils.isEmpty(card)?nickName:card,memEnhance);
+							Object[] backgroud = randomGroundFileEx(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+							CheckinRender render = new CheckinRender(new LocalFileRenderImage((File)backgroud[0])
+									, mem
+									, svCompletions
+									, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mem.getUserId()+"&s=640"))
+									, StringUtils.isEmpty(card)?nickName:card
+									, memEnhance
+									, "背景模式："+(String)backgroud[1]);
 							String templeFileName = qmessage.getMessageType()+qmessage.getGroupId()+"-"+qmessage.getUserId()+".jpg";
 							File outFile = new File(groundTempHome+tempDir+templeFileName);
 							render.render(outFile);
@@ -222,7 +251,14 @@ public class CheckinCmd implements CmdAdapter {
 					String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
 					String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
 					try {
-						CheckinRender render = new CheckinRender(new LocalFileRenderImage(randomGroundFile()), mems.get(0), svCompletions, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mems.get(0).getUserId()+"&s=640")), StringUtils.isEmpty(card)?nickName:card,null);
+						Object[] backgroud = randomGroundFileEx(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+						CheckinRender render = new CheckinRender(new LocalFileRenderImage((File)backgroud[0])
+								, mems.get(0)
+								, svCompletions
+								, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mems.get(0).getUserId()+"&s=640"))
+								, StringUtils.isEmpty(card)?nickName:card
+								, null
+								, "背景模式："+(String)backgroud[1]);
 						String templeFileName = qmessage.getMessageType()+qmessage.getGroupId()+"-"+qmessage.getUserId()+".jpg";
 						File outFile = new File(groundTempHome+tempDir+templeFileName);
 						render.render(outFile);
@@ -263,7 +299,112 @@ public class CheckinCmd implements CmdAdapter {
 				return task;
 			}
 		}
+		Matcher bkgrdMatcher = bkgrdPattern.matcher(message);
+		if(bkgrdMatcher.matches()) {
+			GeneralTask task = new GeneralTask();
+			task.setSelfQnum(selfQnum);
+			task.setType(qmessage.getMessageType());
+			task.setTargetId(qmessage.getGroupId());
+			if(getFav(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId())>=bkgrdFav) {
+				//好感度够了
+				String imageCq = bkgrdMatcher.group(1);
+				if(StringUtils.isEmpty(imageCq)) {
+					task.setMessage("请发送一张图片喵~(不要超过1M哦");
+					callbackManager.addCallbackListener(this,qmessage);
+					return task;
+				}else {
+					if (saveBkgrdOriginCqImgCheckSize(imageCq, (double)1.5*1024*1024, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId())) {
+						task.setMessage(CQUtil.at(qmessage.getUserId())+" 背景设置成功喵！");
+						return task;
+					}else {
+						task.setMessage(CQUtil.at(qmessage.getUserId())+" 背景设置失败~但我不会道歉喵");
+						return task;
+					}
+					
+				}
+			}else {
+				//好感不够
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 好感不够喵~好感度达到"+bkgrdFav+"即可自定义背景喵！");
+				return task;
+			}
+		}
+		Matcher bkgrdRdMatcher = bkgrdRdPattern.matcher(message);
+		if(bkgrdRdMatcher.matches()) {
+			GeneralTask task = new GeneralTask();
+			task.setSelfQnum(selfQnum);
+			task.setType(qmessage.getMessageType());
+			task.setTargetId(qmessage.getGroupId());
+			
+			clearBkgrd(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+			task.setMessage(CQUtil.at(qmessage.getUserId())+" 已将背景模式设置为随机喵！");
+			return task;
+		}
+		
 		return null;
+	}
+	/**
+	 * 通过完成bkgrdCq（cq码形式）保存背景
+	 * @param bkgrdCq
+	 * @param targetType
+	 * @param targetId
+	 * @param userId
+	 */
+	private void saveBkgrd(String bkgrdCq,String targetType,String targetId,String userId) {
+		String key = KEY_PREFFIX+targetType+targetId+"_"+userId;
+		CfgResource cr = cfgResourceMapper.selectByKey(key);
+		if(cr==null) {
+			//未设置过
+			cr = new CfgResource();
+			cr.setCfgKey(key);cr.setCfgResource(bkgrdCq);cr.setResourceType("image");cr.setCreateTime(new Date());cr.setCreateUserId(userId);
+			cfgResourceMapper.insert(cr);
+		}else {
+			cr.setCfgResource(bkgrdCq);
+			cfgResourceMapper.updateResouceByKey(key, bkgrdCq);
+		}
+	}
+	/**
+	 * 清除自定义背景
+	 * @param targetType
+	 * @param targetId
+	 * @param userId
+	 */
+	private void clearBkgrd(String targetType,String targetId,String userId) {
+		String key = KEY_PREFFIX+targetType+targetId+"_"+userId;
+		CfgResource cr = cfgResourceMapper.selectByKey(key);
+		if(cr!=null) {
+			cr.setCfgResource(null);
+			cfgResourceMapper.updateResouceByKey(key, null);
+		}
+	}
+	/**
+	 * 通过原始的cqImage设置背景，中间会对cqImg持久化一次转为本地文件
+	 * @param originCqImg
+	 * @param targetType
+	 * @param targetId
+	 * @param userId
+	 */
+	private void saveBkgrdOriginCqImg(String originCqImg,String targetType,String targetId,String userId) {
+		String persistent = filePersistentUtil.persistent(originCqImg);
+		saveBkgrd(persistent, targetType, targetId, userId);
+	}
+	/**
+	 * 保存前先检查size
+	 * @param originCqImg
+	 * @param size
+	 * @param targetType
+	 * @param targetId
+	 * @param userId
+	 */
+	private boolean saveBkgrdOriginCqImgCheckSize(String originCqImg,double maxSize,String targetType,String targetId,String userId) {
+		String[] meta = filePersistentUtil.getImageMetaInfo(originCqImg);
+		if(meta==null||Double.parseDouble(meta[3])>maxSize) {
+			return false;
+		}else {
+			String persistent = filePersistentUtil.persistentLocal(originCqImg,false);
+			saveBkgrd(persistent, targetType, targetId, userId);
+			return true;
+		}
+		
 	}
 	
 	/**
@@ -438,4 +579,43 @@ public class CheckinCmd implements CmdAdapter {
 		File[] all = dir.listFiles();
 		return all[RandomUtil.randomInt(all.length)];
 	}
+	/**
+	 * 如果有自定义的背景，则取自定义，没有则取随机
+	 * @param targetType
+	 * @param targetId
+	 * @param userId
+	 * @return 0-file 1-source(custom/random)
+	 */
+	private Object[] randomGroundFileEx(String targetType,String targetId,String userId) {
+		String key = KEY_PREFFIX+targetType+targetId+"_"+userId;
+		CfgResource cr = cfgResourceMapper.selectByKey(key);
+		if(cr==null||StringUtils.isEmpty(cr.getCfgResource())) {
+			return new Object[] {randomGroundFile(),"随机"};
+		}else {
+			return new Object[] {new File(cr.getCfgResource()),"自定义"};
+		}
+	}
+
+	private final static Pattern patternCq = Pattern
+			.compile("^\\[CQ\\:image,file=(.*?),url=(.*?)\\]$");
+	@Override
+	public boolean listen(Qmessage originQmessage, Qmessage qmessage, String selfQnum) {
+		if(originQmessage!=qmessage&&originQmessage.getGroupId().equals(qmessage.getGroupId())&&originQmessage.getUserId().equals(qmessage.getUserId())) {
+			//是同一个群的同一个人发的消息
+			Matcher imgMatcher = patternCq.matcher(qmessage.getMessage().trim());
+			if(imgMatcher.find()) {
+				
+				if (saveBkgrdOriginCqImgCheckSize(qmessage.getMessage().trim(), (double)1.5*1024*1024, qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId())) {
+					taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), CQUtil.at(qmessage.getUserId())+" 背景设置成功喵！");
+					return true;
+				}else {
+					taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), CQUtil.at(qmessage.getUserId())+" 背景设置失败~但我不会道歉喵");
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+
 }

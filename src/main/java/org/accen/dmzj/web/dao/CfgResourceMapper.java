@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface CfgResourceMapper {
@@ -64,4 +65,6 @@ public interface CfgResourceMapper {
 	@Select("select count(*) from cfg_resource where cfg_key = #{cfgKey} and cfg_resource = #{cfgResource}")
 	public int countByKeyAndResource(@Param("cfgKey")String cfgKey,@Param("cfgResource")String cfgResource);
 	
+	@Update("update cfg_resource set cfg_resource=#{resource} where cfg_key = #{key} ")
+	public int updateResouceByKey(String key,String resource);
 }
