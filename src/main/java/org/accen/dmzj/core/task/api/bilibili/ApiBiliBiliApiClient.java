@@ -64,7 +64,7 @@ public class ApiBiliBiliApiClient {
 	}
 	
 	public void checkCookie() throws BiliBiliCookieNeverInit {
-		if(sessData==null) {
+		if(getSessData()==null) {
 			throw new BiliBiliCookieNeverInit();
 		}
 	}
@@ -96,7 +96,7 @@ public class ApiBiliBiliApiClient {
 	public String[] downLoadByUrl(String url,int qn) throws BiliBiliCookieNeverInit {
 		Matcher mt = urlPattern.matcher(url);
 		if(mt.matches()) {
-			return downLoadByAvid(mt.group(1), qn);
+			return downLoadByAvid(mt.group(4), qn);
 		}
 		return null;
 	}
@@ -178,7 +178,7 @@ public class ApiBiliBiliApiClient {
 		default:break;
 		}
 		HttpGet urlGet = new HttpGet(String.format(BILIBILI_API_PLAYURL, cid,avid,""+qni));
-		urlGet.setHeader("Cookie", "SESSDATA="+sessData);
+		urlGet.setHeader("Cookie", "SESSDATA="+getSessData());
 		urlGet.setHeader("Host", "api.bilibili.com");
 		try {
 			HttpResponse viewResp = httpClient.execute(urlGet);
