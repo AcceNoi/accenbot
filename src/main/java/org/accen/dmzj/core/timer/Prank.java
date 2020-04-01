@@ -51,7 +51,7 @@ public class Prank {
 			//缓存无，需去网络上取
 			new Thread(()-> {
 				Map<String, Object> rs = pixivicApiClient.rank((page-1)%3+1, dateFmt, rankType.getMode());
-				List<Map<String,Object>> dataList = (List<Map<String, Object>>) ((Map<String,Object>)rs.get("data")).get("data");
+				List<Map<String,Object>> dataList = (List<Map<String, Object>>) rs.get("data");
 				if(dataList==null||dataList.isEmpty()) {
 					//失败，通过asyncCallback通知
 					if(callback!=null) {
