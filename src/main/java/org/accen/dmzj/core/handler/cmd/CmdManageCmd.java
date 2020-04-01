@@ -30,7 +30,8 @@ public class CmdManageCmd implements CmdAdapter {
 	private TriggerProSwitchCmd tpsc;
 	@Autowired
 	private RepeatModeSwitchCmd rmsc;
-	
+	@Autowired
+	private RandomRepeatPropModifyCmd rrpm;
 	@Override
 	public String describe() {
 		return "展示所有的功能";
@@ -177,8 +178,9 @@ public class CmdManageCmd implements CmdAdapter {
 				.append("当前群状态:\n")
 				.append("报时：           "+(clock==null?"未开启":clock)+"\n")
 				.append("词条触发率：  "+tpsc.triggerPro(qmessage.getGroupId())+"%\n")
-				.append("风纪模式:       "+funcSwitchUtil.judgeModeCn(qmessage.getMessageType(), qmessage.getGroupId())+"\n")
-				.append("复读模式:       "+(rmsc.modeOpen(qmessage.getGroupId())?"开启\n":"关闭\n"))
+				.append("风纪模式：       "+funcSwitchUtil.judgeModeCn(qmessage.getMessageType(), qmessage.getGroupId())+"\n")
+				.append("复读模式：       "+(rmsc.modeOpen(qmessage.getGroupId())?"开启\n":"关闭\n"))
+				.append("随机复读：       "+rrpm.getRandomRepeatProp(qmessage.getGroupId())+"%\n")
 				.append("加群欢迎： "+(increaseNotice==null?"未设置":increaseNotice.getConfigValue())+"\n")
 				.append(StringUtil.SPLIT_FOOT)
 				.append("Copyright クロノス/Accen\n")
