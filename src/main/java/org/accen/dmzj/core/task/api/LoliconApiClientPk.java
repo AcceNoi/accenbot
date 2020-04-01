@@ -12,8 +12,9 @@ public class LoliconApiClientPk {
 	private LoliconApiClient loliconApiClient;
 
 	public String setu() {
-		String html = loliconApiClient.setu();
-		return parseHtml(html);
+		/*String html = loliconApiClient.setu();
+		return parseHtml(html);*/
+		return null;
 	}
 	private String parseHtml(String html) {
 		Document dom = Jsoup.parse(html);

@@ -15,6 +15,7 @@ import org.accen.dmzj.core.handler.callbacker.CallbackListener;
 import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
+import org.accen.dmzj.core.task.api.LoliconApiClient;
 import org.accen.dmzj.core.task.api.LoliconApiClientPk;
 import org.accen.dmzj.core.task.api.PixivcatApiClient;
 import org.accen.dmzj.core.task.api.PixivicApiClient;
@@ -50,6 +51,8 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	private CallbackManager callbackManager;
 	@Autowired
 	private LoliconApiClientPk loliconApiClientPk;
+	@Autowired
+	private LoliconApiClient loliconApiClient;
 	@Autowired
 	private CfgResourceMapper cfgResourceMapper;
 	@Autowired
@@ -107,7 +110,8 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 							task.setMessage(CQUtil.at(qmessage.getUserId())+" 金币不够啦，没钱就别看涩图喵~");
 							return task;
 						}else {
-							String imageUrl = loliconApiClientPk.setu();
+//							String imageUrl = loliconApiClientPk.setu();
+							String imageUrl = (String) ((List<Map<String, Object>>)(loliconApiClient.setu().get("data"))).get(0).get("url");
 							if(imageUrl!=null&&funcSwitchUtil.isImgReviewPass(imageUrl, qmessage.getMessageType(), qmessage.getGroupId())) {
 								int factDecrease = Math.abs(decrease);
 								if(decrease<0) {
@@ -164,11 +168,12 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 						task.setType(qmessage.getMessageType());
 						task.setTargetId(qmessage.getGroupId());
 						Map<String,Object> rs = pixivicApiClient.search(keyword, 1);
-						int total = (int)((double)((Map<String, Object>)rs.get("data")).get("total"));
+//						int total = (int)((double)((Map<String, Object>)rs.get("data")).get("total"));
+						int total = ((List<Map<String, Object>>)rs.get("data")).size();
 						if(total>0) {
 							total = total<20?total:20;//只取前20个
 							int rdIndex = RandomUtil.randomInt(total);
-							Map<String,Object> rdRs = ((List<Map<String,Object>>)((Map<String, Object>)rs.get("data")).get("illustrations")).get(rdIndex);
+							Map<String,Object> rdRs = ((List<Map<String, Object>>)rs.get("data")).get(rdIndex);
 							String largeImgUrl = (String)((List<Map<String,Object>>)rdRs.get("imageUrls")).get(0).get("original");
 							long pid = (long)((double)rdRs.get("id"));
 							String title = (String)rdRs.get("title");
