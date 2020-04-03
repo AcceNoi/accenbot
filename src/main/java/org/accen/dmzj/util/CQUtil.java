@@ -121,4 +121,15 @@ public class CQUtil {
 	public static String share(String url,String title,String content,String image) {
 		return "[CQ:share,url="+url+",title="+title+",content="+content+",image="+image+"]";
 	}
+	private final static Pattern patternCqImg = Pattern
+			.compile(".*?\\[CQ\\:image,.*?\\].*");
+	/**
+	 * 判断是否含有图片
+	 * @param str
+	 * @return
+	 */
+	public static boolean hasImg(String str) {
+		return patternCqImg.matcher(str).matches();
+	}
+	
 }
