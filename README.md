@@ -1,4 +1,4 @@
-**基于[酷Q机器人](https://cqp.cc/) ![酷Q](https://sr.cqp.me/template/dightnew/ex/logo-common.png "酷Q")和[CoolQ HTTP API 插件](https://github.com/richardchien/coolq-http-api/)实现的QQ群聊天机器人。**
+**基于Mirai和[CqHTTP Mirai](https://github.com/yyuueexxiinngg/cqhttp-mirai)实现的QQ群聊天机器人。**
 ---
 
 [![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)
@@ -115,7 +115,8 @@
 
 ## 感谢
 
-  - 感谢酷Q项目，各位有兴趣可移步[酷Q社区]( https://cqp.cc/ )
+  - ~~感谢酷Q项目，各位有兴趣可移步[酷Q社区]( https://cqp.cc/ )~~
   - 感谢大佬[richardchien](https://github.com/richardchien)的**[coolq-http-api](https://github.com/richardchien/coolq-http-api)**项目，提供了一个第三方公共调用的接口
   - 感觉大佬[Henryhaohao](https://github.com/Henryhaohao)的**[Bilibili_video_download](https://github.com/Henryhaohao/Bilibili_video_download)**项目的B站接口调用指导
+  - 感谢**[cqhttp mirai](https://github.com/yyuueexxiinngg/cqhttp-mirai)**项目基本保持cqhttp风格，保证了项目的迁移
 
