@@ -154,7 +154,7 @@ public class ImageSearchCmd implements CmdAdapter,CallbackListener {
 					
 					task2.setMessage(CQUtil.at(qmessage.getUserId())
 							+"检索到图片喵！"
-							+CQUtil.imageUrl(imageResult.getUrl())
+//							+CQUtil.imageUrl(imageResult.getUrl())
 							+ "相似度："
 							+imageResult.getSimilarity()
 							+"。标题："

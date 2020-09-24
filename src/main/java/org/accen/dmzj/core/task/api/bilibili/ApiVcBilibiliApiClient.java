@@ -7,12 +7,12 @@ import org.accen.dmzj.core.annotation.FeignApi;
 import feign.Param;
 import feign.RequestLine;
 /**
- * 用来获取B站动态的API，up主不管发文章还是视频，都会已动态的形式呈现
+ * 用来获取B站动态的API，up主不管发文章还是视频，都会已动 态的形式呈现
  * @author <a href="1339liu@gmail.com">Accen</a>
  *
  */
 @FeignApi(host = "https://api.vc.bilibili.com")
-public interface ApiVcBilibiliApiClient {
+public interface ApiVcBilibiliApiClient { 
 	/**
 	 * 获取up动态
 	 * @param visitorUid 参观者uid（貌似没啥用，b站不知道有没有私密动态的说法）

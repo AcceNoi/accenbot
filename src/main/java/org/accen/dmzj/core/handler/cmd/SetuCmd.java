@@ -67,10 +67,10 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	@Autowired
 	private CheckinCmd checkinCmd;
 	
-	private static final Pattern pattern = Pattern.compile("^随机(色图|瑟图|涩图)$");
+	private static final Pattern pattern = Pattern.compile("^(随机|来点|发点)(色图|瑟图|涩图)$");
 	private static final Pattern collectPattern = Pattern.compile("^随机收藏$");
 	private static final Pattern searchPattern = Pattern.compile("^(P|p)站搜图(.+)");
-	private static final Pattern searchPattern2 = Pattern.compile("^随机(.+)");
+	private static final Pattern searchPattern2 = Pattern.compile("^(随机|来点|发点|搞点)(.+)");
 	private static final Pattern getPattern = Pattern.compile("^(P|p)站找图((\\d+)?(-){0,1}(\\d*))");
 	private static final String proxyPreffix = "https://i.pixiv.cat";
 	
@@ -161,7 +161,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 					Matcher searchMatcher = searchPattern.matcher(message);
 					Matcher searchMatcher2 = searchPattern2.matcher(message);
 					if(searchMatcher.matches()||searchMatcher2.matches()) {
-						String keyword = searchMatcher.matches()?searchMatcher.group(2).trim():searchMatcher2.group(1).trim();
+						String keyword = searchMatcher.matches()?searchMatcher.group(2).trim():searchMatcher2.group(2).trim();
 						GeneralTask task =  new GeneralTask();
 						
 						task.setSelfQnum(selfQnum);

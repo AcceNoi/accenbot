@@ -9,7 +9,7 @@ import feign.RequestLine;
 
 @FeignApi(host = "https://api.pixivic.com")
 public interface PixivicApiClient {
-	@RequestLine("GET /illustrations?keyword={keyword}&page={page}")
+	@RequestLine("GET /illustrations?keyword={keyword}&page={page}&pageSize=30&illustType=illust&searchType=original&maxSanityLevel=4")
 	public Map<String,Object> search(@Param("keyword")String keyword,@Param("page")int page);
 	/**
 	 * 搜索建议

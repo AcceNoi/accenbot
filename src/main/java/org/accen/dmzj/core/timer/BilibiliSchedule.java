@@ -99,8 +99,9 @@ public class BilibiliSchedule {
 			});*/
 			
 			//accen@20191122不再使用各个分散的API，统一使用动态
-			
+			 
 			subMap.forEach((upid,subTarget)->{
+				logger.info("upid:"+upid);
 				Map<String, Object> dynHises = apiVc.dynamic(null, upid, 0);
 				if((int)dynHises.get("code")==0) {
 					@SuppressWarnings("unchecked")
@@ -202,7 +203,7 @@ public class BilibiliSchedule {
 			return new String[] {msgBuf.append(parseDynamicCardMap(gson.fromJson(orginJson, Map.class),originType, ++depth,originUname)[0]).toString(),null};
 		}else if(type>>1==1) {
 			String description = (String) ((Map<String,Object>)cardMap.get("item")).get("description");
-			description = description.length()>83?(description.substring(0, 80)+"..."):description;
+//			description = description.length()>83?(description.substring(0, 80)+"..."):description;
 			List<Map<String,Object>> pics = (List<Map<String, Object>>) ((Map<String,Object>)cardMap.get("item")).get("pictures");
 			//普通动态
 			if(depth>0) {
@@ -239,7 +240,7 @@ public class BilibiliSchedule {
 			long aid = ((Double)cardMap.get("aid")).longValue();
 			String title = (String)cardMap.get("title");
 			String description = (String) cardMap.get("desc");
-			description = description.length()>83?(description.substring(0, 80)+"..."):description;
+//			description = description.length()>83?(description.substring(0, 80)+"..."):description;
 			String pic = (String) cardMap.get("pic");
 			msgBuf.append(title)
 						.append("\n")
@@ -260,9 +261,9 @@ public class BilibiliSchedule {
 				msgBuf.append("发布了一个小视频：\n");
 			}
 			String description = (String) ((Map<String,Object>)cardMap.get("item")).get("description");
-			String description1 = description.length()>83?(description.substring(0, 80)+"..."):description;
+//			String description1 = description.length()>83?(description.substring(0, 80)+"..."):description;
 			String imgUrl = (String) ((Map<String,Object>)((Map<String,Object>)cardMap.get("item")).get("cover")).get("unclipped");
-			msgBuf.append(description1)
+			msgBuf.append(description)
 				.append(StringUtils.isEmpty(imgUrl)?"":CQUtil.imageUrl(imgUrl));
 			return new String[] {msgBuf.toString(),null};
 		}else if(type>>6==1) {
@@ -278,9 +279,9 @@ public class BilibiliSchedule {
 			String title = (String) cardMap.get("title");
 			String summary = (String) cardMap.get("summary");
 			String description = title.trim()+"\n"+summary;
-			String description1 = description.length()>83?(description.substring(0, 80)+"..."):description;
+//			String description1 = description.length()>83?(description.substring(0, 80)+"..."):description;
 			List<String> pics = (List<String>) cardMap.get("image_urls");
-			msgBuf.append(description1)
+			msgBuf.append(description)
 						.append("[")
 						.append("https://www.bilibili.com/read/cv")
 						.append(cvId)
@@ -300,9 +301,9 @@ public class BilibiliSchedule {
 			String title = (String) cardMap.get("title");
 			String intro = (String) cardMap.get("intro");
 			String description = title.trim()+"\n"+intro.trim();
-			String description1 = description.length()>83?(description.substring(0, 80)+"..."):description;
+//			String description1 = description.length()>83?(description.substring(0, 80)+"..."):description;
 			String cover = (String) cardMap.get("cover");
-			msgBuf.append(description1)
+			msgBuf.append(description)
 					.append("[")
 					.append("https://www.bilibili.com/audio/au")
 					.append(mId)

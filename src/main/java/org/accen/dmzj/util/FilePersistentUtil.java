@@ -34,8 +34,12 @@ public class FilePersistentUtil {
 	@Value("${sys.static.url.upload}")
 	private String localUrl;
 	
-	@Value("${coolq.base.home}")
-	private String coolqHome;
+	/*@Value("${coolq.base.home}")
+	private String coolqHome;*/
+	@Value("${sys.static.temp.home.image}")
+	private String imageHome;
+	@Value("${sys.static.temp.home.record}")
+	private String recordHome;
 	
 	private HttpClient httpClient = HttpClientBuilder.create().build();
 	/**
@@ -104,7 +108,7 @@ public class FilePersistentUtil {
 				if(isCq) {
 					return cqImg;
 				}else {
-					return coolqHome+"/"+matcher.group(1)+"/"+matcher.group(2);
+					return ("image".equals(matcher.group(1))?imageHome:recordHome)+"/"+matcher.group(2);
 				}
 				
 			}else {
@@ -134,13 +138,14 @@ public class FilePersistentUtil {
 		if(matcher.matches()) {
 			String fileName = matcher.group(1);
 			try {
-				FileReader cqimgFileReader = new FileReader(coolqHome+"/data/image/"+fileName+".cqimg");
+//				System.out.println(imageHome+"/"+fileName+".cqimg");
+				FileReader cqimgFileReader = new FileReader(imageHome+"/"+fileName+".cqimg");
 				BufferedReader cqimgBuf = new BufferedReader(cqimgFileReader);
 				String[] meta = new String[6];
 				cqimgBuf.readLine();
 				meta[0] = cqimgBuf.readLine().substring(4);//md5
-				meta[1] = cqimgBuf.readLine().substring(6);//width
-				meta[2] = cqimgBuf.readLine().substring(7);//height
+				/*meta[1] = cqimgBuf.readLine().substring(6);//width
+				meta[2] = cqimgBuf.readLine().substring(7);//height*/
 				meta[3] = cqimgBuf.readLine().substring(5);//size
 				meta[4] = cqimgBuf.readLine().substring(4);//url
 				meta[5] = cqimgBuf.readLine().substring(8);//addtime

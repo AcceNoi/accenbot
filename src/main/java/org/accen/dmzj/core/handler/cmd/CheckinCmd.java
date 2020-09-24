@@ -178,7 +178,13 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 								String templeFileName = qmessage.getMessageType()+qmessage.getGroupId()+"-"+qmessage.getUserId()+".jpg";
 								File outFile = new File(groundTempHome+tempDir+templeFileName);
 								render.render(outFile);
-								
+								//哀悼
+								CfgConfigValue config = cfgConfigValueMapper.selectByTargetAndKey("system", "0", "check_to_gray");
+								if(config!=null&&"1".equals(config.getConfigValue())) {
+									File grayFile = new File(groundTempHome+tempDir+"gray_"+templeFileName); 
+									org.accen.dmzj.util.ImageUtil.toGray(outFile, grayFile);
+									outFile = grayFile;
+								}
 								task.setMessage(CQUtil.imageUrl("file:///"+outFile.getAbsolutePath()));
 							} catch (MalformedURLException e) {
 								e.printStackTrace();

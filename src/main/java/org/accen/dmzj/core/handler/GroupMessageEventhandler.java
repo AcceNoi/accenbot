@@ -49,7 +49,7 @@ public class GroupMessageEventhandler implements EventHandler{
 	private static final Random random = new Random();
 	
 	@Value("${coolq.manager}")
-	private String manager = "1339633536";//管理员qq
+	private String manager = "1339633536" ;//管理员qq
 	//不活跃的群组，即面壁中的
 	private Set<String> noActiveGroup = new HashSet<String>();
 	private static final String startSign = "召唤";
