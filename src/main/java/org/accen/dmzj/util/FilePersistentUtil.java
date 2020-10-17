@@ -48,26 +48,9 @@ public class FilePersistentUtil {
 	 * @param fileName
 	 * @return 长度为2的数组，0-本地文件地址，1-生成的网络文件地址
 	 */
+	@Deprecated
 	public String[] persistent(String url,String fileName) {
-		HttpGet get = new HttpGet(url);
-		try {
-			HttpResponse resp = httpClient.execute(get);
-			HttpEntity responseEntity = resp.getEntity();
-			if(resp.getStatusLine().getStatusCode()==200) {
-				String localFileName = localFilePath+fileName;
-				OutputStream os = new FileOutputStream(localFileName);
-				InputStream is = responseEntity.getContent();
-				IOUtils.copy(is, os);
-				os.close();
-				is.close();
-				return new String[] {localFileName,localUrl+fileName};
-			}
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return persistent(url, fileName, localUrl);
 	}
 	
 	private final static Pattern patternCq = Pattern
@@ -78,17 +61,53 @@ public class FilePersistentUtil {
 	 * @return
 	 */
 	public String persistent(String cqImg) {
+		return persistentByCq(cqImg, localUrl);
+	}
+	public String persistentByCq(String cqImg,String localDir) {
 		Matcher matcher = patternCq.matcher(cqImg);
 		if(matcher.matches()) {
 			String url = matcher.group(2);
 			String fileName = matcher.group(1);
-			String[] persistentResult = persistent(url, fileName);
+			String[] persistentResult = persistent(url, fileName,localDir);
 			if(persistentResult!=null) {
 				//转化成本地文件模式
 				cqImg = String.format("[CQ:image,file=file:///%s]", persistentResult[0]);
 			}
 		}
 		return cqImg;
+	}
+	public String persistentByCq(String cqImg,String fileName,String localDir) {
+		Matcher matcher = patternCq.matcher(cqImg);
+		if(matcher.matches()) {
+			String url = matcher.group(2);
+			String[] persistentResult = persistent(url, fileName,localDir);
+			if(persistentResult!=null) {
+				//转化成本地文件模式
+				cqImg = String.format("[CQ:image,file=file:///%s]", persistentResult[0]);
+			}
+		}
+		return cqImg;
+	}
+	private String[] persistent(String url,String fileName,String localDir) {
+		HttpGet get = new HttpGet(url);
+		try {
+			HttpResponse resp = httpClient.execute(get);
+			HttpEntity responseEntity = resp.getEntity();
+			if(resp.getStatusLine().getStatusCode()==200) {
+				String localFileName = localDir+"/"+fileName;
+				OutputStream os = new FileOutputStream(localFileName);
+				InputStream is = responseEntity.getContent();
+				IOUtils.copy(is, os);
+				os.close();
+				is.close();
+				return new String[] {localFileName,localDir+"/"+fileName};
+			}
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	private final static Pattern patternCqEx = Pattern

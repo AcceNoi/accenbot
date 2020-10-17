@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.Base64.Decoder;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,7 +98,7 @@ public class CQUtil {
 		return null;
 	}
 	
-	private final static Pattern patternCq = Pattern
+	public final static Pattern patternImageCqDetail = Pattern
 			.compile("\\[CQ\\:image,file=(.*?),url=(.*?)\\]");
 	/**
 	 * 抽取cq码中的图片url
@@ -104,11 +106,27 @@ public class CQUtil {
 	 * @return
 	 */
 	public static String grepImageUrl(String cqImg) {
-		Matcher matcher = patternCq.matcher(cqImg);
+		Matcher matcher = patternImageCqDetail.matcher(cqImg);
 		if(matcher.matches()) {
 			return matcher.group(2);
 		}
 		return null;
+	}
+	public final static Pattern patternImageCq = Pattern
+			.compile("(\\[CQ\\:image,file=.*?,url=.*?\\])");
+	/**
+	 * 抽取消息中所有的图片cq码
+	 * @param message
+	 * @return
+	 */
+	public static List<String> grepImageCq(String message) {
+		List<String> imageCqList = new LinkedList<String>();
+		Matcher matcher = patternImageCq.matcher(message);
+		while(matcher.find()) {
+			imageCqList.add(matcher.group(1));
+		}
+		return imageCqList;
+		
 	}
 	/**
 	 * 链接分享
