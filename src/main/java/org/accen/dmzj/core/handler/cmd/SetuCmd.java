@@ -1,5 +1,8 @@
 package org.accen.dmzj.core.handler.cmd;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64.Encoder;
@@ -24,10 +27,12 @@ import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.FuncSwitchUtil;
 import org.accen.dmzj.util.RandomMeta;
 import org.accen.dmzj.util.RandomUtil;
+import org.accen.dmzj.util.SetuCatcher;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CfgResourceMapper;
 import org.accen.dmzj.web.vo.CfgResource;
 import org.accen.dmzj.web.vo.Qmessage;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -66,6 +71,8 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	private int decrease ;
 	@Autowired
 	private CheckinCmd checkinCmd;
+	@Autowired
+	private SetuCatcher setuCatcher;
 	
 	private static final Pattern pattern = Pattern.compile("^(随机|来点|发点)(色图|瑟图|涩图)$");
 	private static final Pattern collectPattern = Pattern.compile("^随机收藏$");
@@ -102,41 +109,61 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 						task.setType(qmessage.getMessageType());
 						task.setTargetId(qmessage.getGroupId());
 						
-						int curCoin = checkinCmd.getCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
-						if(curCoin<0) {
-							task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还未绑定哦，暂时无法查看涩图，发送[绑定]即可绑定个人信息喵~");
-							return task;
-						}else if(curCoin-Math.abs(decrease)<0) {
-							task.setMessage(CQUtil.at(qmessage.getUserId())+" 金币不够啦，没钱就别看涩图喵~");
-							return task;
-						}else {
-//							String imageUrl = loliconApiClientPk.setu();
-							String imageUrl = (String) ((List<Map<String, Object>>)(loliconApiClient.setu().get("data"))).get(0).get("url");
-							if(imageUrl!=null&&funcSwitchUtil.isImgReviewPass(imageUrl, qmessage.getMessageType(), qmessage.getGroupId())) {
-								int factDecrease = Math.abs(decrease);
-								if(decrease<0) {
-									factDecrease = RandomUtil.randomInt(factDecrease+1);
-								}
-								//消耗金币
-								int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -factDecrease);
-								
-								//添加到收藏监听
-								if(!waitingCollect.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId())) {
-									waitingCollect.put(qmessage.getMessageType()+"_"+qmessage.getGroupId(), new CacheMap<String, String>());
-								}
-								//当前群所等待收藏的图片
-								CacheMap<String,String> curGroupWaitingCollectImags = waitingCollect.get(qmessage.getMessageType()+"_"+qmessage.getGroupId());
-								//随机一个不在等待map中的随机数字
-								String rdZh = RandomUtil.randZhNumExclude(2, curGroupWaitingCollectImags.keySet());
-								curGroupWaitingCollectImags.put(rdZh, imageUrl,60000);
-								//把收藏的提示放上去
-								task.setMessage(CQUtil.imageUrl(imageUrl)+"\n"+CQUtil.at(qmessage.getUserId())+"无尽的欲望消耗了您"+factDecrease+"枚金币~收藏此涩图请发送[收藏"+rdZh+"]喵~");
-								callbackManager.addResidentListener(this);
-								
-//								locked = false;
+						if(RandomUtil.randomPass(0)) {
+							//80%从api取
+							int curCoin = checkinCmd.getCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
+							if(curCoin<0) {
+								task.setMessage(CQUtil.at(qmessage.getUserId())+" 您还未绑定哦，暂时无法查看涩图，发送[绑定]即可绑定个人信息喵~");
 								return task;
+							}else if(curCoin-Math.abs(decrease)<0) {
+								task.setMessage(CQUtil.at(qmessage.getUserId())+" 金币不够啦，没钱就别看涩图喵~");
+								return task;
+							}else {
+//								String imageUrl = loliconApiClientPk.setu();
+								String imageUrl = (String) ((List<Map<String, Object>>)(loliconApiClient.setu().get("data"))).get(0).get("url");
+								if(imageUrl!=null&&funcSwitchUtil.isImgReviewPass(imageUrl, qmessage.getMessageType(), qmessage.getGroupId())) {
+									int factDecrease = Math.abs(decrease);
+									if(decrease<0) {
+										factDecrease = RandomUtil.randomInt(factDecrease+1);
+									}
+									//消耗金币
+									int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -factDecrease);
+									
+									//添加到收藏监听
+									if(!waitingCollect.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId())) {
+										waitingCollect.put(qmessage.getMessageType()+"_"+qmessage.getGroupId(), new CacheMap<String, String>());
+									}
+									//当前群所等待收藏的图片
+									CacheMap<String,String> curGroupWaitingCollectImags = waitingCollect.get(qmessage.getMessageType()+"_"+qmessage.getGroupId());
+									//随机一个不在等待map中的随机数字
+									String rdZh = RandomUtil.randZhNumExclude(2, curGroupWaitingCollectImags.keySet());
+									curGroupWaitingCollectImags.put(rdZh, imageUrl,60000);
+									//把收藏的提示放上去
+									task.setMessage(CQUtil.imageUrl(imageUrl)+"\n"+CQUtil.at(qmessage.getUserId())+"无尽的欲望消耗了您"+factDecrease+"枚金币~收藏此涩图请发送[收藏"+rdZh+"]喵~");
+									callbackManager.addResidentListener(this);
+									
+//									locked = false;
+									return task;
+								}
 							}
+						}else {
+							File localSetu = setuCatcher.randomSetu();
+							byte[] buffer = new byte[(int) localSetu.length()];
+							try(InputStream is = new FileInputStream(localSetu)){							;
+								is.read(buffer);
+								task.setMessage(CQUtil.imageBs64(new Base64().encodeToString(buffer))
+										+"by "+localSetu.getName().substring(0, localSetu.getName().lastIndexOf(SetuCatcher.SETU_SUFFIX)));
+								return task;
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
+							} catch (IOException e) {
+								e.printStackTrace();
+							} 
+							return null;
+							
 						}
+						
+						
 						
 						
 						
