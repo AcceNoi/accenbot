@@ -9,6 +9,6 @@ import feign.codec.Decoder;
 @FeignApi(host = "https://i.pixiv.cat",decoder = Decoder.Default.class)
 public interface PixivcatApiClient {
 	
-	@RequestLine("GET {pPath}")
+	@RequestLine("GET /{pPath}.jpg")
 	public Response pixivImage(String pPath);
 }
