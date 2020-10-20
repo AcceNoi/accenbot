@@ -45,6 +45,7 @@ public class UrlRenderImage extends RenderImage {
 	}
 	public UrlRenderImage(URL url) throws IOException {
 		this.imageUrl = url;
+		System.out.println(url);
 //		InputStream is = imageUrl.openStream();
 		URLConnection conn = null;
 		if("HTTPS".equalsIgnoreCase(this.imageUrl.getProtocol())) {
@@ -53,7 +54,7 @@ public class UrlRenderImage extends RenderImage {
 		}else if("HTTP".equalsIgnoreCase(this.imageUrl.getProtocol())){
 			conn = (HttpURLConnection) imageUrl.openConnection();
 		}
-		
+//		imageUrl.
 		/*conn.setConnectTimeout(20*1000);
 		conn.setReadTimeout(20*1000);*/
 		buffImage = ImageIO.read(conn.getInputStream());

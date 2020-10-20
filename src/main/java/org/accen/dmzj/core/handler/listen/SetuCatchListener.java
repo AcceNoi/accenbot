@@ -47,10 +47,10 @@ public class SetuCatchListener implements ListenAdpter{
 	protected SetuGreper isSetu(Qmessage qmessage) {
 		/*if(!"857083789".equals(qmessage.getGroupId())){
 			return false;
-		}*/
+		}
 		if(!CQUtil.hasImg(qmessage.getMessage())) {
 			return null;
-		}
+		}*/
 		if(!allowedSenders.contains(qmessage.getUserId())&&!Pattern.matches("^(涩|色|瑟|se)图充能.*", qmessage.getMessage())) {
 			return null;
 		}
@@ -66,5 +66,5 @@ public class SetuCatchListener implements ListenAdpter{
 		return null;
 	}
 	
-	private static final Pattern pixivPattern = Pattern.compile("^(涩|色|瑟|se)图充能(\\d+?((，|,|、)\\d+?)*)");
+	private static final Pattern pixivPattern = Pattern.compile("^(涩|色|瑟|se)图充能(\\d+?(-\\d+?){0,1}((，|,|、)\\d+?(-\\d+?){0,1})*)");
 }

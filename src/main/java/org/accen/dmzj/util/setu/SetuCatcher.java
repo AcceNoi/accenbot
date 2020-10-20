@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -57,18 +58,37 @@ public class SetuCatcher {
 		}
 	}
 	/**
+	 * 从pid中抓取涩图
+	 * @param pid
+	 * @param fileName
+	 * @return
+	 */
+	public boolean catchFromPid(String pid,String fileName) {
+		if(avoidRepeatingPid.contains(pid)) {
+			return false;
+		}else {
+			String url = "https://pixiv.cat/"+pid+".jpg";
+			filePersistentUtil.persistent(url, fileName, SETU_DIR);
+			avoidRepeatingPid.add(pid);
+			return true;
+		}
+		
+	}
+	/**
 	 * 从is中抓取涩图
 	 * @param pid
 	 * @param is
 	 * @return
 	 */
+	@Deprecated
 	public boolean catchFromInputStream(String pid,InputStream is) {
 		if(avoidRepeatingPid.contains(pid)||is==null) {
 			return false;
 		}else {
-			File setu = new File(SETU_DIR+"/"+pid+".jpg");
-			try {
-				IOUtils.copy(is, new FileOutputStream(setu));
+			File setu = new File(SETU_DIR+"/"+pid+".accen");
+			try(OutputStream os = new FileOutputStream(setu);){
+				IOUtils.copy(is, os);
+				os.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

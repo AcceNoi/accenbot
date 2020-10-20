@@ -88,7 +88,7 @@ public class FilePersistentUtil {
 		}
 		return cqImg;
 	}
-	private String[] persistent(String url,String fileName,String localDir) {
+	public String[] persistent(String url,String fileName,String localDir) {
 		HttpGet get = new HttpGet(url);
 		try {
 			HttpResponse resp = httpClient.execute(get);
