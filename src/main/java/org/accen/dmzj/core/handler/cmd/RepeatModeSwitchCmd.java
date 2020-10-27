@@ -39,7 +39,8 @@ public class RepeatModeSwitchCmd implements CmdAdapter {
 	 * @return
 	 */
 	public boolean modeOpen(String groupId) {
-		return allowGroup.contains(groupId);
+//		return allowGroup.contains(groupId);
+		return true;
 	}
 	
 	private static final Pattern pattern = Pattern.compile("^(开启|关闭)复读模式$");

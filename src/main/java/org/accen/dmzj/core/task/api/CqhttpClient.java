@@ -7,7 +7,11 @@ import org.springframework.stereotype.Component;
 
 import feign.Headers;
 import feign.RequestLine;
-
+/**
+ * @see <a href="https://github.com/howmanybots/onebot">OneBot 标准</a>
+ * @author <a href="1339liu@gmail.com">Accen</a>
+ *
+ */
 @FeignApi(host="http://localhost:5700",maxPeriod = 15000,maxAttempts = 1)
 @Headers({"Content-Type: application/json","Accept: application/json","Authorization: Bearer kSLuTF2GC2Q4q4ugm3"})
 @Component
@@ -49,4 +53,10 @@ public interface CqhttpClient {
 	 */
 	@RequestLine("POST /get_image")
 	public Map<String,Object> getImage(Map<String,Object> body);
+	/**
+	 * 获取群列表
+	 * @return
+	 */
+	@RequestLine("GET /get_group_list")
+	public Map<String,Object> groupList();
 }
