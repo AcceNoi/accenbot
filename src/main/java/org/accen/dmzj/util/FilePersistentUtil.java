@@ -134,7 +134,7 @@ public class FilePersistentUtil {
 				//url段有，则说明是网路文件
 				String url = matcher.group(4);
 				String fileName = matcher.group(2);
-				String[] persistentResult = persistent(url, fileName);
+				String[] persistentResult = persistent(url, fileName, localFilePath);//persistent(url, fileName);
 				if(persistentResult!=null) {
 					if(isCq) {
 						return String.format("[CQ:image,file=file:///%s]", persistentResult[0]);
