@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
@@ -108,6 +109,21 @@ public class SetuCatcher {
 		}
 		return new File(SETU_DIR+childs[RandomUtil.randomInt(childs.length)]);
 		
+	}
+	/**
+	 * 随机获得count张不重复的涩图
+	 * @param count
+	 * @return
+	 */
+	public File[] randomSetu(int count) {
+		String[] childs = setuList();
+		if(childs.length<=0) {
+			return null;
+		}
+		return Arrays.stream(RandomUtil.randomInt(childs.length, count))
+			.boxed()
+			.map(index->new File(SETU_DIR+childs[index]))
+			.toArray(File[]::new);
 	}
 	
 	private String[] setuList() {

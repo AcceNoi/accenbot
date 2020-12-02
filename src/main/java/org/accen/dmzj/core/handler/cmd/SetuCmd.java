@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Base64.Encoder;
 import java.util.HashMap;
 import java.util.List;
@@ -146,7 +147,8 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 								}
 							}
 						}else {
-							File localSetu = setuCatcher.randomSetu();
+							
+							/*File localSetu = setuCatcher.randomSetu();
 							byte[] buffer = new byte[(int) localSetu.length()];
 							try(InputStream is = new FileInputStream(localSetu)){							;
 								is.read(buffer);
@@ -158,7 +160,27 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 							} catch (IOException e) {
 								e.printStackTrace();
 							} 
-							return null;
+							return null;*/
+							File[] localSetus = setuCatcher.randomSetu(RandomUtil.randomInt(4)+1);
+							final Base64 base64 = new Base64();
+							String msg = Arrays.stream(localSetus).map(localSetu->{
+								byte[] buffer = new byte[(int) localSetu.length()];
+								try(InputStream is = new FileInputStream(localSetu)){							;
+									is.read(buffer);
+									return CQUtil.imageBs64(base64.encodeToString(buffer));
+								} catch (FileNotFoundException e) {
+									e.printStackTrace();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+								return "";
+							}).collect(Collectors.joining(""));
+							if(msg!=null&&!msg.isBlank()) {
+								task.setMessage(msg);
+								return task;
+							}else {
+								return null;
+							}
 							
 						}
 						
