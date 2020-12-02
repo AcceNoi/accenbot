@@ -2,8 +2,12 @@ package org.accen.dmzj.core.task.api.baidu;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.task.api.vo.BaikeResult;
 import org.accen.dmzj.util.RandomUtil;
@@ -20,6 +24,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Component
 public class BaikeApicClientPk {
 	@Autowired
@@ -40,6 +45,9 @@ public class BaikeApicClientPk {
 			HttpEntity responseEntity = originResp.getEntity();
 			if(originResp.getStatusLine().getStatusCode()==200) {
 				return EntityUtils.toString(responseEntity,"UTF-8");
+			}else if(originResp.getStatusLine().getStatusCode()/100==3) {
+				String redirectLocation = originResp.getHeaders("Location")[0].getValue();
+				return httpBaike("https://baike.baidu.com"+redirectLocation);
 			}
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
@@ -98,6 +106,27 @@ public class BaikeApicClientPk {
 			BaikeResult br = new BaikeResult();
 			if(imgs!=null&&!imgs.isEmpty()) {
 				String imageUrl = imgs.first().attr("src");
+				int queryMark = imageUrl.indexOf("?");
+				if(queryMark>=0&&queryMark<imageUrl.length()-1) {
+					imageUrl = imageUrl.substring(0, queryMark+1)+Arrays.stream(imageUrl.substring(queryMark+1).split("&")).map(query->{
+						String[] nameAndValue = query.split("=");
+						/*return switch(nameAndValue.length) {
+						case 1 -> nameAndValue[0];
+						case 2 -> try {nameAndValue[0]+"="+URLEncoder.encode(nameAndValue[1],"utf-8");} catch (UnsupportedEncodingException e){// TODO Auto-generated catch block
+e.printStackTrace();}
+						default -> "";
+						};*/
+						switch(nameAndValue.length) {
+						case 1:return nameAndValue[0];
+						case 2:try {
+								return nameAndValue[0]+"="+URLEncoder.encode(nameAndValue[1],"utf-8");
+							} catch (UnsupportedEncodingException e) {
+								e.printStackTrace();
+							}
+						default: return "";
+						}
+					}).collect(Collectors.joining("&"));
+				}
 				br.setImageUrl(imageUrl);
 			}
 			
