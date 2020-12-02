@@ -101,7 +101,7 @@ public class BilibiliSchedule {
 			//accen@20191122不再使用各个分散的API，统一使用动态
 			 
 			subMap.forEach((upid,subTarget)->{
-				logger.info("upid:"+upid);
+//				logger.info("upid:"+upid);
 				Map<String, Object> dynHises = apiVc.dynamic(null, upid, 0);
 				if((int)dynHises.get("code")==0) {
 					@SuppressWarnings("unchecked")

@@ -2,11 +2,13 @@ package org.accen.dmzj.core.handler.cmd;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.api.BilibiliSearchApiClientPk;
+import org.accen.dmzj.core.task.api.PixivicApiClient;
 import org.accen.dmzj.core.task.api.vo.BilibiliBangumiInfo;
 import org.accen.dmzj.core.task.api.vo.BilibiliUserInfo;
 import org.accen.dmzj.util.CQUtil;
@@ -20,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional
-public class BilibiliUpSubscribeCmd implements CmdAdapter{
+public class SubscribeCmd implements CmdAdapter{
 
 	@Autowired
 	private CmdBuSubMapper cmdBuSubMapper;
@@ -37,14 +39,18 @@ public class BilibiliUpSubscribeCmd implements CmdAdapter{
 
 	@Autowired
 	private BilibiliSearchApiClientPk bilibiliSearchApiClientPk;
+	@Autowired
+	private PixivicApiClient pixivicApiClient;
 	
 	private final static Pattern pattern = Pattern.compile("^(取消)?订阅B站(UP|Up|up|番剧)(.*)");
+	private final static Pattern patternIllustor = Pattern.compile("^(取消)?订阅P站(画师)(\\d+)");
 	private final static Pattern myPattern = Pattern.compile("^我的订阅$");
 	
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
 		Matcher matcher = pattern.matcher(message);
+		Matcher matcherIllustor = patternIllustor.matcher(message);
 		Matcher myMatcher = myPattern.matcher(message);
 		if(matcher.matches()) {
 			String subTarget = "bilibili";
@@ -161,6 +167,52 @@ public class BilibiliUpSubscribeCmd implements CmdAdapter{
 					
 				}
 			}
+		}else if(matcherIllustor.matches()) {
+			GeneralTask task =  new GeneralTask();
+			task.setSelfQnum(selfQnum);
+			task.setType(qmessage.getMessageType());
+			task.setTargetId(qmessage.getGroupId());
+			
+			//p站画师订阅
+			Map<String,Object> artistDetail = pixivicApiClient.artist(Integer.parseInt(matcherIllustor.group(3)));
+			
+			if(artistDetail.containsKey("data")) {
+				String artistName = (String) ((Map<String,Object>)artistDetail.get("data")).get("name");
+				String avatar = (String) ((Map<String,Object>)artistDetail.get("data")).get("avatar");
+				String comment = (String) ((Map<String,Object>)artistDetail.get("data")).get("comment");
+				List<CmdBuSub>  subs = null;
+				if("取消".equals(matcherIllustor.group(1))) {
+					subs = cmdBuSubMapper.findBySubscriberAndObj("group", qmessage.getGroupId(), qmessage.getUserId(), "pixiv", "artist", matcherIllustor.group(3));
+					if(subs==null||subs.isEmpty()) {
+						task.setMessage(CQUtil.at(qmessage.getUserId())+" 还未订阅此画师"+artistName+"（"+matcherIllustor.group(3)+"）喵~");
+					}else {
+						cmdBuSubMapper.deleteById(subs.get(0).getId());
+						task.setMessage(CQUtil.at(qmessage.getUserId())+" 已取消订阅画师"+artistName+"（"+matcherIllustor.group(3)+"）了喵~");
+					}	
+				}else {
+					//订阅
+					CmdBuSub sub = new CmdBuSub();
+					sub.setStatus("1");
+					sub.setSubObj(""+matcherIllustor.group(3));
+					sub.setSubObjMark(artistName);
+					sub.setSubscriber(qmessage.getUserId());
+					sub.setTargetId(qmessage.getGroupId());
+					sub.setSubTarget("pixiv");
+					sub.setSubType("artist");
+					sub.setType("group");
+					sub.setSubTime(new Date());
+					
+					cmdBuSubMapper.insert(sub);
+					
+					task.setMessage(CQUtil.at(qmessage.getUserId())+" 已成功订阅P站画师"+artistName+"（"+matcherIllustor.group(3)+"）"
+							+CQUtil.imageUrl(avatar.replace("i.pximg.net", "i.pixiv.cat"))
+							+StringUtil.SPLIT+comment);
+				}
+			}else {
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 无法找到此画师喵~画师ID："+matcherIllustor.group(3));
+			}
+			
+			return task;
 			
 		}else if(myMatcher.matches()) {
 			//我的订阅
@@ -180,7 +232,7 @@ public class BilibiliUpSubscribeCmd implements CmdAdapter{
 					CmdBuSub mySub = mySubs.get(index);
 					msgBuf.append(index+1)
 							.append(". ")
-							.append("bilibili".equals(mySub.getSubTarget())?"B站":"")
+							.append(mySub.getSubTarget()).append(" ")
 							.append(mySub.getSubType())
 							.append("[")
 							.append(mySub.getSubObj())
@@ -191,7 +243,7 @@ public class BilibiliUpSubscribeCmd implements CmdAdapter{
 				task.setMessage(msgBuf.toString());
 				return task;
 			}else {
-				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您当前还没订阅喵~发送[订阅B站UP陈睿]试试喵~");
+				task.setMessage(CQUtil.at(qmessage.getUserId())+" 您当前还没订阅喵~发送[订阅P站画师159912]试试喵~");
 				return task;
 			}
 		}
