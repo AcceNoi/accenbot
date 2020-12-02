@@ -18,6 +18,20 @@ public class RandomUtil {
 		return rd.nextInt(max);
 	}
 	/**
+	 * 无放回的随机多个int值[0,max)
+	 * @param max
+	 * @param count
+	 * @return
+	 */
+	public static int[] randomInt(int max,int count) {
+		count = count>max?max:count;
+		Set<Integer> rs = new HashSet<Integer>(count);
+		while(rs.size()<count) {
+			rs.add(randomInt(max));
+		}
+		return rs.stream().mapToInt(Integer::valueOf).toArray();
+	}
+	/**
 	 * 百分比几率随机是否通过。
 	 * @param prob 通过率，大于等于1则返回true，小于等于0则返回false，其他按几率返回
 	 * @return
