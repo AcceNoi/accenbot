@@ -2,6 +2,7 @@ package org.accen.dmzj.util;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,14 +48,19 @@ public class QmessageUtil {
 	public boolean isManagerOrGroupManagerOrGroupOwner(Qmessage qmessage) {
 		return isManager(qmessage)||isGroupManager(qmessage)||isGroupOwner(qmessage);
 	}
+	private Set<String> groupList ;
 	/**
 	 * 获取当前bot的群列表
 	 * @return
 	 */
 	public Set<String> groupList(){
-		List<Map<String, Object>> groupListInfo = (List<Map<String, Object>>) cqhttpClient.groupList().get("data");
-		return groupListInfo.parallelStream()
-								.map(map->new BigDecimal((Double)map.get("group_id")).stripTrailingZeros().toPlainString())
-								.collect(Collectors.toSet());
+		if(groupList == null || groupList.isEmpty()) {
+			List<Map<String, Object>> groupListInfo = (List<Map<String, Object>>) cqhttpClient.groupList().get("data");
+			groupList = groupListInfo.parallelStream()
+									.map(map->new BigDecimal((Double)map.get("group_id")).stripTrailingZeros().toPlainString())
+									.collect(Collectors.toSet());
+		}
+		return groupList==null?new HashSet<String>():new HashSet<>(groupList);
+		
 	}
 }
