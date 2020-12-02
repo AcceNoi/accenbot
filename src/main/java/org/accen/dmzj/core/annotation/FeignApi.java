@@ -5,8 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.accen.dmzj.core.autoconfigure.FeignApiInitAfter;
+import org.accen.dmzj.core.autoconfigure.FeignApiInitBefore;
+
 import feign.Client;
-import feign.Retryer;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.gson.GsonDecoder;
@@ -47,4 +49,14 @@ public @interface FeignApi {
 	 * @return
 	 */
 	int maxAttempts() default 3;
+	/**
+	 * 初始化之前
+	 * @return
+	 */
+	Class<? extends FeignApiInitBefore> before() default FeignApiInitBefore.class;
+	/**
+	 * 初始化之后
+	 * @return
+	 */
+	Class<? extends FeignApiInitAfter> after() default FeignApiInitAfter.class;
 }

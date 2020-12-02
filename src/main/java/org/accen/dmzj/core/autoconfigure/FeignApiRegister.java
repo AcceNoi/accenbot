@@ -1,4 +1,4 @@
-package org.accen.dmzj.core.annotation;
+package org.accen.dmzj.core.autoconfigure;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -6,6 +6,8 @@ import java.lang.reflect.InvocationTargetException;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.accen.dmzj.core.annotation.FeignApi;
+import org.accen.dmzj.core.task.api.PixivApiClientInitBefore;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.stereotype.Component;
@@ -32,17 +34,43 @@ public class FeignApiRegister implements BeanFactoryPostProcessor { // 扫描的
 		if(feignClassInfo==null) {
 			return;
 		}
-		
 		feignClassInfo.forEach(feignClass->{
 			String url = feignClass.loadClass().getAnnotation(FeignApi.class).host();
 			if(!(url.startsWith("http://")||url.startsWith("https://"))) {
 				url = "http://"+url;
 			}
+			String auth = null;
+			Class<? extends FeignApiInitBefore> clazz = feignClass.loadClass().getAnnotation(FeignApi.class).before();
+			try {
+				if(clazz.getConstructors()!=null&&clazz.getConstructors().length>0) {
+					FeignApiInitBefore before = (FeignApiInitBefore) clazz.getConstructors()[0].newInstance(null);
+					Object result = before.before(feignClass.loadClass(), feignClass.loadClass().getAnnotation(FeignApi.class));
+					if(before instanceof PixivApiClientInitBefore) {
+						auth = (String) result;
+					}
+				}
+				
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			}
+			
 			Feign.Builder builder = getFeignBuilder(feignClass.loadClass().getAnnotation(FeignApi.class).encoder()
 					,feignClass.loadClass().getAnnotation(FeignApi.class).decoder()
 					,feignClass.loadClass().getAnnotation(FeignApi.class).client()
 					,feignClass.loadClass().getAnnotation(FeignApi.class).maxPeriod()
 					,feignClass.loadClass().getAnnotation(FeignApi.class).maxAttempts());
+			if(auth!=null) {
+				final String auth2 = auth;
+				builder.requestInterceptor(template->template.header("authorization",auth2));
+			}
 			beanFactory.registerSingleton(feignClass.getName(), builder.target(feignClass.loadClass(), url));
 		});
 	}
