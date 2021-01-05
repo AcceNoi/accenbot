@@ -29,14 +29,18 @@ public class CheckinRender implements Render,Backgroudable{
 	private SysGroupMember mem;
 	private Map<String, String> memEnhance;//对mem做的增强，由于mem只能表示当前的状态，无法显示值的变化，使用这个来实现展示
 	private String foot;
+	@Deprecated
 	private String[][] svCompletions;
+	private String hitokoto;
+	private String hitokotoFrom;
 	private final static int WIDTH = 1080;
-	private final static int HEIGHT = 1200;
-	public CheckinRender(RenderImage background,SysGroupMember mem,String[][] svCompletions,RenderImage profileImage,String qqName,Map<String, String> memEnhance,String foot) {
+	private final static int HEIGHT = 1747;
+	public CheckinRender(RenderImage background,SysGroupMember mem,String hitokoto,String hitokotoFrom,RenderImage profileImage,String qqName,Map<String, String> memEnhance,String foot) {
 		super();
 		this.backgroundImg = background;
 		this.mem = mem;
-		this.svCompletions = svCompletions;
+		this.hitokoto = hitokoto;
+		this.hitokotoFrom = hitokotoFrom;
 		this.profileImg = profileImage;
 		this.qqName = qqName;
 		this.memEnhance = memEnhance;
@@ -66,7 +70,9 @@ public class CheckinRender implements Render,Backgroudable{
 		//6.绘制留言
 		renderRemark(wrapperG, 150*3+faceRadius);
 		//7.绘制卡包
-		renderPk(wrapperG, 100*3-faceRadius, 100*3+faceRadius, 208*3+faceRadius);
+		//7.绘制一言
+		renderHitokoto(wrapperG,208*3+faceRadius);
+//		renderPk(wrapperG, 100*3-faceRadius, 100*3+faceRadius, 208*3+faceRadius);
 		//8.绘制foot
 		renderFoot(wrapperG,850,1160);
 		//8.绘制头像
@@ -142,6 +148,21 @@ public class CheckinRender implements Render,Backgroudable{
 		float x = caculateCenterTextX(remark, ft16, 0, WIDTH, wrapperG);
 		renderTextOutline(wrapperG, x, y, ft16, remark);
 	}
+	private final int hitokotoLineWordCount = 15;
+	protected void renderHitokoto(Graphics2D wrapperG,float y) {
+		Font ft18 = new Font("微软雅黑", Font.BOLD, 18*3);
+		int oneLineLength = ft18.getSize()*hitokotoLineWordCount;
+		int x = (WIDTH-oneLineLength)/2;
+		for(int line = 0;line<=this.hitokoto.length()/hitokotoLineWordCount;line++) {
+			String ph =  hitokotoLineWordCount*(line+1)>(this.hitokoto.length()+1)?this.hitokoto.substring(hitokotoLineWordCount*line):this.hitokoto.substring(hitokotoLineWordCount*line,hitokotoLineWordCount*(line+1));
+			renderTextOutline(wrapperG, x, y+ft18.getSize()*line, ft18, ph);
+		}
+		Font ft12 = new Font("微软雅黑", Font.BOLD, 12*3);
+		String from = "——"+this.hitokotoFrom+"  ";
+		FontMetrics fm = wrapperG.getFontMetrics(ft12);
+		renderTextOutline(wrapperG, WIDTH-fm.stringWidth(from), y+ft18.getSize()*(this.hitokoto.length()/hitokotoLineWordCount+1), ft12, from);
+	}
+	@Deprecated
 	protected void renderPk(Graphics2D wrapperG,float x1,float x2,float y) {
 		Font ft16 = new Font("微软雅黑", Font.BOLD, 16*3);
 		FontMetrics fm = wrapperG.getFontMetrics(ft16);

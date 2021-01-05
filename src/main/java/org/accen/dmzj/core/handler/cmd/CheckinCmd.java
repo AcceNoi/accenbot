@@ -18,6 +18,7 @@ import org.accen.dmzj.core.handler.callbacker.CallbackListener;
 import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
+import org.accen.dmzj.core.task.api.HitokotoApiClient;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.FilePersistentUtil;
 import org.accen.dmzj.util.RandomUtil;
@@ -69,6 +70,8 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 	private CfgResourceMapper cfgResourceMapper;
 	@Autowired
 	private FilePersistentUtil filePersistentUtil;
+	@Autowired
+	private HitokotoApiClient hitokotoApiClient;
 	@Override
 	public String describe() {
 		return "签到或者绑定账号";
@@ -165,12 +168,13 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 							
 							String card = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("card");
 							String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
-							String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+//							String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+							Map<String, Object> hitokotoMap = hitokotoApiClient.hitokoto();
 							try {
 								Object[] backgroud = randomGroundFileEx(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 								CheckinRender render = new CheckinRender(new LocalFileRenderImage((File)backgroud[0])
 										, mem
-										, svCompletions
+										, (String)hitokotoMap.get("hitokoto"),(String)hitokotoMap.get("from")
 										, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mem.getUserId()+"&s=640"))
 										, StringUtils.isEmpty(card)?nickName:card
 										, memEnhance
@@ -226,12 +230,13 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 						
 						String card = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("card");
 						String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
-						String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+//						String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+						Map<String, Object> hitokotoMap = hitokotoApiClient.hitokoto();
 						try {
 							Object[] backgroud = randomGroundFileEx(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 							CheckinRender render = new CheckinRender(new LocalFileRenderImage((File)backgroud[0])
 									, mem
-									, svCompletions
+									, (String)hitokotoMap.get("hitokoto"),(String)hitokotoMap.get("from")
 									, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mem.getUserId()+"&s=640"))
 									, StringUtils.isEmpty(card)?nickName:card
 									, memEnhance
@@ -269,12 +274,13 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 										
 					String card = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("card");
 					String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
-					String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+//					String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
+					Map<String, Object> hitokotoMap = hitokotoApiClient.hitokoto();
 					try {
 						Object[] backgroud = randomGroundFileEx(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 						CheckinRender render = new CheckinRender(new LocalFileRenderImage((File)backgroud[0])
 								, mems.get(0)
-								, svCompletions
+								, (String)hitokotoMap.get("hitokoto"),(String)hitokotoMap.get("from")
 								, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mems.get(0).getUserId()+"&s=640"))
 								, StringUtils.isEmpty(card)?nickName:card
 								, null
@@ -402,7 +408,7 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 			cr.setCfgResource(null);
 			cfgResourceMapper.updateResouceByKey(key, null);
 		}
-	}
+	} 
 	/**
 	 * 通过原始的cqImage设置背景，中间会对cqImg持久化一次转为本地文件
 	 * @param originCqImg
