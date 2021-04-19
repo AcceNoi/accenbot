@@ -5,16 +5,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Base64;
-import java.util.Base64.Decoder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-
-import ch.qos.logback.core.pattern.parser.Parser;
 
 public class CQUtil {
 	
@@ -55,6 +54,33 @@ public class CQUtil {
 	}
 	public static String imageUrl(String url) {
 		return "[CQ:image,cache=0,file="+url+"]";
+	}
+	private static final HttpClient httpClient = HttpClient.newHttpClient();
+	/**
+	 * 可转base64
+	 * @param url
+	 * @param showBase64
+	 * @return
+	 */
+	public static String imageUrl(String url,boolean showBase64) {
+		if(showBase64) {
+			HttpRequest get = HttpRequest.newBuilder()
+								.uri(URI.create(url))
+								.GET().build();
+			try {
+				HttpResponse<byte[]> resp = httpClient.send(get, HttpResponse.BodyHandlers.ofByteArray());
+				if(resp.statusCode()==200) {
+					return imageBs64(Base64.getEncoder().encodeToString(resp.body()));
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}else {
+			return imageUrl(url);
+		}
 	}
 	public static String imageBs64(String encodedStr) {
 		return "[CQ:image,file=base64://"+encodedStr+"]";

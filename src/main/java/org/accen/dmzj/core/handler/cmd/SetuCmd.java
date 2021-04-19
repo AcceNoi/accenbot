@@ -217,50 +217,57 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 						task.setTargetId(qmessage.getGroupId());
 						Map<String,Object> rs = pixivicApiClient.search(keyword, 1);
 //						int total = (int)((double)((Map<String, Object>)rs.get("data")).get("total"));
-						int total = ((List<Map<String, Object>>)rs.get("data")).size();
-						if(total>0) {
-							total = total<20?total:20;//只取前20个
-							int rdIndex = RandomUtil.randomInt(total);
-							Map<String,Object> rdRs = ((List<Map<String, Object>>)rs.get("data")).get(rdIndex);
-							String largeImgUrl = (String)((List<Map<String,Object>>)rdRs.get("imageUrls")).get(0).get("original");
-							long pid = (long)((double)rdRs.get("id"));
-							String title = (String)rdRs.get("title");
-							String author = (String) ((Map<String,Object>)rdRs.get("artistPreView")).get("name");
-							String[] fmtPixivImgUrl = StringUtil.formatUrl(largeImgUrl);
-							String proxyLargeImgUrl = proxyPreffix+fmtPixivImgUrl[3];
-							/*try {
-								InputStream is = pixivcatApiClient.pixivImage(fmtPixivImgUrl[3]).body().asInputStream();
-								String bs64Img = StringUtil.is2Base64(is);*/
-								//添加到收藏监听
-								if(!waitingCollect.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId())) {
-									waitingCollect.put(qmessage.getMessageType()+"_"+qmessage.getGroupId(), new CacheMap<String, String>());
-								}
-								//当前群所等待收藏的图片
-								CacheMap<String,String> curGroupWaitingCollectImags = waitingCollect.get(qmessage.getMessageType()+"_"+qmessage.getGroupId());
-								//随机一个不在等待map中的随机数字
-								String rdZh = RandomUtil.randZhNumExclude(2, curGroupWaitingCollectImags.keySet());
-								curGroupWaitingCollectImags.put(rdZh, proxyLargeImgUrl,60000);
-								
-								
-								callbackManager.addResidentListener(this);
-								
-								//搜索建议
-								String[] sugArr = suggestions(keyword);
-								
-								//图片使用base64
-								
-								task.setMessage(CQUtil.imageUrl(proxyLargeImgUrl)+CQUtil.at(qmessage.getUserId())+"\n标题："+title+"，PID："+pid+"，Author："+author+"。收藏此图片请发送[收藏"+rdZh+"]喵~"+(sugArr==null?"":("\n更多搜索建议："+String.join("、",sugArr))));
-//								locked = false;
-								return task;
-							/*} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}*/
-							
-							
-						}else {
-							//未检索到
+						if(!rs.containsKey("data")) {
+							//重试一次
+							rs = pixivicApiClient.search(keyword, 1);
 						}
+						if(rs.containsKey("data")) {
+							int total = ((List<Map<String, Object>>)rs.get("data")).size();
+							if(total>0) {
+								total = total<20?total:20;//只取前20个
+								int rdIndex = RandomUtil.randomInt(total);
+								Map<String,Object> rdRs = ((List<Map<String, Object>>)rs.get("data")).get(rdIndex);
+								String largeImgUrl = (String)((List<Map<String,Object>>)rdRs.get("imageUrls")).get(0).get("original");
+								long pid = (long)((double)rdRs.get("id"));
+								String title = (String)rdRs.get("title");
+								String author = (String) ((Map<String,Object>)rdRs.get("artistPreView")).get("name");
+								String[] fmtPixivImgUrl = StringUtil.formatUrl(largeImgUrl);
+								String proxyLargeImgUrl = proxyPreffix+fmtPixivImgUrl[3];
+								/*try {
+									InputStream is = pixivcatApiClient.pixivImage(fmtPixivImgUrl[3]).body().asInputStream();
+									String bs64Img = StringUtil.is2Base64(is);*/
+									//添加到收藏监听
+									if(!waitingCollect.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId())) {
+										waitingCollect.put(qmessage.getMessageType()+"_"+qmessage.getGroupId(), new CacheMap<String, String>());
+									}
+									//当前群所等待收藏的图片
+									CacheMap<String,String> curGroupWaitingCollectImags = waitingCollect.get(qmessage.getMessageType()+"_"+qmessage.getGroupId());
+									//随机一个不在等待map中的随机数字
+									String rdZh = RandomUtil.randZhNumExclude(2, curGroupWaitingCollectImags.keySet());
+									curGroupWaitingCollectImags.put(rdZh, proxyLargeImgUrl,60000);
+									
+									
+									callbackManager.addResidentListener(this);
+									
+									//搜索建议
+									String[] sugArr = suggestions(keyword);
+									
+									//图片使用base64
+									
+									task.setMessage(CQUtil.imageUrl(proxyLargeImgUrl,true)+CQUtil.at(qmessage.getUserId())+"\n标题："+title+"，PID："+pid+"，Author："+author+"。收藏此图片请发送[收藏"+rdZh+"]喵~"+(sugArr==null?"":("\n更多搜索建议："+String.join("、",sugArr))));
+//									locked = false;
+									return task;
+								/*} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}*/
+								
+								
+							}else {
+								//未检索到
+							}
+						}
+						
 						
 						
 					}
@@ -272,7 +279,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 						task.setSelfQnum(selfQnum);
 						task.setType(qmessage.getMessageType());
 						task.setTargetId(qmessage.getGroupId());
-						task.setMessage(CQUtil.image("https://pixiv.cat/"+pid+".jpg"));
+						task.setMessage(CQUtil.imageUrl("https://pixiv.cat/"+pid+".jpg",true));
 						return task;
 					}
 //					locked = false;
