@@ -34,7 +34,7 @@ public class CheckinRender implements Render,Backgroudable{
 	private String hitokoto;
 	private String hitokotoFrom;
 	private final static int WIDTH = 1080;
-	private final static int HEIGHT = 1747;
+	private final static int HEIGHT = 1511;
 	public CheckinRender(RenderImage background,SysGroupMember mem,String hitokoto,String hitokotoFrom,RenderImage profileImage,String qqName,Map<String, String> memEnhance,String foot) {
 		super();
 		this.backgroundImg = background;
@@ -154,7 +154,7 @@ public class CheckinRender implements Render,Backgroudable{
 		int oneLineLength = ft18.getSize()*hitokotoLineWordCount;
 		int x = (WIDTH-oneLineLength)/2;
 		for(int line = 0;line<=this.hitokoto.length()/hitokotoLineWordCount;line++) {
-			String ph =  hitokotoLineWordCount*(line+1)>(this.hitokoto.length()+1)?this.hitokoto.substring(hitokotoLineWordCount*line):this.hitokoto.substring(hitokotoLineWordCount*line,hitokotoLineWordCount*(line+1));
+			String ph =  hitokotoLineWordCount*(line+1)>=this.hitokoto.length()?this.hitokoto.substring(hitokotoLineWordCount*line):this.hitokoto.substring(hitokotoLineWordCount*line,hitokotoLineWordCount*(line+1));
 			renderTextOutline(wrapperG, x, y+ft18.getSize()*line, ft18, ph);
 		}
 		Font ft12 = new Font("微软雅黑", Font.BOLD, 12*3);
