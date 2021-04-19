@@ -30,7 +30,45 @@ public class FfmpegUtil {
 	 */
 	public String convertVideo2Audio(String src,String target,String targetFmt,String ss,String to) {
 		String bin = ffmpegBin;
-		String cmd = bin+"ffmpeg -i "+src+" -ss "+ss+" -to "+to+" -acodec "+targetFmt+" -vn "+target;
+		String cmd = bin+"ffmpeg.exe -i "+src+" -ss "+ss+" -to "+to+" -acodec "+targetFmt+" -vn "+target;
+		logger.info("ffmpeg cmd: "+cmd);
+		Runtime run = Runtime.getRuntime();
+		try {
+			String[] exe = new String[3];
+			if(SystemUtil.getOs().startsWith("LINUX")) {
+				exe[0] = "sh";
+				exe[1] = "-c";
+			}else if(SystemUtil.getOs().startsWith("WINDOWS")) {
+				exe[0] = "cmd ";
+				exe[1] = "/c";
+			}
+			exe[2] = cmd;
+			Process p = run.exec(exe);
+//			p.getOutputStream().close();
+//			p.getInputStream().close();
+//			p.getErrorStream().close();
+			dealStream(p);
+			p.waitFor();
+			p.destroy();
+			return target;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			 run.freeMemory();
+		}
+		return null;
+	}
+	/**
+	 * 压缩至32k
+	 * @param src
+	 * @param target
+	 * @return
+	 */
+	public String zipAudio(String src,String target) {
+		String bin = ffmpegBin;
+		String cmd = bin+"ffmpeg.exe -i "+src+" -b:a 32k  -acodec mp3 -ar 44100 -ac 1 "+target;
 		logger.info("ffmpeg cmd: "+cmd);
 		Runtime run = Runtime.getRuntime();
 		try {

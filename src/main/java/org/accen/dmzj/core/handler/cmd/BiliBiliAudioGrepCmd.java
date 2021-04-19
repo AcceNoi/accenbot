@@ -67,7 +67,7 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 
 	private static final String KEY_PREFFIX = "audio_bilibili_";
 	
-	private final static Pattern grepPattern = Pattern.compile("^抽取B站(.+)?从(.+)?到(.+)?(音乐|语音)，设置名称(.+)?$");
+	private final static Pattern grepPattern = Pattern.compile("^抽取B站(.+)?从(.+)?到(.+)?(语音)，设置名称(.+)?$");
 	@Override
 	public  GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
@@ -98,9 +98,9 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 					if(diff<=0) {
 						task.setMessage("时间格式输入错误喵~");
 						return task;
-					}else if(diff>120&&"语音".equals(type)){
+					}else if(diff>300&&"语音".equals(type)){
 						//如果大于120且为语音，则不给过
-						task.setMessage("抽取的语音时长不能超过120秒的说~");
+						task.setMessage("抽取的语音时长不能超过300秒的说~");
 						return task;
 					}
 					try {
@@ -116,6 +116,12 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 						if(audio==null) {
 							task.setMessage("视频剪切失败喵~");
 							return task;
+						}
+						//压缩
+						String target2 = tempMusicPath+KEY_PREFFIX+targetFileName+".mp3";
+						audio = ffmpegUtil.zipAudio(target, target2);
+						if(audio!=null) {
+							target = target2;
 						}
 						if("音乐".equals(type)) {
 							CfgResource cr = new CfgResource();
@@ -140,7 +146,7 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 							CfgQuickReply reply = new CfgQuickReply();
 							reply.setMatchType(1);
 							reply.setPattern(StringUtil.transferPattern(name));
-							reply.setReply("[CQ:record,file="+staticMusic+KEY_PREFFIX+targetFileName+".aac,cache=0]");
+							reply.setReply("[CQ:record,file=file:///"+target+",cache=0]");
 							reply.setApplyType(2);
 							reply.setApplyTarget(qmessage.getGroupId());
 							reply.setNeedAt(2);
