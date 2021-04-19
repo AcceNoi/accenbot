@@ -6,13 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.accen.dmzj.core.exception.BiliBiliCookieExpired;
 import org.accen.dmzj.core.exception.BiliBiliCookieNeverInit;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CfgConfigValueMapper;
@@ -21,7 +19,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -71,7 +68,7 @@ public class ApiBiliBiliApiClient {
 	private final HttpClient httpClient = HttpClientBuilder.create().build();
 	private final Gson gson = new Gson();
 	
-	private final static Pattern urlPattern = Pattern.compile(".*?(bilibili|b23).(com|tv)/(video/){0,1}av(\\d+)?.*");
+	private final static Pattern urlPattern = Pattern.compile(".*?(bilibili|b23).(com|tv)/(video/){0,1}(av|AV|BV|bv)([0-9a-zA-Z]+)?.*");
 	/**
 	 * 
 	 * @param str
@@ -96,10 +93,24 @@ public class ApiBiliBiliApiClient {
 	public String[] downLoadByUrl(String url,int qn) throws BiliBiliCookieNeverInit {
 		Matcher mt = urlPattern.matcher(url);
 		if(mt.matches()) {
-			return downLoadByAvid(mt.group(4), qn);
+			if("av".equalsIgnoreCase(mt.group(4))) {
+				return downLoadByAvid(mt.group(5), qn);
+			}else if("bv".equalsIgnoreCase(mt.group(4))) {
+				return downloadByBvid(mt.group(5), qn);
+			}
+			
 		}
 		return null;
 	}
+	public String[] downloadByBvid(String bvid,int qn) throws BiliBiliCookieNeverInit {
+		checkCookie();
+		String avid = getAvidByBvid(bvid);
+		if(avid==null) {
+			return null;
+		}
+		return downLoadByAvid(avid, qn);
+	}
+	
 	/**
 	 * 
 	 * @param avid
@@ -164,6 +175,23 @@ public class ApiBiliBiliApiClient {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		return null;
+	}
+	private final static String BILIBILI_API_VIEW_BV = "https://api.bilibili.com/x/web-interface/view?bvid=%s";
+	public String getAvidByBvid(String bvid) {
+		HttpGet get = new HttpGet(String.format(BILIBILI_API_VIEW_BV, bvid));
+		try {
+			HttpResponse viewResp = httpClient.execute(get);
+			if(viewResp.getStatusLine().getStatusCode()==200) {
+				String ctt = EntityUtils.toString(viewResp.getEntity(),"UTF-8");
+				Map<String, Object> data = gson.fromJson(ctt, Map.class);
+				return new BigDecimal((Double) ((Map<String, Object>)data.get("data")).get("aid")).stripTrailingZeros().toPlainString();
+			}
+		} catch (ClientProtocolException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 		return null;
 	}
