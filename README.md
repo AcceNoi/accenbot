@@ -13,6 +13,8 @@
 
 ##  <font color="red">注意</font>
 >使用了preview特性，请确保使用JDK15+（可能会持续到17发布）进行编译和运行，并添加--enable-preview参数。
+>
+>当前最新版本[V2.0-Agito](https://github.com/AcceNoi/dmzjbot/releases/tag/V2.0-Agito)，重构了API模块，使用Springboot 2.4+，不再使用原生的Feign而改用OpenFeign。重写了Pixivc的Auth模块，现在支持认证失效重连。
 
 ## 功能介绍
 
