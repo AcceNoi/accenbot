@@ -8,7 +8,7 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.accen.dmzj.core.task.GeneralTask;
-import org.accen.dmzj.core.task.api.CqhttpClient;
+import org.accen.dmzj.core.api.cq.CqhttpClient;
 import org.accen.dmzj.web.dao.CfgListenStatusMapper;
 import org.accen.dmzj.web.dao.SysRecordCountMapper;
 import org.accen.dmzj.web.vo.CfgListenStatus;

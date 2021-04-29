@@ -18,7 +18,7 @@ public class ChaosListener implements ListenAdpter{
 	private ChaosModeCmd chaosModeCmd;
 	@Autowired
 	private QmessageUtil qmessageUtil;
-	@Value("${coolq.chaosmod.prop:0.8}")
+	@Value("${coolq.chaosmod.prop:0.05}")
 	private float prop;
 	@Autowired
 	private TaskManager taskManager;

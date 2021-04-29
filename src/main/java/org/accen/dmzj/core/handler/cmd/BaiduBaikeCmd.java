@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
-import org.accen.dmzj.core.task.api.baidu.BaikeApicClientPk;
-import org.accen.dmzj.core.task.api.vo.BaikeResult;
+import org.accen.dmzj.core.api.baidu.BaikeApicClientPk;
+import org.accen.dmzj.core.api.vo.BaikeResult;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomUtil;
 import org.accen.dmzj.web.dao.CmdWikiMapper;

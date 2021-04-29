@@ -1,28 +1,10 @@
 package org.accen.dmzj.util.setu;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
-import org.accen.dmzj.core.task.api.PixivcatApiClient;
+import org.accen.dmzj.core.api.PixivcatApiClient;
 import org.accen.dmzj.util.ApplicationContextUtil;
-import org.accen.dmzj.util.FilePersistentUtil;
-import org.accen.dmzj.util.render.UrlRenderImage;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-
-import feign.Response;
 /**
  * p站图抓取
  * @author <a href="1339liu@gmail.com">Accen</a>

@@ -54,7 +54,9 @@ public class GroupMessageEventhandler implements EventHandler{
 	private Set<String> noActiveGroup = new HashSet<String>();
 	private static final String startSign = "召唤";
 	private static final String endSign = "去面壁";
-	
+	public boolean isActiveGroup(String group) {
+		return !noActiveGroup.contains(group);
+	}
 	@Override
 	public void handle(Map<String, Object> event) {
 		if(EventParser.MESSAGE_TYPE_GROUP.equals(event.get("message_type"))

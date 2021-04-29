@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.task.TaskManager;
-import org.accen.dmzj.core.task.api.bilibili.ApiVcBilibiliApiClient;
-import org.accen.dmzj.core.task.api.bilibili.LiveBilibiliApiClient;
+import org.accen.dmzj.core.api.bilibili.ApiVcBilibiliApiClient;
+import org.accen.dmzj.core.api.bilibili.LiveBilibiliApiClient;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CmdBuSubMapper;
@@ -46,9 +46,9 @@ public class BilibiliSchedule {
 	
 	private static final Logger logger = LoggerFactory.getLogger(BilibiliSchedule.class);
 	/**
-	 * 每2分钟执行一次，也就是说最糟糕情况下，数分钟的延迟。但是由于api是<a href="http://docs.kaaass.net/showdoc/web/#/2?page_id=3">Kaass</a>提供的，还是不要调用过于频繁
+	 * 每5分钟执行一次，也就是说最糟糕情况下，数分钟的延迟。但是由于api是<a href="http://docs.kaaass.net/showdoc/web/#/2?page_id=3">Kaass</a>提供的，还是不要调用过于频繁
 	 */
-	@Scheduled(cron = "0 */2 * * * *")
+	@Scheduled(cron = "0 */5 * * * *")
 	public void bilibiUpScan() {
 		//先获取当前时间戳，用于2min内投稿即为新投稿
 		long curTimestamp=new Date().getTime();
@@ -110,8 +110,8 @@ public class BilibiliSchedule {
 						for(Map<String,Object> card:cards) {
 							@SuppressWarnings("unchecked")
 							Map<String, Object> desc = (Map<String, Object>) card.get("desc");
-							long timestamp = (long) ((double)desc.get("timestamp"))*1000;
-							if(curTimestamp-timestamp<=2*60*1000) {
+							int timestamp =  ((int)desc.get("timestamp"))*1000;
+							if(curTimestamp-timestamp<=5*60*1000) {
 								String[] cardFmted = parseDynamicCard(card);
 								String cardContent = cardFmted[0];//更新的内容
 								String share = cardFmted[1];
@@ -161,7 +161,7 @@ public class BilibiliSchedule {
 	private String[] parseDynamicCard(Map<String,Object> card) {
 		
 		Map<String, Object> desc = (Map<String, Object>) card.get("desc");
-		int type = (int) ((double)desc.get("type"));
+		int type = (int)desc.get("type");
 		String cardJson = StringUtil.unicodeToString(((String) card.get("card"))).replaceAll("\n", " ");
 //		logger.info(card.get("card").toString());
 		logger.debug(cardJson);
@@ -170,9 +170,9 @@ public class BilibiliSchedule {
 		
 	}
 	/**
-	 * 对card内容的解析，暂时可以解析1-转发动态/2-普通动态/8-视频/64-专栏
-	 * @param cardMap
-	 * @param type 动态类型 1 2 8 64
+	 * 对card内容的解析，暂时可以解析1-转发动态/2-普通动态/8-视频/64-专栏/4-无图片动态、256-音频
+	 * @param cardMap 
+	 * @param type 动态类型 1 2 8 64 
 	 * @param depth 深度，当动态为转发动态时，会叠加一次深度，从0开始记，一般认为所关注的人发布的动态深度为0
 	 * @param nextUname 当当前动态不是顶层动态时（是被转发的），也就是depth>0时，需要提供这条动态的发布者。
 	 * @return 0-文本形式的消息，1-分享形式的消息
@@ -195,7 +195,7 @@ public class BilibiliSchedule {
 			}
 			
 			//转发的动态拿到原始的动态
-			int originType = (int) ((double)((Map<String,Object>)cardMap.get("item")).get("orig_type"));
+			int originType = (int)((Map<String,Object>)cardMap.get("item")).get("orig_type");
 			String originUname = (String) ((Map<String,Object>) ((Map<String,Object>)cardMap.get("origin_user")).get("info")).get("uname");
 			//番剧是没有上传者名字的，用标题代替，不过在上一级无所谓，拿到的反正是空
 			
@@ -214,7 +214,7 @@ public class BilibiliSchedule {
 				msgBuf.append("发布了新动态：\n");
 			}
 			msgBuf.append(description)
-					.append((pics!=null&&!pics.isEmpty())?CQUtil.imageUrl((String) pics.get(0).get("img_src")):"");
+					.append((pics!=null&&!pics.isEmpty())?CQUtil.imageUrl((String) pics.get(0).get("img_src"),true):"");
 			return new String[] {msgBuf.toString(),null};
 		}else if(type>>2==1){
 			//也是普通动态
@@ -237,7 +237,7 @@ public class BilibiliSchedule {
 			}else if(depth==0) {
 				msgBuf.append("更新了一个视频：\n");
 			}
-			long aid = ((Double)cardMap.get("aid")).longValue();
+			long aid = (Long)cardMap.get("aid");
 			String title = (String)cardMap.get("title");
 			String description = (String) cardMap.get("desc");
 //			description = description.length()>83?(description.substring(0, 80)+"..."):description;
@@ -249,7 +249,7 @@ public class BilibiliSchedule {
 						.append("https://www.bilibili.com/video/av")
 						.append(aid)
 						.append("]")
-						.append(StringUtils.isEmpty(pic)?"":CQUtil.imageUrl(pic));
+						.append(StringUtils.isEmpty(pic)?"":CQUtil.imageUrl(pic,true));
 			return new String[] {msgBuf.toString(),CQUtil.share("https://www.bilibili.com/video/av"+aid, title, description, pic)};
 		}else if(type>>4==1) {
 			//小视频
@@ -264,7 +264,7 @@ public class BilibiliSchedule {
 //			String description1 = description.length()>83?(description.substring(0, 80)+"..."):description;
 			String imgUrl = (String) ((Map<String,Object>)((Map<String,Object>)cardMap.get("item")).get("cover")).get("unclipped");
 			msgBuf.append(description)
-				.append(StringUtils.isEmpty(imgUrl)?"":CQUtil.imageUrl(imgUrl));
+				.append(StringUtils.isEmpty(imgUrl)?"":CQUtil.imageUrl(imgUrl,true));
 			return new String[] {msgBuf.toString(),null};
 		}else if(type>>6==1) {
 			//专栏
@@ -275,7 +275,7 @@ public class BilibiliSchedule {
 			}else if(depth==0) {
 				msgBuf.append("发布了一则专栏：\n");
 			}
-			long cvId = ((Double)cardMap.get("id")).longValue();
+			long cvId = (long)cardMap.get("id");
 			String title = (String) cardMap.get("title");
 			String summary = (String) cardMap.get("summary");
 			String description = title.trim()+"\n"+summary;
@@ -286,7 +286,7 @@ public class BilibiliSchedule {
 						.append("https://www.bilibili.com/read/cv")
 						.append(cvId)
 						.append("]")
-						.append((pics!=null&&!pics.isEmpty())?CQUtil.imageUrl( pics.get(0)):"");
+						.append((pics!=null&&!pics.isEmpty())?CQUtil.imageUrl( pics.get(0),true):"");
 			return new String[] {msgBuf.toString(),null};
 		}else if(type>>8==1){
 			//音乐
@@ -297,7 +297,7 @@ public class BilibiliSchedule {
 			}else if(depth==0) {
 				msgBuf.append("发布了一首音乐：\n");
 			}
-			long mId = ((Double)cardMap.get("id")).longValue();
+			long mId = (long)cardMap.get("id");
 			String title = (String) cardMap.get("title");
 			String intro = (String) cardMap.get("intro");
 			String description = title.trim()+"\n"+intro.trim();
@@ -308,7 +308,7 @@ public class BilibiliSchedule {
 					.append("https://www.bilibili.com/audio/au")
 					.append(mId)
 					.append("]")
-					.append(StringUtils.isEmpty(cover)?"":CQUtil.imageUrl(cover));
+					.append(StringUtils.hasLength(cover)?"":CQUtil.imageUrl(cover,true));
 			return new String[] {msgBuf.toString(),null};
 		}else if(type>>9==1){
 			//512番剧，名字取番剧标题而不是上传者名
@@ -330,7 +330,7 @@ public class BilibiliSchedule {
 					.append("[")
 					.append(url)
 					.append("]")
-					.append(StringUtils.isEmpty(cover)?"":CQUtil.imageUrl(cover));
+					.append(StringUtils.isEmpty(cover)?"":CQUtil.imageUrl(cover,true));
 			return new String[] {msgBuf.toString(),null};
 		}else {
 			return new String[] {msgBuf.toString(),null};
@@ -365,7 +365,7 @@ public class BilibiliSchedule {
 				String[] roomIdSttsArr = roomIdStts.split("#");
 				Map<String,Object> roomInfo = apiLive.infoByRoom(roomIdSttsArr[0]);
 				if((int)roomInfo.get("code")==0) {
-					int liveStatus =(int) ((double)((Map<String, Object>)((Map<String,Object>)roomInfo.get("data")).get("room_info")).get("live_status"));
+					int liveStatus =(int) ((Map<String, Object>)((Map<String,Object>)roomInfo.get("data")).get("room_info")).get("live_status");
 					if(Integer.parseInt(roomIdSttsArr[1])==0&&liveStatus==1) {
 						//开播了
 						String title =  (String)((Map<String, Object>)((Map<String,Object>)roomInfo.get("data")).get("room_info")).get("title");
@@ -384,7 +384,7 @@ public class BilibiliSchedule {
 								.append("https://live.bilibili.com/")
 								.append(roomIdSttsArr[0])
 								.append("]")
-								.append(StringUtils.isEmpty(cover)?"":CQUtil.imageUrl(cover))
+								.append(StringUtils.isEmpty(cover)?"":CQUtil.imageUrl(cover,true))
 								.append(" 快去围观吧喵~");
 							logger.debug(msg.toString());
 							taskManager.addGeneralTaskQuick(botId, "group", targetId, msg.toString());

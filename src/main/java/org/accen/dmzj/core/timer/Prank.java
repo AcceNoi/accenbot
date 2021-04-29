@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.exception.DataNeverInitedException;
 import org.accen.dmzj.core.handler.callbacker.AsyncCallback;
-import org.accen.dmzj.core.task.api.PixivicApiClient;
+import org.accen.dmzj.core.api.pixivc.PixivicApiClient;
 import org.accen.dmzj.util.render.PixivUrlRenderImage;
 import org.accen.dmzj.util.render.SimpleImageRender;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class Prank {
 //									return new PixivUrlRenderImage(new URL(((String)imageUrls.get(0).get("large")).replace("i.pximg.net", "i.pixiv.cat"))
 									return new PixivUrlRenderImage(new URL(((String)imageUrls.get(0).get("large")).replace("_webp", "").replace("i.pximg.net", "i.pixiv.cat"))
 //									return new PixivUrlRenderImage(new URL("https://bigimg.cheerfun.dev/get/"+((String)imageUrls.get(0).get("large")))
-											, ""+(long)((double)singleData.get("id"))+(imageUrls.size()>1?("[1-"+imageUrls.size()+"]"):"")
+											, ""+(int)singleData.get("id")+(imageUrls.size()>1?("[1-"+imageUrls.size()+"]"):"")
 											, (String)singleData.get("title")
 											, (String)artistPreView.get("name"));
 								} catch (MalformedURLException e) {

@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.task.GeneralTask;
-import org.accen.dmzj.core.task.api.bilibili.ApiBiliBiliApiClient;
+import org.accen.dmzj.core.api.bilibili.ApiBiliBiliApiClient;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

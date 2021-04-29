@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
-import org.accen.dmzj.core.task.api.MusicApiClient;
-import org.accen.dmzj.core.task.api.vo.Music163Result;
+import org.accen.dmzj.core.api.MusicApiClient;
+import org.accen.dmzj.core.api.vo.Music163Result;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomUtil;
 import org.accen.dmzj.util.StringUtil;
@@ -16,7 +16,6 @@ import org.accen.dmzj.web.vo.CfgResource;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.connection.ReactiveListCommands.LSetCommand;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;

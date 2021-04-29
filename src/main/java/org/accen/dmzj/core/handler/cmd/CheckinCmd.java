@@ -18,7 +18,7 @@ import org.accen.dmzj.core.handler.callbacker.CallbackListener;
 import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
-import org.accen.dmzj.core.task.api.HitokotoApiClient;
+import org.accen.dmzj.core.api.HitokotoApiClient;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.FilePersistentUtil;
 import org.accen.dmzj.util.RandomUtil;
@@ -176,7 +176,7 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 										, mem
 										, (String)hitokotoMap.get("hitokoto"),(String)hitokotoMap.get("from")
 										, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mem.getUserId()+"&s=640"))
-										, StringUtils.isEmpty(card)?nickName:card
+										, StringUtils.hasLength(card)?nickName:card
 										, memEnhance
 										, "背景模式："+(String)backgroud[1]);
 								String templeFileName = qmessage.getMessageType()+qmessage.getGroupId()+"-"+qmessage.getUserId()+".jpg";
@@ -238,7 +238,7 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 									, mem
 									, (String)hitokotoMap.get("hitokoto"),(String)hitokotoMap.get("from")
 									, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mem.getUserId()+"&s=640"))
-									, StringUtils.isEmpty(card)?nickName:card
+									, StringUtils.hasLength(card)?nickName:card
 									, memEnhance
 									, "背景模式："+(String)backgroud[1]);
 							String templeFileName = qmessage.getMessageType()+qmessage.getGroupId()+"-"+qmessage.getUserId()+".jpg";
@@ -282,7 +282,7 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 								, mems.get(0)
 								, (String)hitokotoMap.get("hitokoto"),(String)hitokotoMap.get("from")
 								, new UrlRenderImage(new URL("http://q1.qlogo.cn/g?b=qq&nk="+mems.get(0).getUserId()+"&s=640"))
-								, StringUtils.isEmpty(card)?nickName:card
+								, StringUtils.hasLength(card)?nickName:card
 								, null
 								, "背景模式："+(String)backgroud[1]);
 						String templeFileName = qmessage.getMessageType()+qmessage.getGroupId()+"-"+qmessage.getUserId()+".jpg";
@@ -341,7 +341,7 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 			if(getFav(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId())>=bkgrdFav) {
 				//好感度够了
 				String imageCq = bkgrdMatcher.group(1);
-				if(StringUtils.isEmpty(imageCq)) {
+				if(StringUtils.hasLength(imageCq)) {
 					task.setMessage("请发送一张图片喵~(不要超过1M哦");
 					callbackManager.addCallbackListener(this,qmessage);
 					return task;

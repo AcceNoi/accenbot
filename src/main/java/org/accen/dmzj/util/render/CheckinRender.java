@@ -153,7 +153,10 @@ public class CheckinRender implements Render,Backgroudable{
 		Font ft18 = new Font("微软雅黑", Font.BOLD, 18*3);
 		int oneLineLength = ft18.getSize()*hitokotoLineWordCount;
 		int x = (WIDTH-oneLineLength)/2;
-		for(int line = 0;line<=this.hitokoto.length()/hitokotoLineWordCount;line++) {
+		//进一法确定行数
+		int allLines = (int) Math.ceil(this.hitokoto.length()/hitokotoLineWordCount);
+		
+		for(int line = 0;line<allLines;line++) {
 			String ph =  hitokotoLineWordCount*(line+1)>=this.hitokoto.length()?this.hitokoto.substring(hitokotoLineWordCount*line):this.hitokoto.substring(hitokotoLineWordCount*line,hitokotoLineWordCount*(line+1));
 			renderTextOutline(wrapperG, x, y+ft18.getSize()*line, ft18, ph);
 		}

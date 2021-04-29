@@ -54,7 +54,8 @@ public class ChaosModeCmd extends ModeCmd implements CmdAdapter {
 
 	@Override
 	public boolean modeOpen(String groupId) {
-		return super.hasGroup(groupId);
+//		return super.hasGroup(groupId);
+		return true;
 	}
 
 }

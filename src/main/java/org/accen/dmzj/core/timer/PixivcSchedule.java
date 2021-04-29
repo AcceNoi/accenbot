@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.task.TaskManager;
-import org.accen.dmzj.core.task.api.PixivicApiClient;
+import org.accen.dmzj.core.api.pixivc.PixivicApiClient;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.dao.CmdBuSubMapper;
 import org.accen.dmzj.web.vo.CmdBuSub;

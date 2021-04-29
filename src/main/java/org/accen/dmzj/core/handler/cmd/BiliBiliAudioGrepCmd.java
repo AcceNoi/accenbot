@@ -1,6 +1,5 @@
 package org.accen.dmzj.core.handler.cmd;
 
-import java.io.File;
 import java.util.Date;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -10,7 +9,7 @@ import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.exception.BiliBiliCookieNeverInit;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
-import org.accen.dmzj.core.task.api.bilibili.ApiBiliBiliApiClient;
+import org.accen.dmzj.core.api.bilibili.ApiBiliBiliApiClient;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.FfmpegUtil;
 import org.accen.dmzj.util.StringUtil;

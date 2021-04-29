@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.accen.dmzj.core.task.api.CqhttpClient;
+import org.accen.dmzj.core.api.cq.CqhttpClient;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +57,7 @@ public class QmessageUtil {
 		if(groupList == null || groupList.isEmpty()) {
 			List<Map<String, Object>> groupListInfo = (List<Map<String, Object>>) cqhttpClient.groupList().get("data");
 			groupList = groupListInfo.parallelStream()
-									.map(map->new BigDecimal((Double)map.get("group_id")).stripTrailingZeros().toPlainString())
+									.map(map->new BigDecimal((Integer)map.get("group_id")).stripTrailingZeros().toPlainString())
 									.collect(Collectors.toSet());
 		}
 		return groupList==null?new HashSet<String>():new HashSet<>(groupList);

@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Base64.Encoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +18,8 @@ import org.accen.dmzj.core.handler.callbacker.CallbackListener;
 import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
-import org.accen.dmzj.core.task.api.LoliconApiClient;
-import org.accen.dmzj.core.task.api.LoliconApiClientPk;
-import org.accen.dmzj.core.task.api.PixivicApiClient;
+import org.accen.dmzj.core.api.LoliconApiClient;
+import org.accen.dmzj.core.api.pixivc.PixivicApiClient;
 import org.accen.dmzj.core.timer.CacheMap;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.FuncSwitchUtil;
@@ -54,8 +52,6 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	}
 	@Autowired
 	private CallbackManager callbackManager;
-	@Autowired
-	private LoliconApiClientPk loliconApiClientPk;
 	@Autowired
 	private LoliconApiClient loliconApiClient;
 	@Autowired
@@ -228,7 +224,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 								int rdIndex = RandomUtil.randomInt(total);
 								Map<String,Object> rdRs = ((List<Map<String, Object>>)rs.get("data")).get(rdIndex);
 								String largeImgUrl = (String)((List<Map<String,Object>>)rdRs.get("imageUrls")).get(0).get("original");
-								long pid = (long)((double)rdRs.get("id"));
+								long pid = (long)rdRs.get("id");
 								String title = (String)rdRs.get("title");
 								String author = (String) ((Map<String,Object>)rdRs.get("artistPreView")).get("name");
 								String[] fmtPixivImgUrl = StringUtil.formatUrl(largeImgUrl);

@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
-import org.accen.dmzj.core.task.api.JiRenGuApiClient;
+import org.accen.dmzj.core.api.JiRenGuApiClient;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;

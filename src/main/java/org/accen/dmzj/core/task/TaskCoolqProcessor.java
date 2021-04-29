@@ -3,7 +3,7 @@ package org.accen.dmzj.core.task;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.accen.dmzj.core.task.api.CqhttpClient;
+import org.accen.dmzj.core.api.cq.CqhttpClient;
 import org.accen.dmzj.util.ApplicationContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

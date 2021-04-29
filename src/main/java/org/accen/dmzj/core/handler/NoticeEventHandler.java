@@ -9,7 +9,7 @@ import java.util.Map;
 import org.accen.dmzj.core.annotation.HandlerChain;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
-import org.accen.dmzj.core.task.api.QqNickApiClient;
+import org.accen.dmzj.core.api.QqNickApiClient;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomUtil;
 import org.accen.dmzj.web.dao.CfgConfigValueMapper;
@@ -47,7 +47,7 @@ public class NoticeEventHandler implements EventHandler{
 		if(NOTICE_TYPE_GROUP_INCREASE.equals(noticeType)) {
 			//新人加群
 			CfgConfigValue config = configMapper.selectByTargetAndKey("group", new BigDecimal((Double)event.get("group_id")).stripTrailingZeros().toPlainString(), REPLY_GROUP_INCREASE);
-			if(config!=null&&!StringUtils.isEmpty(config.getConfigValue())) {
+			if(config!=null&&!StringUtils.hasLength(config.getConfigValue())) {
 				String userId = new BigDecimal((Double)event.get("user_id")).stripTrailingZeros().toPlainString();
 				
 				GeneralTask task = new GeneralTask();

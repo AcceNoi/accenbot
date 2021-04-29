@@ -7,10 +7,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.task.GeneralTask;
-import org.accen.dmzj.core.task.api.BilibiliSearchApiClientPk;
-import org.accen.dmzj.core.task.api.PixivicApiClient;
-import org.accen.dmzj.core.task.api.vo.BilibiliBangumiInfo;
-import org.accen.dmzj.core.task.api.vo.BilibiliUserInfo;
+import org.accen.dmzj.core.api.bilibili.BilibiliSearchApiClientPk;
+import org.accen.dmzj.core.api.pixivc.PixivicApiClient;
+import org.accen.dmzj.core.api.vo.BilibiliBangumiInfo;
+import org.accen.dmzj.core.api.vo.BilibiliUserInfo;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CmdBuSubMapper;

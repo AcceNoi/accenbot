@@ -9,12 +9,10 @@ import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
-import org.accen.dmzj.core.task.api.GoogleTranslateApiClient;
-import org.accen.dmzj.core.task.api.YoudaoApiClient;
-import org.accen.dmzj.core.task.api.vo.YoudaoTranslateResult;
+import org.accen.dmzj.core.api.GoogleTranslateApiClient;
+import org.accen.dmzj.core.api.YoudaoApiClient;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.GoogleUtil;
-import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

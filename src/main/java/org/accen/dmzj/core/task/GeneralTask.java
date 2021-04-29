@@ -29,5 +29,15 @@ public class GeneralTask {
 	public void setSelfQnum(String selfQnum) {
 		this.selfQnum = selfQnum;
 	}
+	public GeneralTask(String type, String targetId, String message, String selfQnum) {
+		super();
+		this.type = type;
+		this.targetId = targetId;
+		this.message = message;
+		this.selfQnum = selfQnum;
+	}
+	public GeneralTask() {
+		super();
+	}
 	
 }
