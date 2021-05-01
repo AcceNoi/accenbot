@@ -341,7 +341,7 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 			if(getFav(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId())>=bkgrdFav) {
 				//好感度够了
 				String imageCq = bkgrdMatcher.group(1);
-				if(StringUtils.hasLength(imageCq)) {
+				if(!StringUtils.hasLength(imageCq)) {
 					task.setMessage("请发送一张图片喵~(不要超过1M哦");
 					callbackManager.addCallbackListener(this,qmessage);
 					return task;

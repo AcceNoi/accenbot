@@ -144,7 +144,7 @@ public class CheckinRender implements Render,Backgroudable{
 	}
 	protected void renderRemark(Graphics2D wrapperG,float y) {
 		Font ft16 = new Font("微软雅黑", Font.BOLD, 16*3);
-		String remark = StringUtils.isEmpty(mem.getRemark())?"↑这个人很懒，还没有设置留言":mem.getRemark();
+		String remark = !StringUtils.hasLength(mem.getRemark())?"↑这个人很懒，还没有设置留言":mem.getRemark();
 		float x = caculateCenterTextX(remark, ft16, 0, WIDTH, wrapperG);
 		renderTextOutline(wrapperG, x, y, ft16, remark);
 	}
@@ -154,7 +154,7 @@ public class CheckinRender implements Render,Backgroudable{
 		int oneLineLength = ft18.getSize()*hitokotoLineWordCount;
 		int x = (WIDTH-oneLineLength)/2;
 		//进一法确定行数
-		int allLines = (int) Math.ceil(this.hitokoto.length()/hitokotoLineWordCount);
+		int allLines = (int) Math.ceil((double)this.hitokoto.length()/hitokotoLineWordCount);
 		
 		for(int line = 0;line<allLines;line++) {
 			String ph =  hitokotoLineWordCount*(line+1)>=this.hitokoto.length()?this.hitokoto.substring(hitokotoLineWordCount*line):this.hitokoto.substring(hitokotoLineWordCount*line,hitokotoLineWordCount*(line+1));

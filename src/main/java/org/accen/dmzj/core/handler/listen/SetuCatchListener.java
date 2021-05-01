@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SetuCatchListener implements ListenAdpter{
-	private Set<String> allowedSenders = Set.of("2735919291");//yome喵
+	private Set<String> allowedSenders = Set.of("");//yome喵
 	private long minImageSize = 100*1024;//单位为Byte
 	private long maxImageSize = 10*1024*1024;
 	@Autowired

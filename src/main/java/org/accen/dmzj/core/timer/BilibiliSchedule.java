@@ -308,7 +308,7 @@ public class BilibiliSchedule {
 					.append("https://www.bilibili.com/audio/au")
 					.append(mId)
 					.append("]")
-					.append(StringUtils.hasLength(cover)?"":CQUtil.imageUrl(cover,true));
+					.append(!StringUtils.hasLength(cover)?"":CQUtil.imageUrl(cover,true));
 			return new String[] {msgBuf.toString(),null};
 		}else if(type>>9==1){
 			//512番剧，名字取番剧标题而不是上传者名

@@ -123,7 +123,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 										factDecrease = RandomUtil.randomInt(factDecrease+1);
 									}
 									//消耗金币
-									int newCoin = checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -factDecrease);
+									checkinCmd.modifyCoin(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), -factDecrease);
 									
 									//添加到收藏监听
 									if(!waitingCollect.containsKey(qmessage.getMessageType()+"_"+qmessage.getGroupId())) {
@@ -224,7 +224,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 								int rdIndex = RandomUtil.randomInt(total);
 								Map<String,Object> rdRs = ((List<Map<String, Object>>)rs.get("data")).get(rdIndex);
 								String largeImgUrl = (String)((List<Map<String,Object>>)rdRs.get("imageUrls")).get(0).get("original");
-								long pid = (long)rdRs.get("id");
+								long pid = (int)rdRs.get("id");
 								String title = (String)rdRs.get("title");
 								String author = (String) ((Map<String,Object>)rdRs.get("artistPreView")).get("name");
 								String[] fmtPixivImgUrl = StringUtil.formatUrl(largeImgUrl);
