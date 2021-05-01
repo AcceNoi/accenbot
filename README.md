@@ -3,8 +3,6 @@
 
 [![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)
 
-## 主页（鸽置中） - [bot.accen.wiki](http://bot.accen.wiki)
-
 | Author | Accen/クロノス    |
 | ------ | ----------------- |
 | Email  | 1339liu@gmail.com |
@@ -12,9 +10,18 @@
 ---
 
 ##  <font color="red">注意</font>
->使用了preview特性，请确保使用JDK15+（可能会持续到17发布）进行编译和运行，并添加--enable-preview参数。
+>本项目依赖[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)
 >
->当前最新版本[V2.0-Agito](https://github.com/AcceNoi/dmzjbot/releases/tag/V2.0-Agito)，重构了API模块，使用Springboot 2.4+，不再使用原生的Feign而改用OpenFeign。重写了Pixivc的Auth模块，现在支持认证失效重连。
+>本项目使用了preview特性，请确保使用JDK15+（可能会持续到17发布）进行编译和运行，并添加--enable-preview参数。
+>
+>当前最新版本[V2.0-Agito](https://github.com/AcceNoi/dmzjbot/releases/tag/V2.0-Agito)，重构了API模块，使用Springboot 2.4+，不再使用原生的Feign改用OpenFeign。重写了Pixivc的Auth模块[PixivcAuth](https://github.com/AcceNoi/accenbot/blob/master/src/main/java/org/accen/dmzj/core/api/pixivc/PixivcAuthFeignRequestInterceptor.java)，现在支持认证失效重连。
+
+### V2.0+待填的坑
+- 支持解析分P的B站视频
+- 集成ffmpeg（当前是外挂）
+- 整理各个功能的配置（基于Springboot-configuration-processor2.4+）
+- 隔离每个功能的工作空间
+- 集成[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)
 
 ## 功能介绍
 
@@ -118,9 +125,6 @@
 - **功能开关** 功能开关用来对bot的某些功能进行限制，现在的功能主要包含：词条回复、系统功能、回调监听、监听。能够被功能开关所限制的是系统功能。通过@FuncSwitch标识这个功能，在CFG_CONFIG_VALUE中对其进行控制，粒度暂时只能精确到群组，详细可看FuncSwitchUtil.java。
 
 - **图片绘制** 图片绘制是系统很重要的一个功能，完成了所有与自定义图片的绘制工作。整体接口是Render.java（完成图片的绘制）、RenderImage.java（负责定义单个图片的元信息和custom绘制）、Scalable（负责图片的缩放）。另外对Render做了两个简单的实现<u>SimpleImageRender（网格式图片绘制，其实就是用来支持p站榜单的绘制，支持设置横向间隔水平间隔，支持设置向上填充或水平对齐）</u>、CheckinRender（个人信息的绘制，由于里面的信息比较复杂，建议不要再更改）。后续可能会将图片绘制的功能全部抽取出来作为一个独立的项目。
-
-## 关于版本
->现已推出三个版本，最新版Lindworm上线了图片绘制功能。往后也是按照此习惯进行发布（除非有重大代码重构才会考虑切大版本），至于版本命名基本参考自各种神话传说（毕竟cy也喜欢从各种神话中取材）。
 
 ## 感谢
 
