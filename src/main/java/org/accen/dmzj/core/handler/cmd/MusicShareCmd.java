@@ -69,8 +69,8 @@ public class MusicShareCmd implements CmdAdapter {
 			
 			if("网易".equals(matcher.group(1))) {
 				Music163Result result = musicApiClient.music163Search(musicName, 0, 1, 1);
-				if(result!=null&&"200".equals(result.getCode())&&result.getResult().getSongs().length>0) {
-					long songId = result.getResult().getSongs()[0].getId();
+				if(result!=null&&"200".equals(result.code())&&result.result().songs().length>0) {
+					long songId = result.result().songs()[0].id();
 					
 					//增加好感度
 					int curFav = checkinCmd.modifyFav(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId(), increase);
@@ -81,7 +81,7 @@ public class MusicShareCmd implements CmdAdapter {
 			}else if("B站".equals(matcher.group(1))) {
 				String isRandom = matcher.group(2);
 				CfgResource cr  = null;
-				if(!StringUtils.isEmpty(isRandom)) {
+				if(StringUtils.hasLength(isRandom)) {
 					List<CfgResource> crs = cfgResourceMapper.findByKey(KEY_PREFFIX, matcher.group(3));
 					if(crs!=null&&!crs.isEmpty()) {
 						cr = crs.get(RandomUtil.randomInt(crs.size()));
@@ -106,7 +106,7 @@ public class MusicShareCmd implements CmdAdapter {
 			
 		}else if(listMatcher.matches()) {
 			String pageNoStr = listMatcher.group(1);
-			int pageNo = StringUtils.isEmpty(pageNoStr)?1:Integer.parseInt(pageNoStr);
+			int pageNo = !StringUtils.hasLength(pageNoStr)?1:Integer.parseInt(pageNoStr);
 			int offset = (pageNo-1)*musicListSize;
 			List<CfgResource> musics = cfgResourceMapper.findBMusicLimit(offset, musicListSize);
 			if(musics!=null&&!musics.isEmpty()) {
