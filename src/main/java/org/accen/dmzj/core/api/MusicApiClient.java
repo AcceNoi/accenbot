@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.accen.dmzj.core.api.vo.Music163Result;
-import org.accen.dmzj.core.feign.auth.GloabalFeignConfigration;
+import org.accen.dmzj.core.feign.GloabalFeignConfigration;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.support.SpringDecoder;
