@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.accen</groupId>
-	<artifactId>dmzjbot</artifactId>
+	<artifactId>accenbot</artifactId>
 	<packaging>jar</packaging>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>dmzjbot Maven Webapp</name>
+	<name>accenbot Maven Webapp</name>
 	<url>http://maven.apache.org</url>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -117,7 +117,7 @@
 	</dependencies>
 	
 	<build>
-		<finalName>dmzjbot</finalName>
+		<finalName>accenbot</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

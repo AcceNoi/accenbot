@@ -1,4 +1,4 @@
-package org.accen.dmzj.core.feign.auth;
+package org.accen.dmzj.core.feign;
 
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
