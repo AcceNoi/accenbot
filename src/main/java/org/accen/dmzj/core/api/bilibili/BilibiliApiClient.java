@@ -27,4 +27,10 @@ public interface BilibiliApiClient {
 	
 	@GetMapping("/x/web-interface/search/type")
 	public Map<String, Object> search(@RequestParam("page")int page,@RequestParam("keyword")String kw,@RequestParam("search_type")String type);
+
+	@GetMapping("/x/web-interface/view")
+	public Map<String, Object> viewByAid(@RequestParam("aid")String avid);
+	
+	@GetMapping("/x/web-interface/view")
+	public Map<String, Object> viewByBid(@RequestParam("bvid")String bvid);
 }

@@ -114,9 +114,9 @@ public class CmdManageCmd implements CmdAdapter {
 				.append(StringUtil.SPLIT)
 				.append("3. B站歌曲列表>>发送【B站歌曲列表】\n")
 				.append(StringUtil.SPLIT)
-				.append("4. B站歌曲投稿（暂不稳定）>>发送【抽取B站https://www.bilibili.com/video/av+{avid}从dd:dd:dd到dd:dd:dd音乐，设置名称xxx】\n")
+				.append("4. B站歌曲投稿（暂不稳定）>>发送【抽取av+{avid}从dd:dd:dd到dd:dd:dd音乐，设置名称xxx】\n")
 				.append(StringUtil.SPLIT)
-				.append("5. B站语音投稿>>发送【抽取B站https://www.bilibili.com/video/av+{avid}从dd:dd:dd到dd:dd:dd语音，设置名称xxx】");
+				.append("5. B站语音投稿>>发送【抽取av+{avid}从dd:dd:dd到dd:dd:dd语音，设置名称xxx】");
 			break;
 		case "/抽卡":
 			func.append("#抽卡#\n")

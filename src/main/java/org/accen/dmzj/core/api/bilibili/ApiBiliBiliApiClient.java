@@ -30,6 +30,8 @@ import com.google.gson.Gson;
 
 @Component
 public class ApiBiliBiliApiClient {
+	@Autowired
+	private BilibiliApiClient apiClient;
 	@Value("${sys.static.html.mime}")
 	private String tempMimePath;//usr/local/niginx/music/
 
@@ -76,6 +78,7 @@ public class ApiBiliBiliApiClient {
 	 * @return 0-本地视频地址, 1-封面地址，2-标题（后续作为content），3-视频地址
 	 * @throws BiliBiliCookieNeverInit
 	 */
+	@Deprecated
 	public String[] downLoadAdaptive(String str,int qn) throws BiliBiliCookieNeverInit {
 		if(StringUtil.isNumberString(str)) {
 			return downLoadByAvid(str, qn);
@@ -90,6 +93,7 @@ public class ApiBiliBiliApiClient {
 	 * @return 0-本地视频地址, 1-封面地址，2-标题（后续作为content），3-视频地址
 	 * @throws BiliBiliCookieNeverInit
 	 */
+	@Deprecated
 	public String[] downLoadByUrl(String url,int qn) throws BiliBiliCookieNeverInit {
 		Matcher mt = urlPattern.matcher(url);
 		if(mt.matches()) {
@@ -102,7 +106,23 @@ public class ApiBiliBiliApiClient {
 		}
 		return null;
 	}
-	public String[] downloadByBvid(String bvid,int qn) throws BiliBiliCookieNeverInit {
+	public String[] downloadByVNo(String vType,String vNo,int qn) throws BiliBiliCookieNeverInit{
+		if("AV".equalsIgnoreCase(vType)) {
+			return downLoadByAvid(vNo, qn);
+		}else if("BV".equalsIgnoreCase(vType)) {
+			return downloadByBvid(vNo, qn);
+		}
+		return null;
+	}
+
+	/**
+	 * 同构bv号获取视频信息
+	 * @param bvid
+	 * @param qn
+	 * @return
+	 * @throws BiliBiliCookieNeverInit
+	 */
+	private String[] downloadByBvid(String bvid,int qn) throws BiliBiliCookieNeverInit {
 		checkCookie();
 		String avid = getAvidByBvid(bvid);
 		if(avid==null) {
@@ -118,7 +138,7 @@ public class ApiBiliBiliApiClient {
 	 * @return 0-本地视频地址, 1-封面地址，2-标题（后续作为content）,3-视频地址
 	 * @throws BiliBiliCookieNeverInit
 	 */
-	public String[] downLoadByAvid(String avid,int qn) throws BiliBiliCookieNeverInit {
+	private String[] downLoadByAvid(String avid,int qn) throws BiliBiliCookieNeverInit {
 		checkCookie();
 		
 		//1.获取cid
@@ -151,7 +171,7 @@ public class ApiBiliBiliApiClient {
 		return new String[] {videoName,rs[1],rs[2],"https://www.bilibili.com/video/av"+avid};
 		
 	}
-	private final static String BILIBILI_API_VIEW="https://api.bilibili.com/x/web-interface/view?aid=%s";
+//	private final static String BILIBILI_API_VIEW="https://api.bilibili.com/x/web-interface/view?aid=%s";
 	
 	/**
 	 * 解析视频的基本信息
@@ -159,41 +179,16 @@ public class ApiBiliBiliApiClient {
 	 * @return 0-cid, 1-封面地址，2-标题（后续作为content）
 	 */
 	public String[] getAvCid(String avid) {
-		HttpGet viewGet = new HttpGet(String.format(BILIBILI_API_VIEW, avid));
-		try {
-			HttpResponse viewResp = httpClient.execute(viewGet);
-			if(viewResp.getStatusLine().getStatusCode()==200) {
-				String ctt = EntityUtils.toString(viewResp.getEntity(),"UTF-8");
-				
-				Map<String, Object> data = gson.fromJson(ctt, Map.class);
-				Long cid = (Long)((List<Map<String, Object>>)((Map<String, Object>)data.get("data")).get("pages")).get(0).get("cid");
-				String imageUrl = (String) ((Map<String, Object>)data.get("data")).get("pic");
-				String title = (String) ((Map<String, Object>)data.get("data")).get("title");
-				return new String[] {cid.toString(),imageUrl,title};
-			}
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+		Map<String, Object> data = apiClient.viewByAid(avid);
+		Integer cid = (Integer)((List<Map<String, Object>>)((Map<String, Object>)data.get("data")).get("pages")).get(0).get("cid");
+		String imageUrl = (String) ((Map<String, Object>)data.get("data")).get("pic");
+		String title = (String) ((Map<String, Object>)data.get("data")).get("title");
+		return new String[] {cid.toString(),imageUrl,title};
 	}
-	private final static String BILIBILI_API_VIEW_BV = "https://api.bilibili.com/x/web-interface/view?bvid=%s";
 	public String getAvidByBvid(String bvid) {
-		HttpGet get = new HttpGet(String.format(BILIBILI_API_VIEW_BV, bvid));
-		try {
-			HttpResponse viewResp = httpClient.execute(get);
-			if(viewResp.getStatusLine().getStatusCode()==200) {
-				String ctt = EntityUtils.toString(viewResp.getEntity(),"UTF-8");
-				Map<String, Object> data = gson.fromJson(ctt, Map.class);
-				return ((Long) ((Map<String, Object>)data.get("data")).get("aid")).toString();
-			}
-		} catch (ClientProtocolException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		return null;
+		
+		Map<String, Object> data = apiClient.viewByBid(bvid);
+		return ((Integer) ((Map<String, Object>)data.get("data")).get("aid")).toString();
 	}
 	private final static String BILIBILI_API_PLAYURL="https://api.bilibili.com/x/player/playurl?cid=%s&avid=%s&qn=%s";
 	public String getUrl(String cid,String avid,int qn) {

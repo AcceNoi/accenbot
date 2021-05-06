@@ -61,12 +61,12 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 
 	@Override
 	public String example() {
-		return "抽取B站[www.bilibili.com/video/av64689940]从[00:00:00]到[00:01:59]音乐，设置名称[小狐狸]";
+		return "抽取BV64689940从00:00:00到00:01:59语音，设置名称小狐狸";
 	}
 
 	private static final String KEY_PREFFIX = "audio_bilibili_";
 	
-	private final static Pattern grepPattern = Pattern.compile("^抽取B站(.+)?从(.+)?到(.+)?(语音)，设置名称(.+)?$");
+	private final static Pattern grepPattern = Pattern.compile("^抽取(A|B)V(.+)?从(.+)?到(.+)?(语音)，设置名称(.+)?$",Pattern.CASE_INSENSITIVE);
 	@Override
 	public  GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
@@ -87,11 +87,12 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 					task.setMessage(CQUtil.at(qmessage.getUserId())+" 您库存金币不够了哦，暂无法添加词条喵~");
 					return task;
 				}else {
-					String url = matcher.group(1);
-					String ss = matcher.group(2);
-					String tt = matcher.group(3);
-					String type = matcher.group(4);
-					String name = matcher.group(5);
+					String vType = matcher.group(1).toUpperCase()+"V";
+					String vNo = matcher.group(2);
+					String ss = matcher.group(3);
+					String tt = matcher.group(4);
+					String type = matcher.group(5);
+					String name = matcher.group(6);
 					
 					int diff = ffmpegUtil.checkTimeIllegalEx(ss, tt);
 					if(diff<=0) {
@@ -104,9 +105,9 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 					}
 					try {
 						
-						taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), "视频["+url+"]解析中~");
+						taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), "视频["+vType+vNo+"]解析中~");
 						
-						String[] rs = apiClient.downLoadAdaptive(url, 360);
+						String[] rs = apiClient.downloadByVNo(vType, vNo, 360);
 						String videoFile = rs[0];
 						//剪切音频
 						String targetFileName = StringUtil.uuid();
