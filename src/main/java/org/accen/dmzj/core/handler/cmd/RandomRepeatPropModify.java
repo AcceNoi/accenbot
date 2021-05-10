@@ -15,22 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@FuncSwitch("random_repeat")
+@FuncSwitch(title = "设置复读几率")
 @Component
-public class RandomRepeatPropModifyCmd implements CmdAdapter {
+public class RandomRepeatPropModify implements CmdAdapter {
 
 	private Map<String, Integer> groupProp = new HashMap<String, Integer>();//各个群组的随机几率
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 	@Autowired
 	private CfgConfigValueMapper configMapper;
 	private final static String CONFIG_KEY_PREFIX = "random_repeat_";

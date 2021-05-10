@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.handler.callbacker.CallbackListener;
 import org.accen.dmzj.core.handler.callbacker.CallbackManager;
+import org.accen.dmzj.core.handler.group.Default;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.core.api.HitokotoApiClient;
@@ -38,10 +39,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-@FuncSwitch("cmd_checkin")
+@FuncSwitch(groupClass = Default.class, title = "签到")
 @Component
 @Transactional
-public class CheckinCmd implements CmdAdapter,CallbackListener {
+public class Checkin implements CmdAdapter,CallbackListener {
 	@Value("${coolq.mem.iniCoin}")
 	private int iniCoin = 20;//初始金币
 	@Value("${coolq.mem.coinIncr}")
@@ -72,15 +73,6 @@ public class CheckinCmd implements CmdAdapter,CallbackListener {
 	private FilePersistentUtil filePersistentUtil;
 	@Autowired
 	private HitokotoApiClient hitokotoApiClient;
-	@Override
-	public String describe() {
-		return "签到或者绑定账号";
-	}
-
-	@Override
-	public String example() {
-		return "签到";
-	}
 
 	@Autowired
 	private CallbackManager callbackManager;

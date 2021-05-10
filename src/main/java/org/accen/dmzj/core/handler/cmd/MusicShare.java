@@ -8,6 +8,7 @@ import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.api.MusicApiClient;
 import org.accen.dmzj.core.api.vo.Music163Result;
+import org.accen.dmzj.core.handler.group.Audio;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomUtil;
 import org.accen.dmzj.util.StringUtil;
@@ -20,10 +21,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-@FuncSwitch("cmd_music_share")
+@FuncSwitch(groupClass = Audio.class, title = "点歌",format = "网易点歌+[歌曲名称]",showMenu = true)
 @Transactional
 @Component
-public class MusicShareCmd implements CmdAdapter {
+public class MusicShare implements CmdAdapter {
 
 	@Autowired
 	private MusicApiClient musicApiClient;
@@ -34,18 +35,7 @@ public class MusicShareCmd implements CmdAdapter {
 	private int increase = 1;
 	
 	@Autowired
-	private CheckinCmd checkinCmd;
-	
-	
-	@Override
-	public String describe() {
-		return "分享歌曲";
-	}
-
-	@Override
-	public String example() {
-		return "[网易|qq|虾米|B站]点歌 恋爱循环";
-	}
+	private Checkin checkinCmd;
 
 	@Value("${coolq.music.list.pageSize:10}")
 	private int musicListSize;

@@ -7,10 +7,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.task.GeneralTask;
+import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.api.bilibili.BilibiliSearchApiClientPk;
 import org.accen.dmzj.core.api.pixivc.PixivicApiClient;
 import org.accen.dmzj.core.api.vo.BilibiliBangumiInfo;
 import org.accen.dmzj.core.api.vo.BilibiliUserInfo;
+import org.accen.dmzj.core.handler.group.Subscribe;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CmdBuSubMapper;
@@ -20,22 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@FuncSwitch(groupClass = Subscribe.class, title = "订阅B站up",format = "订阅B站UP+[uid]",showMenu = true)
 @Component
 @Transactional
-public class SubscribeCmd implements CmdAdapter{
+public class BilibiliSubscribe implements CmdAdapter{
 
 	@Autowired
 	private CmdBuSubMapper cmdBuSubMapper;
-	
-	@Override
-	public String describe() {
-		return "订阅或取消一位b站视频up主";
-	}
-
-	@Override
-	public String example() {
-		return "订阅錬金ノクロノス";
-	}
 
 	@Autowired
 	private BilibiliSearchApiClientPk bilibiliSearchApiClientPk;

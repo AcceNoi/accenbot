@@ -12,21 +12,9 @@ import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@FuncSwitch("cmd_repeat_mode")
+@FuncSwitch(title = "复读模式")
 @Component
-public class RepeatModeSwitchCmd implements CmdAdapter {
-
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+public class RepeatModeSwitch implements CmdAdapter {
 
 	@Value("${coolq.manager}")
 	private String manager = "1339633536";//管理员qq

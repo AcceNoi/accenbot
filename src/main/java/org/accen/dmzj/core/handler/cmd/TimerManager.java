@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
+import org.accen.dmzj.core.handler.group.System;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.core.timer.ReportTimeSchedule;
@@ -13,25 +14,14 @@ import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-@FuncSwitch("cmd_report_manage")
+@FuncSwitch(title = "开启报时",format = "开启晓报时",groupClass = System.class,showMenu = true)
 @Component
-public class TimerManagerCmd implements CmdAdapter {
+public class TimerManager implements CmdAdapter {
 
 	@Autowired
 	private ReportTimeSchedule timeSchedule;
 	@Autowired
 	private TaskManager TaskManager;
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Value("${coolq.manager}")
 	private String manager = "1339633536";//管理员qq

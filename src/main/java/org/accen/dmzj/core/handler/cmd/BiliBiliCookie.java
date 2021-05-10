@@ -10,19 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BiliBiliCookieCmd implements CmdAdapter {
-
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+public class BiliBiliCookie implements CmdAdapter {
 	
 	@Autowired
 	private ApiBiliBiliApiClient apiClient;

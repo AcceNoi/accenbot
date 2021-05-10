@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.handler.callbacker.AsyncCallback;
+import org.accen.dmzj.core.handler.group.Image;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.core.timer.Prank;
@@ -17,22 +18,9 @@ import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@FuncSwitch("cmd_prank")
+@FuncSwitch(groupClass = Image.class,showMenu = true, title = "p站榜单",format = "p站本月榜[1-9]")
 @Component
-public class PixivRankCmd implements CmdAdapter,AsyncCallback {
-
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+public class PixivRank implements CmdAdapter,AsyncCallback {
 	
 	@Autowired
 	private Prank prank;

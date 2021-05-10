@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
+import org.accen.dmzj.core.handler.group.Entry;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.dao.CfgQuickReplyMapper;
@@ -14,26 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-@FuncSwitch("cmd_msg_delete")
+@FuncSwitch(groupClass = Entry.class, title = "删除词条",format = "删除词条+[要删除的词条编号]",showMenu = true)
 @Component
 @Transactional
-public class FuzzyMsgDeleteCmd  implements CmdAdapter{
+public class FuzzyMsgDelete  implements CmdAdapter{
 
 	@Autowired
-	private CheckinCmd checkinCmd;
+	private Checkin checkinCmd;
 	@Autowired
 	private CfgQuickReplyMapper cfgQuickReplyMapper;
-	
-	@Override
-	public String describe() {
-		return "删除一条已存在的词条";
-	}
-
-	@Override
-	public String example() {
-		return "删除词条1";
-	}
-	
+		
 	@Value("${coolq.fuzzymsg.fav.lowerlimit:10}")
 	private int lowerLimitFav;//删除词条最低好感
 	@Value("${coolq.fuzzymsg.fav.adminexcept:true}")

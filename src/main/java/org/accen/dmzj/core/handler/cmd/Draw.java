@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.autoconfigure.Workdirer;
+import org.accen.dmzj.core.handler.group.Default;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomUtil;
@@ -22,24 +23,14 @@ import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.stereotype.Component;
 
 import com.madgag.gif.fmsware.GifDecoder;
-@FuncSwitch("cmd_draw")
+@FuncSwitch(groupClass = Default.class, title = "抽签")
 @Component
-public class DrawCmd implements CmdAdapter,Workdirer{
+public class Draw implements CmdAdapter,Workdirer{
 	@Override
 	public String workdir() {
 		return "drawSource/";
 	}
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	private final static Pattern DRAW_PATTERN = Pattern.compile("^(.+)?抽签$");
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {

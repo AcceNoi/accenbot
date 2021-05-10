@@ -8,6 +8,7 @@ import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.api.baidu.BaikeApicClientPk;
 import org.accen.dmzj.core.api.vo.BaikeResult;
+import org.accen.dmzj.core.handler.group.Pedia;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.RandomUtil;
 import org.accen.dmzj.web.dao.CmdWikiMapper;
@@ -16,19 +17,15 @@ import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@FuncSwitch("cmd_baike")
+@FuncSwitch(name = "cmd_baike",
+			title = "百科",
+			showMenu = true,
+			format = "了解+[想了解的内容]", 
+			order = 1,
+			groupClass = Pedia.class)
 @Component
-public class BaiduBaikeCmd implements CmdAdapter{
+public class BaiduBaike implements CmdAdapter{
 
-	@Override
-	public String describe() {
-		return "获取一个词条的摘要";
-	}
-
-	@Override
-	public String example() {
-		return "了解克洛诺斯";
-	}
 	
 	@Autowired
 	private BaikeApicClientPk baikeApicClientPk;

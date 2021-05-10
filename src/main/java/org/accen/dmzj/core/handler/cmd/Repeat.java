@@ -8,19 +8,9 @@ import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.stereotype.Component;
-@FuncSwitch("cmd_repeat")
+@FuncSwitch(title = "复读")
 @Component
-public class RepeatCmd implements CmdAdapter {
-
-	@Override
-	public String describe() {
-		return "重复消息";
-	}
-
-	@Override
-	public String example() {
-		return "说debu!";
-	}
+public class Repeat implements CmdAdapter {
 
 	private final static Pattern pattern = Pattern.compile("^老婆说(/|\\$|%)?(.+)");
 	

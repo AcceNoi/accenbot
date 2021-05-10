@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.exception.BiliBiliCookieNeverInit;
+import org.accen.dmzj.core.handler.group.Audio;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.core.api.bilibili.ApiBiliBiliApiClient;
@@ -24,10 +25,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-@FuncSwitch("cmd_audio_grep")
+@FuncSwitch(groupClass = Audio.class, 
+			title = "B站语音投稿",
+			showMenu = true,
+			format = "抽取[BV|AV+bv或av号]从[dd:dd:dd]到[dd:dd:dd]语音，设置名称[词条名]",
+			order = 2)
 @Transactional
 @Component
-public class BiliBiliAudioGrepCmd implements CmdAdapter {
+public class BiliBiliAudioGrep implements CmdAdapter {
 
 	@Value("${sys.static.html.music}")
 	private String tempMusicPath;//usr/local/niginx/music/
@@ -49,20 +54,10 @@ public class BiliBiliAudioGrepCmd implements CmdAdapter {
 	@Value("${coolq.fuzzymsg.coin.decrease:3}")
 	private int decrease = 3;
 	@Autowired
-	private CheckinCmd checkinCmd;
+	private Checkin checkinCmd;
 	
 	@Autowired
 	private TaskManager taskManager;
-	
-	@Override
-	public String describe() {
-		return "抽取B站音频";
-	}
-
-	@Override
-	public String example() {
-		return "抽取BV64689940从00:00:00到00:01:59语音，设置名称小狐狸";
-	}
 
 	private static final String KEY_PREFFIX = "audio_bilibili_";
 	

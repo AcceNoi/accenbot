@@ -5,11 +5,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
+import org.accen.dmzj.core.handler.group.Entry;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.FilePersistentUtil;
 import org.accen.dmzj.util.FuncSwitchUtil;
-import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CfgQuickReplyMapper;
 import org.accen.dmzj.web.vo.CfgQuickReply;
 import org.accen.dmzj.web.vo.Qmessage;
@@ -19,10 +19,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-@FuncSwitch("cmd_msg_add")
+@FuncSwitch(groupClass = Entry.class, showMenu = true,
+			title = "新增词条",format = "添加(精确)问[词条]答[回复]")
 @Component
 @Transactional
-public class FuzzyMsgAddCmd implements CmdAdapter {
+public class FuzzyMsgAdd implements CmdAdapter {
 	@Autowired
 	private CfgQuickReplyMapper cfgQuickReplyMapper;
 
@@ -33,20 +34,10 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 	private FuncSwitchUtil funcSwitchUtil;
 	
 	@Autowired
-	private CheckinCmd checkinCmd;
+	private Checkin checkinCmd;
 	@Value("${coolq.fuzzymsg.coin.decrease:3}")
 	private int decrease ;//
 	
-	@Override
-	public String describe() {
-		return "新增一条消息匹配回复";
-	}
-
-	@Override
-	public String example() {
-		return "添加[精确]问什么番？答[回复]吐鲁番";
-	}
-
 	@Override
 	public GeneralTask cmdAdapt(Qmessage qmessage,String selfQnum) {
 		//1.基本信息
@@ -71,8 +62,8 @@ public class FuzzyMsgAddCmd implements CmdAdapter {
 			String reply = matcher.group(4);
 			//3.1处理
 			
-			if(StringUtils.isEmpty(ask)||StringUtils.isEmpty(reply)) {
-				task.setMessage(CQUtil.at(qmessage.getUserId())+"添加失败，示例："+example());
+			if(!StringUtils.hasLength(ask)||!StringUtils.hasLength(reply)) {
+				task.setMessage(CQUtil.at(qmessage.getUserId())+"添加失败！");
 			}else if(!isPrecise&&ask.length()<2) {
 				//如果是模糊词条，则需要两个字匹配
 				task.setMessage(CQUtil.at(qmessage.getUserId())+" 为避免刷屏，模糊词条请不要少于两个字喵~");

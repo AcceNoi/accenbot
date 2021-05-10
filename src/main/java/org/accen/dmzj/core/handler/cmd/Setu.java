@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.handler.callbacker.CallbackListener;
 import org.accen.dmzj.core.handler.callbacker.CallbackManager;
+import org.accen.dmzj.core.handler.group.Image;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.core.api.LoliconApiClient;
@@ -36,20 +37,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@FuncSwitch("cmd_setu")
+@FuncSwitch(groupClass = Image.class, title = "随机图片",format = "随机涩图",showMenu = true)
 @Component
 @Transactional
-public class SetuCmd implements CmdAdapter,CallbackListener {
+public class Setu implements CmdAdapter,CallbackListener {
 
-	@Override
-	public String describe() {
-		return "随机获取网上的一张p站图";
-	}
-
-	@Override
-	public String example() {
-		return "随机涩图";
-	}
 	@Autowired
 	private CallbackManager callbackManager;
 	@Autowired
@@ -66,7 +58,7 @@ public class SetuCmd implements CmdAdapter,CallbackListener {
 	@Value("${coolq.setu.coin.decrease:-3}")
 	private int decrease ;
 	@Autowired
-	private CheckinCmd checkinCmd;
+	private Checkin checkinCmd;
 	@Autowired
 	private SetuCatcher setuCatcher;
 	

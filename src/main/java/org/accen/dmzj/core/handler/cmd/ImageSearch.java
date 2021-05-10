@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.handler.callbacker.CallbackListener;
 import org.accen.dmzj.core.handler.callbacker.CallbackManager;
+import org.accen.dmzj.core.handler.group.Image;
 import org.accen.dmzj.core.handler.listen.GroupRepeatListener;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
@@ -20,10 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-@FuncSwitch("cmd_img_search")
+@FuncSwitch(groupClass = Image.class, title = "查找图片", format = "老婆找图+[图片]",showMenu = true)
 @Component
 @Transactional
-public class ImageSearchCmd implements CmdAdapter,CallbackListener {
+public class ImageSearch implements CmdAdapter,CallbackListener {
 
 	@Value("${coolq.base.home}")
 	private String coolqHome;
@@ -42,17 +43,7 @@ public class ImageSearchCmd implements CmdAdapter,CallbackListener {
 	private TaskManager taskManager;
 	
 	@Autowired
-	private CheckinCmd checkinCmd;
-	
-	@Override
-	public String describe() {
-		return "检索网络图片";
-	}
-
-	@Override
-	public String example() {
-		return "老婆找图[图片]";
-	}
+	private Checkin checkinCmd;
 	
 	private final static Pattern patternCmd = Pattern
 			.compile("^老婆找图(\\[CQ\\:image,file=.*?\\])?$");

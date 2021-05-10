@@ -17,19 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SetWelcomCmd implements CmdAdapter {
-
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+public class SetWelcome implements CmdAdapter {
 
 	@Value("${coolq.manager}")
 	private String manager = "1339633536";//管理员qq

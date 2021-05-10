@@ -5,27 +5,17 @@ import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.handler.ModeCmd;
+import org.accen.dmzj.core.handler.group.Default;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.QmessageUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@FuncSwitch("cmd_chaos")
+@FuncSwitch(groupClass = Default.class, title = "混乱模式")
 @Component
-public class ChaosModeCmd extends ModeCmd implements CmdAdapter {
+public class ChaosMode extends ModeCmd implements CmdAdapter {
 
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	private static final Pattern switchPattern = Pattern.compile("^(开启|关闭)混乱模式$");
 	@Autowired
 	private QmessageUtil qmessageUtil;
