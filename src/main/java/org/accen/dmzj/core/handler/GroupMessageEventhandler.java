@@ -40,6 +40,8 @@ public class GroupMessageEventhandler implements EventHandler{
 	@Autowired
 	private TaskManager taskManager;
 	@Autowired
+	private CmdManager cmdManager;
+	@Autowired
 	private CallbackManager callbackManager;
 	@Autowired
 	private FuncSwitchUtil funcSwitchUtil;
@@ -187,14 +189,15 @@ public class GroupMessageEventhandler implements EventHandler{
 				
 			}
 			//3.功能型（对系统功能进行操作，或对确定的消息匹配并产生复杂的回复的任务）
-			Map<String, CmdAdapter> cmds = ApplicationContextUtil.getBeans(CmdAdapter.class); 
+			/*Map<String, CmdAdapter> cmds = ApplicationContextUtil.getBeans(CmdAdapter.class); 
 			for(String cmdName:cmds.keySet()) {
 				CmdAdapter cmd = cmds.get(cmdName);
 				if(funcSwitchUtil.isCmdPass(cmd.getClass(), qmessage.getMessageType(), qmessage.getGroupId())) {
 					tasks.add(cmd.cmdAdapt(qmessage, event.get("selfQnum").toString()));
 				}
 				
-			}
+			}*/
+			cmdManager.accept(qmessage);
 			//4.监听型（匹配所有消息，但满足特定条件后产生复杂的回复的任务）
 			Map<String,ListenAdpter> listens = ApplicationContextUtil.getBeans(ListenAdpter.class);
 			for(String listenName:listens.keySet()) {
