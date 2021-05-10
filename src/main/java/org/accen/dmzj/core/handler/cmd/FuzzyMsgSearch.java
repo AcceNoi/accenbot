@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
+import org.accen.dmzj.core.handler.group.Entry;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.StringUtil;
@@ -16,21 +17,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-@FuncSwitch("cmd_msg_search")
+@FuncSwitch(groupClass = Entry.class, title = "查看词条",format = "查看词条+[想查看的词条编号]",showMenu = true)
 @Component
 @Transactional
 public class FuzzyMsgSearch implements CmdAdapter {
 	@Autowired
 	private CfgQuickReplyMapper cfgQuickReplyMapper;
-	@Override
-	public String describe() {
-		return "查询一条已存在的词条";
-	}
-
-	@Override
-	public String example() {
-		return "查看词条1";
-	}
 	
 	@Value("${coolq.fuzzymsg.list.pageSize:5}")
 	private int listSize;
@@ -80,7 +72,7 @@ public class FuzzyMsgSearch implements CmdAdapter {
 			List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByTargetAndPattern( qmessage.getGroupId(), pt);
 			if(replys!=null&&!replys.isEmpty()) {
 				StringBuffer msgBuf = new StringBuffer("本群");
-				msgBuf.append(StringUtils.isEmpty(cttMatcher.group(1))?"":"精确")
+				msgBuf.append(!StringUtils.hasLength(cttMatcher.group(1))?"":"精确")
 						.append("词条[")
 						.append(cttMatcher.group(2))
 						.append("]为：\n");
@@ -100,7 +92,7 @@ public class FuzzyMsgSearch implements CmdAdapter {
 			}
 		}else if(myMatcher.matches()) {
 			String pageNoStr = myMatcher.group(1);
-			int pageNo = StringUtils.isEmpty(pageNoStr)?1:Integer.parseInt(pageNoStr);
+			int pageNo = !StringUtils.hasLength(pageNoStr)?1:Integer.parseInt(pageNoStr);
 			int offset = (pageNo-1)*listSize;
 			
 			List<CfgQuickReply> replys = cfgQuickReplyMapper.queryByCreator(qmessage.getGroupId(), qmessage.getUserId(), offset, listSize);

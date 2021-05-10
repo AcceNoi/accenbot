@@ -1,7 +1,7 @@
 package org.accen.dmzj.core.timer;
 
 import org.accen.dmzj.core.handler.GroupMessageEventhandler;
-import org.accen.dmzj.core.handler.cmd.SetuCmd;
+import org.accen.dmzj.core.handler.cmd.Setu;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.QmessageUtil;
@@ -20,7 +20,7 @@ public class SuddenSetuSchedule {
 	@Autowired
 	private GroupMessageEventhandler groupMessageEventhandler;
 	@Autowired
-	private SetuCmd setuCmd;
+	private Setu setuCmd;
 	@Value("${coolq.bot}")
 	private String botId;
 	@Autowired

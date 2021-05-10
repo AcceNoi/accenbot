@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.accen.dmzj.core.annotation.FuncSwitch;
+import org.accen.dmzj.core.handler.group.System;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.dao.CfgConfigValueMapper;
@@ -13,21 +14,10 @@ import org.accen.dmzj.web.vo.CfgConfigValue;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-@FuncSwitch("cmd_trigger")
+@FuncSwitch(groupClass = System.class,showMenu = true, title = "设置词条几率",format = "设置几率\\d%")
 @Component
 public class TriggerProSwitchCmd implements CmdAdapter {
 
-	@Override
-	public String describe() {
-		return "设置触发词条几率";
-	}
-
-	@Override
-	public String example() {
-		return "设置几率50%";
-	}
-
-	
 	private final static Pattern pattern = Pattern.compile("^设置几率([1-9]?\\d|100)%$");
 	private Map<String, Integer> groupPro = new HashMap<String, Integer>();
 	private final static String FUZZY_PRO = "FUZZY_PRO";

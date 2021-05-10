@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.accen.dmzj.core.handler.cmd.CheckinCmd;
-import org.accen.dmzj.core.handler.cmd.RepeatModeSwitchCmd;
+import org.accen.dmzj.core.handler.cmd.Checkin;
+import org.accen.dmzj.core.handler.cmd.RepeatModeSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.web.vo.Qmessage;
@@ -25,9 +25,9 @@ public class RepeatModeListener implements ListenAdpter {
 	@Value("${coolq.repeatmode.time:2}")
 	private int triggerTime;
 	@Autowired
-	private RepeatModeSwitchCmd repeatModeSwitchCmd;
+	private RepeatModeSwitch repeatModeSwitchCmd;
 	@Autowired
-	private CheckinCmd checkinCmd;
+	private Checkin checkinCmd;
 	@Autowired
 	private TaskManager taskManager;
 	@Override

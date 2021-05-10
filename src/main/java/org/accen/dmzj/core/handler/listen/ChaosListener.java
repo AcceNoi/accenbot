@@ -3,7 +3,7 @@ package org.accen.dmzj.core.handler.listen;
 import java.util.List;
 import java.util.Set;
 
-import org.accen.dmzj.core.handler.cmd.ChaosModeCmd;
+import org.accen.dmzj.core.handler.cmd.ChaosMode;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.QmessageUtil;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChaosListener implements ListenAdpter{
 	@Autowired
-	private ChaosModeCmd chaosModeCmd;
+	private ChaosMode chaosModeCmd;
 	@Autowired
 	private QmessageUtil qmessageUtil;
 	@Value("${coolq.chaosmod.prop:0.05}")

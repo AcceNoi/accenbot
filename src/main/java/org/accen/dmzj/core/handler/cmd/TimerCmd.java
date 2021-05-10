@@ -12,19 +12,9 @@ import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-@FuncSwitch("cmd_timer")
+@FuncSwitch(title = "定时提醒")
 @Component
 public class TimerCmd implements CmdAdapter {
-
-	@Override
-	public String describe() {
-		return "设置定时提醒任务";
-	}
-
-	@Override
-	public String example() {
-		return "1小时后提醒我吃饭";
-	}
 	
 	@Autowired
 	private TaskManager taskManager;

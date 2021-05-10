@@ -3,7 +3,7 @@ package org.accen.dmzj.core.handler.listen;
 import java.util.List;
 import java.util.Map;
 
-import org.accen.dmzj.core.handler.cmd.RandomRepeatPropModifyCmd;
+import org.accen.dmzj.core.handler.cmd.RandomRepeatPropModify;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.CQUtil;
@@ -15,7 +15,7 @@ import org.springframework.util.StringUtils;
 @Component
 public class RandomRepeatListener implements ListenAdpter {
 	@Autowired
-	private RandomRepeatPropModifyCmd randomRepeatPropModifyCmd;
+	private RandomRepeatPropModify randomRepeatPropModifyCmd;
 	@Autowired
 	private TaskManager taskManager;
 	@Override

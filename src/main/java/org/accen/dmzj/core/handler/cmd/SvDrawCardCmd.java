@@ -29,25 +29,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-@FuncSwitch("cmd_sv_draw")
 @Transactional
 @Component
 public class SvDrawCardCmd implements CmdAdapter,CallbackListener {
 	@Autowired
-	private CheckinCmd checkinCmd;
+	private Checkin checkinCmd;
 	@Autowired
 	private CmdSvCardMapper cmdSvCardMapper;
 	@Autowired
 	private TaskManager taskManager;
-	@Override
-	public String describe() {
-		return "影之诗卡包抽卡";
-	}
-
-	@Override
-	public String example() {
-		return "影之诗抽卡森罗咆哮";
-	}
+	
 	@Value("${coolq.sv.drawcount:8}")
 	private int drawCount = 8;//单次抽取张数
 	@Value("${coolq.sv.coin.descrease:8}")

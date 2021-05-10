@@ -27,22 +27,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-@FuncSwitch("cmd_touhou_draw")
 @Transactional
 @Component
 public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	@Autowired
 	private CmdSvCardMapper cmdSvCardMapper;
 
@@ -53,7 +41,7 @@ public class TouhouDrawCardCmd implements CmdAdapter,CallbackListener {
 	private TaskManager taskManager;
 	
 	@Autowired
-	private CheckinCmd checkinCmd;
+	private Checkin checkinCmd;
 	
 	private String[] careers = new String[] {"[N]","[R]","[SR]","[SSR]","[UR]"};
 	

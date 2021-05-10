@@ -3,7 +3,6 @@ package org.accen.dmzj.core.handler.cmd;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.accen.dmzj.core.annotation.FuncSwitch;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
 import org.accen.dmzj.util.CQUtil;
@@ -11,11 +10,8 @@ import org.accen.dmzj.web.dao.CfgResourceMapper;
 import org.accen.dmzj.web.vo.CfgResource;
 import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-@FuncSwitch("cmd_henshin")
 @Transactional
-@Component
 public class KamenRiderCmd implements CmdAdapter{
 
 	@Autowired
@@ -24,18 +20,6 @@ public class KamenRiderCmd implements CmdAdapter{
 	@Autowired
 	private CfgResourceMapper cfgResourceMapper;
 	
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	private static final String KEY_PREFFIX = "record_kamenrider_";
 	private static final Pattern pattern = Pattern.compile("^(假面骑士|卡面来打|仮面ライダー)(.*)?(变身|henshin|Henshin|変身).*");
 	@Override

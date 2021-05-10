@@ -9,19 +9,6 @@ import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.stereotype.Component;
 @Component
 public class AtSelfCmd implements CmdAdapter {
-
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	private final static Pattern pattern = Pattern.compile("^\\[CQ:at,qq=(\\d+)\\]$");
 	
 	@Override

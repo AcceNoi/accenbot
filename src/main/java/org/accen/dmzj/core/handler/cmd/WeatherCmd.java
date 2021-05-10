@@ -14,21 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-@FuncSwitch("cmd_weather")
 @Component
 public class WeatherCmd implements CmdAdapter {
-
-	@Override
-	public String describe() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String example() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Autowired
 	private JiRenGuApiClient jiRenGuApiClient;
@@ -39,7 +26,7 @@ public class WeatherCmd implements CmdAdapter {
 	public GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
 		String aft = CQUtil.subAtAfter(message, selfQnum);
-		if(!StringUtils.isEmpty(aft)) {
+		if(StringUtils.hasLength(aft)) {
 			Matcher mt = pattern.matcher(aft.trim());
 			if(mt.matches()) {
 				String city = mt.group(1);

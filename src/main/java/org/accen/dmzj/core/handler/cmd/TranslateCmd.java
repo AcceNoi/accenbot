@@ -17,7 +17,6 @@ import org.accen.dmzj.web.vo.Qmessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-@FuncSwitch("cmd_translate")
 @Component
 public class TranslateCmd implements CmdAdapter{
 	
@@ -40,15 +39,6 @@ public class TranslateCmd implements CmdAdapter{
 	private YoudaoApiClient youdaoApiClient;
 	@Autowired
 	private GoogleTranslateApiClient googleTranslateApiClient;
-	@Override
-	public String describe() {
-		return "多语种翻译";
-	}
-
-	@Override
-	public String example() {
-		return "日语说我回来了";
-	}
 
 	private final static Pattern pattern = Pattern.compile("^(日语|英语|法语|韩语|俄语|西班牙语|中文){0,1}说(.+)");
 	@Override
