@@ -10,16 +10,6 @@ import org.accen.dmzj.web.vo.Qmessage;
  */
 public interface CmdAdapter {
 	/**
-	 * 返回此命令的描述
-	 * @return
-	 */
-	String describe();
-	/**
-	 * 返回一个简易可使用的命令例子
-	 * @return
-	 */
-	String example();
-	/**
 	 * 具体操作
 	 * @param qmessage
 	 */

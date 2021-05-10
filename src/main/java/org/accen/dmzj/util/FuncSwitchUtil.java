@@ -46,7 +46,7 @@ public class FuncSwitchUtil {
 		if(fs==null) {
 			return true;
 		}
-		CfgConfigValue config = configMapper.selectByTargetAndKey("system", "0", NOT_ALLOW_RFEFIX+fs.value());
+		CfgConfigValue config = configMapper.selectByTargetAndKey("system", "0", NOT_ALLOW_RFEFIX+fs.name());
 		if(config==null||!config.getConfigValue().contains(targetType+"_"+targetId)) {
 			return true;
 		}
