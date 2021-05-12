@@ -9,7 +9,7 @@ import feign.RequestTemplate;
 public abstract class AbstractHeaderAuthCounterFeignRequestInterceptor 
 						extends HeaderAuthFeignRequestInterceptor 
 						implements FirstTimeCallCase{
-	private int callCount = 0;
+	private volatile static int callCount = 0;
 	@Override
 	public void resolveRequestTemplate(RequestTemplate template) {
 		if(callCount == 0) {
