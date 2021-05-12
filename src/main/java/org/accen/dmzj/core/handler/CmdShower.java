@@ -99,7 +99,7 @@ public class CmdShower {
 			cmds = new HashMap<>(8);
 			ScanResult scanResult = new ClassGraph().enableClassInfo().acceptPackages(cmdPaths).scan();
 			scanResult.getAllClasses()
-					.parallelStream()
+					.stream()
 					.forEach(classInfo->{
 									FuncSwitch ann = classInfo.loadClass().getAnnotation(FuncSwitch.class);
 									if(ann!=null&&ann.showMenu()&&ann.groupClass()!=Default.class) {
