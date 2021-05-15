@@ -1,13 +1,15 @@
 package org.accen.dmzj.core.api.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @SuppressWarnings("preview")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record Music163Result(Music163Ctt result,String code,String msg) {
+public record Music163Result(@JsonProperty("result") Music163Ctt result,@JsonProperty("code") String code,@JsonProperty("msg") String msg) {
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record Music163Ctt(Music163[] songs,int songCount) {}
+	public record Music163Ctt(@JsonProperty("songs") Music163[] songs,@JsonProperty("songCount") int songCount) {}
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record Music163(long id,String name,int position,Object alias,int status,int fee,long copyrightId,
-			String disc,int no,String mp3Url) {}
+	public record Music163(@JsonProperty("id") long id,@JsonProperty("name") String name,@JsonProperty("position") int position
+			,@JsonProperty("alias") Object alias,@JsonProperty("status") int status,@JsonProperty("fee") int fee,@JsonProperty("copyrightId") long copyrightId
+			,@JsonProperty("disc") String disc,@JsonProperty("no") int no,@JsonProperty("mp3Url") String mp3Url) {}
 }
