@@ -42,16 +42,20 @@ public class CqHttpConfigurationProperties {
 	 */
 	private int connectTimeout;
 	public int connectTimeout() {return this.connectTimeout;}
+	private String botId;
+	public String botId() {return this.botId;}
 
 	public CqHttpConfigurationProperties(@DefaultValue("http://localhost:5700")String pushUrl,
 								String token,
 								@DefaultValue("1")int maxAttempt,
 								@DefaultValue("60000")int readTimeout,
-								@DefaultValue("10000")int connectTimeout) {
+								@DefaultValue("10000")int connectTimeout,
+								String botId) {
 		this.pushUrl = pushUrl;
 		this.token = token;
 		this.maxAttempt = maxAttempt;
 		this.readTimeout = readTimeout;
 		this.connectTimeout = connectTimeout;
+		this.botId = botId;
 	}
 }
