@@ -36,7 +36,8 @@ public class LocalAuthHolder implements AuthHolder {
 			try {
 				String authStr = Files.readString(authLocalFile.toPath());
 				if(StringUtils.hasText(authStr)) {
-					return new Auth(authStr);
+					auth = new Auth(authStr);
+					return auth;
 				}else {
 					return null;
 				}

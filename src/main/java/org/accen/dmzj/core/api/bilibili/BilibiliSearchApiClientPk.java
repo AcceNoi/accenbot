@@ -38,7 +38,7 @@ public class BilibiliSearchApiClientPk {
 			Map<String,Object> firstUserMap = ((List<Map<String, Object>>)((Map<String, Object>)searchResult.get("data")).get("result")).get(0);
 			info.setMid((long)Double.parseDouble(firstUserMap.get("mid").toString()));
 			info.setName(firstUserMap.get("uname").toString());
-			info.setRoomId((long)firstUserMap.get("room_id"));
+			info.setRoomId((int)firstUserMap.get("room_id"));
 			info.setUsign((String)firstUserMap.get("usign"));
 			return info;
 		}

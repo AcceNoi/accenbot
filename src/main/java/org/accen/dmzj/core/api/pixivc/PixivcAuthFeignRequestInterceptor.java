@@ -61,15 +61,23 @@ public class PixivcAuthFeignRequestInterceptor extends AbstractHeaderAuthCounter
 			holder.updateAuth(auth);
 		}
 	}
+	private boolean inited = false;
 	@Override
 	public void firstTimeDo() {
-		if(holder.getAuth()==null) {
+		/*if(holder.getAuth()==null) {
 			synchronized (holder) {
 				if(holder.getAuth()==null) {
 					init();
 				}
 			}
 		
+		}*/
+		if(!inited) {
+			synchronized (holder) {
+				if(!inited) {
+					init();
+				}
+			}
 		}
 		//添加认证header
 		if(holder.getAuth().auth()!=null) {
