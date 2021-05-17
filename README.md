@@ -14,7 +14,28 @@
 >
 >本项目使用了preview特性，请确保使用JDK15+（可能会持续到17发布）进行编译和运行，并添加--enable-preview参数。
 >
->当前最新版本[V2.0-Agito](https://github.com/AcceNoi/dmzjbot/releases/tag/V2.0-Agito)，重构了API模块，使用Springboot 2.4+，不再使用原生的Feign改用OpenFeign。重写了Pixivc的Auth模块[PixivcAuth](https://github.com/AcceNoi/accenbot/blob/master/src/main/java/org/accen/dmzj/core/api/pixivc/PixivcAuthFeignRequestInterceptor.java)，现在支持认证失效重连。
+>当前最新版本[V2.0-Agito](https://github.com/AcceNoi/dmzjbot/releases/tag/V2.0-Agito)，新增了极简正则匹配功能，可以快速实现你的功能，详细可看[Demo](https://github.com/AcceNoi/accenbot/blob/master/src/test/java/dmzjbot/Demo.java)。
+>
+>```java
+>@Component
+>public class Demo {
+>	@CmdRegular(expression = "^检索(.+)$")
+>	@GeneralMessage
+>	public String search(String key) {
+>		//TODO your code
+>		return "检索结果...";
+>	}
+>	
+>	@CmdRegular(expression = "^检索(\\d+)$",qmessageParamIndex = 0)
+>	@GeneralMessage(targetId = "123456")
+>	public String search(Qmessage qmassage,int pid) {
+>		//TODO your code
+>		return "检索结果...";
+>	}
+>}
+>```
+>
+>更详细可看[CmdRegular](https://github.com/AcceNoi/accenbot/blob/master/src/main/java/org/accen/dmzj/core/annotation/CmdRegular.java)和[GeneralMessage](https://github.com/AcceNoi/accenbot/blob/master/src/main/java/org/accen/dmzj/core/annotation/GeneralMessage.java)
 
 ### V2.0+待填的坑
 - 支持解析分P的B站视频

@@ -14,7 +14,7 @@ public class Demo {
 		return "检索结果...";
 	}
 	
-	@CmdRegular(expression = "^检索(.+)$")
+	@CmdRegular(expression = "^检索(\\d+)$",qmessageParamIndex = 0)
 	@GeneralMessage(targetId = "123456")
 	public String search(Qmessage qmassage,int pid) {
 		//TODO your code
