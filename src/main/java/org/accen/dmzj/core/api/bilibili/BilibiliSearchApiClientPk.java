@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.api.KaassApiClient;
 import org.accen.dmzj.core.api.vo.BilibiliBangumiInfo;
+import org.accen.dmzj.core.api.vo.BilibiliSearch;
 import org.accen.dmzj.core.api.vo.BilibiliUserInfo;
 import org.accen.dmzj.core.api.vo.BilibliVideoInfo;
 import org.jsoup.Jsoup;
@@ -31,15 +32,14 @@ public class BilibiliSearchApiClientPk {
 	public BilibiliUserInfo searchUser(String name) {
 		/*String html = client.searchUser(name);
 		return parseHtml(html);*/
-		Map<String,Object> searchResult = bilibiliApiClient.search(1, name, BilibiliApiClient.SEARCH_TYPE_USER);
-		if(Double.parseDouble(((Map<String, Object>)searchResult.get("data")).get("numResults").toString())>=1.0) {
+		BilibiliSearch searchResult = bilibiliApiClient.search(1, name, BilibiliApiClient.SEARCH_TYPE_USER);
+		if(searchResult.data().numResults()>=1) {
 			//numResult有值
 			BilibiliUserInfo info = new BilibiliUserInfo();
-			Map<String,Object> firstUserMap = ((List<Map<String, Object>>)((Map<String, Object>)searchResult.get("data")).get("result")).get(0);
-			info.setMid((long)Double.parseDouble(firstUserMap.get("mid").toString()));
-			info.setName(firstUserMap.get("uname").toString());
-			info.setRoomId((int)firstUserMap.get("room_id"));
-			info.setUsign((String)firstUserMap.get("usign"));
+			info.setMid((Integer)searchResult.data().result()[0].get("mid"));
+			info.setName((String)searchResult.data().result()[0].get("uname"));
+			info.setRoomId((Integer)searchResult.data().result()[0].get("room_id"));
+			info.setUsign((String)searchResult.data().result()[0].get("usign"));
 			return info;
 		}
 		return null;
@@ -88,11 +88,11 @@ public class BilibiliSearchApiClientPk {
 	 * @return
 	 */
 	public BilibiliBangumiInfo searchBangumi(String title) {
-		Map<String,Object> searchResult = bilibiliApiClient.search(1, title, BilibiliApiClient.SEARCH_TYPE_BANGUMI);
-		if(Double.parseDouble(((Map<String, Object>)searchResult.get("data")).get("numResults").toString())>=1.0) {
+		BilibiliSearch searchResult = bilibiliApiClient.search(1, title, BilibiliApiClient.SEARCH_TYPE_BANGUMI);
+		if(searchResult.data().numResults()>=1) {
 			BilibiliBangumiInfo info = new BilibiliBangumiInfo();
-			Map<String,Object> firstBangumiMap = ((List<Map<String, Object>>)((Map<String, Object>)searchResult.get("data")).get("result")).get(0);
-			info.setMediaId((long)Double.parseDouble(firstBangumiMap.get("media_id").toString()));
+			Map<String,Object> firstBangumiMap =searchResult.data().result()[0];
+			info.setMediaId((Integer)firstBangumiMap.get("media_id"));
 //			info.setName(firstBangumiMap.get("title").toString());
 			//由于b站的api给的title会添加<em></em>，需要格式化以下
 			Document titleDoc = Jsoup.parse("<html>"+firstBangumiMap.get("title").toString()+"</html>");

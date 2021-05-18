@@ -2,6 +2,7 @@ package org.accen.dmzj.core.api.bilibili;
 
 import java.util.Map;
 
+import org.accen.dmzj.core.api.vo.BilibiliSearch;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,7 +27,7 @@ public interface BilibiliApiClient {
 	
 	
 	@GetMapping("/x/web-interface/search/type")
-	public Map<String, Object> search(@RequestParam("page")int page,@RequestParam("keyword")String kw,@RequestParam("search_type")String type);
+	public BilibiliSearch search(@RequestParam("page")int page,@RequestParam("keyword")String kw,@RequestParam("search_type")String type);
 
 	@GetMapping("/x/web-interface/view")
 	public Map<String, Object> viewByAid(@RequestParam("aid")String avid);
