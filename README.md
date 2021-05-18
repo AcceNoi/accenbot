@@ -14,21 +14,25 @@
 >
 >本项目使用了preview特性，请确保使用JDK15+（可能会持续到17发布）进行编译和运行，并添加--enable-preview参数。
 >
->当前最新版本[V2.0-Agito](https://github.com/AcceNoi/dmzjbot/releases/tag/V2.0-Agito)，新增了极简正则匹配功能，可以快速实现你的功能，详细可看[Demo](https://github.com/AcceNoi/accenbot/blob/master/src/test/java/dmzjbot/Demo.java)。
+>当前最新版本[V2.0-Agito](https://github.com/AcceNoi/dmzjbot/releases/tag/V2.0-Agito)，新增了极简正则匹配、自动注入功能，可以快速实现你的功能而不用关心消息的来源和去处，详细可看[Demo](https://github.com/AcceNoi/accenbot/blob/master/src/test/java/dmzjbot/Demo.java)。
 >
 >```java
 >@Component
 >public class Demo {
->	@CmdRegular(expression = "^检索(.+)$")
+>	@CmdRegular(expression = "^检索(.+)$",enableAutowiredParam = false)
 >	@GeneralMessage
 >	public String search(String key) {
 >		//TODO your code
 >		return "检索结果...";
 >	}
 >	
->	@CmdRegular(expression = "^检索(\\d+)$",qmessageParamIndex = 0)
+>	@CmdRegular(expression = "^用(.+)引擎检索(\\d+)$")
 >	@GeneralMessage(targetId = "123456")
->	public String search(Qmessage qmassage,int pid) {
+>	public String search(Qmessage qmassage
+>						,@AutowiredParam("message") String msg
+>						,@AutowiredParam Date sendTime
+>						,int pid
+>						,@AutowiredRegular(1) String engine) {
 >		//TODO your code
 >		return "检索结果...";
 >	}

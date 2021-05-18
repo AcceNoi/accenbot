@@ -27,13 +27,8 @@ public @interface CmdRegular {
 	 */
 	String expression();
 	/**
-	 * 是否这个方法需要{@link Qmessage}参数，如果需要，确定其参数下标，值不能与{@link CmdRegular#selfNumParamIndex}重复，如果不需要则返回负值
+	 * 是否允许注入{@link Qmessage}参数，默认true
 	 * @return
 	 */
-	int qmessageParamIndex() default -1;
-	/**
-	 * 是否这个方法需要SelfNum参数，如果需要，确定其参数下标，值不能与{@link CmdRegular#qmessageParamIndex}重复，如果不需要则返回负值
-	 * @return
-	 */
-	int selfNumParamIndex() default -1;
+	boolean enableAutowiredParam() default true;
 }
