@@ -5,12 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.api.bilibili.BilibiliApiClient.BilibiliPlayUrl;
+import org.accen.dmzj.core.api.vo.BilibiliView;
 import org.accen.dmzj.core.exception.BiliBiliCookieNeverInit;
 import org.accen.dmzj.util.StringUtil;
 import org.accen.dmzj.web.dao.CfgConfigValueMapper;
@@ -107,12 +108,37 @@ public class ApiBiliBiliApiClient {
 		return null;
 	}
 	public String[] downloadByVNo(String vType,String vNo,int qn) throws BiliBiliCookieNeverInit{
+		return downloadByVNo(vType, vNo, qn, 0);
+	}
+	public String[] downloadByVNo(String vType,String vNo,int qn,int p) throws BiliBiliCookieNeverInit{
+		String url = null;
+		String refer = null;
+		BilibiliView view = null;
 		if("AV".equalsIgnoreCase(vType)) {
-			return downLoadByAvid(vNo, qn);
+			view = apiClient.view(vNo, null);
+			BilibiliPlayUrl playUrl = apiClient.playurl(view.data().pages()[p].cid(), qn, vNo, null);
+			url = playUrl.data().durl()[0].url();
+			refer = "https://api.bilibili.com/x/player/playurl?cid=%d&qn=%d&aid=%s".formatted(view.data().pages()[p].cid(),qn,vNo);
 		}else if("BV".equalsIgnoreCase(vType)) {
-			return downloadByBvid(vNo, qn);
+			view = apiClient.view(null, vNo);
+			BilibiliPlayUrl playUrl = apiClient.playurl(view.data().pages()[p].cid(), qn, null, vNo);
+			url = playUrl.data().durl()[0].url();
+			refer = "https://api.bilibili.com/x/player/playurl?cid=%d&qn=%d&bvid=%s".formatted(view.data().pages()[p].cid(),qn,vNo);
 		}
-		return null;
+		String videoName = tempMimePath+vType+vNo+"_"+qn+".flv";
+		File video = new File(videoName);
+		if(!video.getParentFile().exists()) {
+			video.getParentFile().mkdirs();
+		}
+		InputStream is = getDownloadRefer(url, refer);
+		try {
+			IOUtils.copy(is,new FileOutputStream(video));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new String[] {videoName,view.data().pic(),view.data().title(),"https://www.bilibili.com/video/"+vType+vNo};
 	}
 
 	/**
@@ -122,6 +148,7 @@ public class ApiBiliBiliApiClient {
 	 * @return
 	 * @throws BiliBiliCookieNeverInit
 	 */
+	@Deprecated
 	private String[] downloadByBvid(String bvid,int qn) throws BiliBiliCookieNeverInit {
 		checkCookie();
 		String avid = getAvidByBvid(bvid);
@@ -138,6 +165,7 @@ public class ApiBiliBiliApiClient {
 	 * @return 0-本地视频地址, 1-封面地址，2-标题（后续作为content）,3-视频地址
 	 * @throws BiliBiliCookieNeverInit
 	 */
+	@Deprecated
 	private String[] downLoadByAvid(String avid,int qn) throws BiliBiliCookieNeverInit {
 		checkCookie();
 		
@@ -178,6 +206,7 @@ public class ApiBiliBiliApiClient {
 	 * @param avid
 	 * @return 0-cid, 1-封面地址，2-标题（后续作为content）
 	 */
+	@Deprecated
 	public String[] getAvCid(String avid) {
 		Map<String, Object> data = apiClient.viewByAid(avid);
 		Integer cid = (Integer)((List<Map<String, Object>>)((Map<String, Object>)data.get("data")).get("pages")).get(0).get("cid");
@@ -185,12 +214,14 @@ public class ApiBiliBiliApiClient {
 		String title = (String) ((Map<String, Object>)data.get("data")).get("title");
 		return new String[] {cid.toString(),imageUrl,title};
 	}
+	@Deprecated
 	public String getAvidByBvid(String bvid) {
 		
 		Map<String, Object> data = apiClient.viewByBid(bvid);
 		return ((Integer) ((Map<String, Object>)data.get("data")).get("aid")).toString();
 	}
 	private final static String BILIBILI_API_PLAYURL="https://api.bilibili.com/x/player/playurl?cid=%s&avid=%s&qn=%s";
+	@Deprecated
 	public String getUrl(String cid,String avid,int qn) {
 		int qni = 16;//默认360p
 		switch(qn) {
@@ -224,6 +255,21 @@ public class ApiBiliBiliApiClient {
 		dlGet.setHeader("Referer", "https://api.bilibili.com/x/web-interface/view?aid="+avid);
 		dlGet.setHeader("Range","bytes=0-");
 		dlGet.setHeader("Origin", "https://www.bilibili.com");
+		
+		try {
+			HttpResponse dlResp = httpClient.execute(dlGet);
+			return dlResp.getEntity().getContent();
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public InputStream getDownloadRefer(String downloadUrl,String refer) {
+		HttpGet dlGet = new HttpGet(downloadUrl);
+		dlGet.setHeader("Referer", refer);
+		dlGet.setHeader("Range","bytes=0-");
 		
 		try {
 			HttpResponse dlResp = httpClient.execute(dlGet);

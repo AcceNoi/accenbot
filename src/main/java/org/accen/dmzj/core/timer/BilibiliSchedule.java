@@ -1,5 +1,6 @@
 package org.accen.dmzj.core.timer;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -64,7 +65,7 @@ public class BilibiliSchedule {
 				if(!subMap.containsKey(key)) {
 					subMap.put(key, new HashMap<String, List<CmdBuSub>>());
 				}
-				if(!subMap.get(key).containsKey(sub.getTargetId())) {
+				if(!subMap.get(key).containsKey(sub.getTargetId())) { 
 					subMap.get(key).put(sub.getTargetId(), new LinkedList<CmdBuSub>());
 				}
 				subMap.get(key).get(sub.getTargetId()).add(sub);
@@ -110,7 +111,7 @@ public class BilibiliSchedule {
 						for(Map<String,Object> card:cards) {
 							@SuppressWarnings("unchecked")
 							Map<String, Object> desc = (Map<String, Object>) card.get("desc");
-							int timestamp =  ((int)desc.get("timestamp"))*1000;
+							long timestamp =  ((long)((int)desc.get("timestamp")))*1000;
 							if(curTimestamp-timestamp<=5*60*1000) {
 								String[] cardFmted = parseDynamicCard(card);
 								String cardContent = cardFmted[0];//更新的内容
@@ -195,7 +196,7 @@ public class BilibiliSchedule {
 			}
 			
 			//转发的动态拿到原始的动态
-			int originType = (int)((Map<String,Object>)cardMap.get("item")).get("orig_type");
+			int originType = new BigDecimal((double)((Map<String,Object>)cardMap.get("item")).get("orig_type")).intValue();
 			String originUname = (String) ((Map<String,Object>) ((Map<String,Object>)cardMap.get("origin_user")).get("info")).get("uname");
 			//番剧是没有上传者名字的，用标题代替，不过在上一级无所谓，拿到的反正是空
 			
@@ -237,7 +238,7 @@ public class BilibiliSchedule {
 			}else if(depth==0) {
 				msgBuf.append("更新了一个视频：\n");
 			}
-			long aid = (Long)cardMap.get("aid");
+			long aid = new BigDecimal((double)cardMap.get("aid")).longValue();
 			String title = (String)cardMap.get("title");
 			String description = (String) cardMap.get("desc");
 //			description = description.length()>83?(description.substring(0, 80)+"..."):description;
@@ -275,7 +276,7 @@ public class BilibiliSchedule {
 			}else if(depth==0) {
 				msgBuf.append("发布了一则专栏：\n");
 			}
-			long cvId = (long)cardMap.get("id");
+			long cvId = new BigDecimal((double)cardMap.get("id")).longValue();
 			String title = (String) cardMap.get("title");
 			String summary = (String) cardMap.get("summary");
 			String description = title.trim()+"\n"+summary;
@@ -297,7 +298,7 @@ public class BilibiliSchedule {
 			}else if(depth==0) {
 				msgBuf.append("发布了一首音乐：\n");
 			}
-			long mId = (long)cardMap.get("id");
+			long mId = new BigDecimal((double)cardMap.get("id")).longValue();
 			String title = (String) cardMap.get("title");
 			String intro = (String) cardMap.get("intro");
 			String description = title.trim()+"\n"+intro.trim();

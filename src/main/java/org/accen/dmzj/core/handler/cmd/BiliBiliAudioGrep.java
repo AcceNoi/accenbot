@@ -61,7 +61,7 @@ public class BiliBiliAudioGrep implements CmdAdapter {
 
 	private static final String KEY_PREFFIX = "audio_bilibili_";
 	
-	private final static Pattern grepPattern = Pattern.compile("^抽取(A|B)V(.+)?从(.+)?到(.+)?(语音)，设置名称(.+)?$",Pattern.CASE_INSENSITIVE);
+	private final static Pattern grepPattern = Pattern.compile("^抽取(A|B)V(.+)?(-\\d+?){0,1}从(.+)?到(.+)?(语音)，设置名称(.+)?$",Pattern.CASE_INSENSITIVE);
 	@Override
 	public  GeneralTask cmdAdapt(Qmessage qmessage, String selfQnum) {
 		String message = qmessage.getMessage().trim();
@@ -84,10 +84,12 @@ public class BiliBiliAudioGrep implements CmdAdapter {
 				}else {
 					String vType = matcher.group(1).toUpperCase()+"V";
 					String vNo = matcher.group(2);
-					String ss = matcher.group(3);
-					String tt = matcher.group(4);
-					String type = matcher.group(5);
-					String name = matcher.group(6);
+					String px = matcher.group(3);
+					int p = StringUtils.hasText(px)?Integer.valueOf(px.substring(1)):0;
+					String ss = matcher.group(4);
+					String tt = matcher.group(5);
+					String type = matcher.group(6);
+					String name = matcher.group(7);
 					
 					int diff = ffmpegUtil.checkTimeIllegalEx(ss, tt);
 					if(diff<=0) {
@@ -102,7 +104,7 @@ public class BiliBiliAudioGrep implements CmdAdapter {
 						
 						taskManager.addGeneralTaskQuick(selfQnum, qmessage.getMessageType(), qmessage.getGroupId(), "视频["+vType+vNo+"]解析中~");
 						
-						String[] rs = apiClient.downloadByVNo(vType, vNo, 360);
+						String[] rs = apiClient.downloadByVNo(vType, vNo, 360,p);
 						String videoFile = rs[0];
 						//剪切音频
 						String targetFileName = StringUtil.uuid();
@@ -130,7 +132,7 @@ public class BiliBiliAudioGrep implements CmdAdapter {
 							cr.setCreateUserId(qmessage.getUserId());
 							String createNickName = (String) ((Map<String, Object>)qmessage.getEvent().get("sender")).get("nickname");
 							String createCard = (String) ((Map<String, Object>)qmessage.getEvent().get("sender")).get("card");//群名片
-							cr.setCreateUserName(StringUtils.isEmpty(createCard)?createNickName:createCard);
+							cr.setCreateUserName(!StringUtils.hasLength(createCard)?createNickName:createCard);
 							cr.setCreateTime(new Date());
 							cfgResourceMapper.insert(cr);
 							
