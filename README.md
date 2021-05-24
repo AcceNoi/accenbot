@@ -1,4 +1,4 @@
-**基于Mirai和[CqHTTP Mirai](https://github.com/yyuueexxiinngg/cqhttp-mirai)实现的QQ群聊天机器人。**
+**基于[Onebot]和[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)实现的QQ群聊天机器人框架。**
 ---
 
 [![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)
@@ -14,7 +14,7 @@
 >
 >本项目使用了preview特性，请确保使用JDK15+（可能会持续到17发布）进行编译和运行，并添加--enable-preview参数。
 >
->当前最新版本[V2.0-Agito](https://github.com/AcceNoi/dmzjbot/releases/tag/V2.0-Agito)，新增了极简正则匹配、自动注入等功能。
+>当前最新版本[V2.1-Tempest](https://github.com/AcceNoi/dmzjbot/releases/tag/V2.1-Tempest)，整理出第一版Accenbot极简配置框架。
 >
 
 ### V2.0+待填的坑
@@ -100,9 +100,43 @@ public class Demo {
 }
 ```
 
-### 3.消息处理链
+### 3.极简配置框架Accenbot
 
-[EventHandler](https://github.com/AcceNoi/accenbot/blob/master/src/main/java/org/accen/dmzj/core/handler/EventHandler.java)重构中...
+除了2种描述的极简正则匹配用于最常用的文本匹配回复，框架将符合Onebot标准Event全部采用极简化配置的方式，同样配合@AutowiredParam和@GeneralMessage，实现功能的快速编写。
+
+***其核心理念是将方法Method代理，将上报的Event的参数注入到该Method的参数中，执行后，若其符合发送消息的格式，则自动封装成消息发出。实现消息来源与反馈的去耦合。***
+
+**@AutowiredParam**：自动注入Event参数，用于标识该Parameter。例如：你可以使用```.```来注入Event这个对象，或者```.post_type```来注入Event的post_type参数，或者```.sender.nickname```注入nickname参数（当然前提是存在这个参数）。另外，AutowiredParam允许你使用驼峰命名的风格就像```.postType```，但是我并不希望你这样做，最好是保持与Onebot协议中描述的一致；此外，AutowiredParam允许你以参数签名的方式来定义第一层的参数，例如@AutowiredParam String postType。
+
+```java
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface AutowiredParam {
+	String value() default "";
+}
+```
+
+**@CmdMessage、@CmdMeta、@CmdNotice、@CmdRequest**：用来定义一个代理（我称之为AccenbotCmdProxy），它们分别匹配Onebot中的四种Event类型。它们可以被标识在Class或者Method上，标识在类上时，executeMethod将起作用，它会将类中的这些方法（默认为execute）注册为AccenbotCmdProxy。而标识在方法上，则为此方法。value参数为该AccenbotCmdProxy的唯一标识，请确保此value为唯一的，否则将抛出CmdRegisterDuplicateException异常，或者使用默认值，框架会为你生成一个唯一的value（但是这很蠢，如果你希望在运行时注销一个AccenbotCmdProxy，建议你显式地为它命名）。
+
+```java
+@Target({ElementType.METHOD,ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface CmdMessage {
+	String value() default "";
+	String[] executeMethod() default {"execute"};
+	int order() default 999;
+	MessageType[] messageType() default MessageType._ALL;
+	MessageSubType[] subType() default MessageSubType._ALL;
+}
+```
+
+除了上面四种，@CmdRegular（也就是第2点描述的）也是相同的原理，只是因为常用（现在实现的80%功能都是属于这种类型）所以单列出来了。
+
+## Quick Start
+
+待补充...
 
 ## [已实现的功能](https://github.com/AcceNoi/accenbot/blob/master/README-FUNCTION.md)
 
