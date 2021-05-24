@@ -55,6 +55,7 @@ public interface BilibiliApiClient {
 	 * @param aid
 	 * @param bvid
 	 */
+	@GetMapping("/x/player/playurl")
 	public BilibiliPlayUrl playurl(@RequestParam("cid")int cid,@RequestParam("qn")int qn,@RequestParam("aid")String aid,@RequestParam("bvid")String bvid);
 	@SuppressWarnings("preview")
 	@JsonIgnoreProperties(ignoreUnknown = true)
