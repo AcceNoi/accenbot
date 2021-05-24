@@ -1,5 +1,7 @@
 package org.accen.dmzj.core.api.cq;
 
+import java.util.Set;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.boot.context.properties.bind.DefaultValue;
@@ -44,18 +46,22 @@ public class CqHttpConfigurationProperties {
 	public int connectTimeout() {return this.connectTimeout;}
 	private String botId;
 	public String botId() {return this.botId;}
-
+	private Set<Long> adminId;
+	public Set<Long> adminId(){return adminId;};
+	
 	public CqHttpConfigurationProperties(@DefaultValue("http://localhost:5700")String pushUrl,
 								String token,
 								@DefaultValue("1")int maxAttempt,
 								@DefaultValue("60000")int readTimeout,
 								@DefaultValue("10000")int connectTimeout,
-								String botId) {
+								String botId,
+								Set<Long> adminId) {
 		this.pushUrl = pushUrl;
 		this.token = token;
 		this.maxAttempt = maxAttempt;
 		this.readTimeout = readTimeout;
 		this.connectTimeout = connectTimeout;
 		this.botId = botId;
+		this.adminId = adminId;
 	}
 }
