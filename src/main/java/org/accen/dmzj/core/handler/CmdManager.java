@@ -33,7 +33,7 @@ public class CmdManager{
 		
 		allCmds.forEach(cmd->{
 			if(funcSwitchUtil.isCmdPass(cmd.getClass(), qmessage.getMessageType(), qmessage.getGroupId())) {
-				taskManager.addGeneralTask(cmd.cmdAdapt(qmessage, qmessage.getEvent().get("selfQnum").toString()));
+				taskManager.addGeneralTask(cmd.cmdAdapt(qmessage, qmessage.getEvent().get("self_id").toString()));
 			}
 		});
 		cmdRegularManager.accept(qmessage, taskManager);

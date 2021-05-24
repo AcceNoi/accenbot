@@ -32,6 +32,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 @HandlerChain(postType = "message")
+@Deprecated
+/**
+ * deprecated since 2.1 ,please see GroupMessageEventHandlerAdpter
+ * @author <a href="1339liu@gmail.com">Accen</a>
+ *
+ */
 public class GroupMessageEventhandler implements EventHandler{
 	@Autowired
 	private QmessageMapper qmessageMapper;

@@ -129,7 +129,7 @@ public class CmdRegularManager implements BeanPostProcessor{
 						taskManager.addGeneralTask(task);
 					}else if(mtd.isAnnotationPresent(GeneralMessage.class)&&rt instanceof String message) {
 						taskManager.addGeneralTaskQuick(
-								qmessage.getEvent().get("selfQnum").toString()
+								qmessage.getEvent().get("self_id").toString()
 								, qmessage.getMessageType()
 								, qmessage.getGroupId()
 								, message);
