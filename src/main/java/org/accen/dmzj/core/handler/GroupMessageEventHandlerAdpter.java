@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.accen.dmzj.core.EventParser;
 import org.accen.dmzj.core.annotation.AutowiredParam;
 import org.accen.dmzj.core.annotation.CmdMessage;
 import org.accen.dmzj.core.annotation.GeneralMessage;
@@ -51,6 +50,7 @@ public class GroupMessageEventHandlerAdpter {
 	 */
 	private Set<Long> noActiveGroup = new HashSet<Long>();
 	
+	
 	private Set<String> adminRoles = Set.of("owner","admin");
 	@GeneralMessage
 	public String execute(@AutowiredParam(".") Map<String, Object> event
@@ -92,8 +92,8 @@ public class GroupMessageEventHandlerAdpter {
 			}
 		}
 		Qmessage qmessage = new Qmessage();
-		qmessage.setMessageType(EventParser.MESSAGE_TYPE_GROUP);
-		qmessage.setSubType(EventParser.SUB_TYPE_NORMAL);
+		qmessage.setMessageType("group");
+		qmessage.setSubType("normal");
 		qmessage.setMessageId(((Integer)event.get("message_id")).toString());
 		qmessage.setGroupId(""+groupId);
 		qmessage.setUserId(""+userId);
@@ -115,5 +115,8 @@ public class GroupMessageEventHandlerAdpter {
 		
 		callbackManager.accept(qmessage);
 		return null;
+	}
+	public boolean isActiveGroup(Long groupId) {
+		return !noActiveGroup.contains(groupId);
 	}
 }

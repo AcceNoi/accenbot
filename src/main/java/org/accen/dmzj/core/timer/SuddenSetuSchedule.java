@@ -1,6 +1,6 @@
 package org.accen.dmzj.core.timer;
 
-import org.accen.dmzj.core.handler.GroupMessageEventhandler;
+import org.accen.dmzj.core.handler.GroupMessageEventHandlerAdpter;
 import org.accen.dmzj.core.handler.cmd.Setu;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
@@ -18,7 +18,7 @@ public class SuddenSetuSchedule {
 	@Autowired
 	private QmessageUtil qmessageUtil;
 	@Autowired
-	private GroupMessageEventhandler groupMessageEventhandler;
+	private GroupMessageEventHandlerAdpter groupMessageEventhandler;
 	@Autowired
 	private Setu setuCmd;
 	@Value("${coolq.bot}")
@@ -30,7 +30,7 @@ public class SuddenSetuSchedule {
 		//随机找一个群
 		String[] groupArr = qmessageUtil.groupList().toArray(String[]::new);
 		String groupId = groupArr[RandomUtil.randomInt(groupArr.length)];
-		if(groupMessageEventhandler.isActiveGroup(groupId)) {
+		if(groupMessageEventhandler.isActiveGroup(Long.valueOf(groupId))) {
 			//伪造一个qmessage
 			Qmessage qmessage = new Qmessage();
 			qmessage.setMessage("随机涩图");qmessage.setMessageType("group");qmessage.setGroupId(groupId);

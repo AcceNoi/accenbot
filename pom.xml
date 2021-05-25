@@ -34,10 +34,6 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 			<version>3.0.2</version>
@@ -53,14 +49,6 @@
 			<version>1.12.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
@@ -68,7 +56,6 @@
     		<groupId>org.apache.httpcomponents</groupId>
     		<artifactId>httpclient</artifactId>
 		</dependency>
-		
 		<dependency>
     		<groupId>commons-net</groupId>
     		<artifactId>commons-net</artifactId>
@@ -86,34 +73,10 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-		    <groupId>net.sourceforge.tess4j</groupId>
-		    <artifactId>tess4j</artifactId>
-		    <version>4.5.4</version>
-		</dependency>
-		<dependency>
 			<groupId>com.madgag</groupId>
 			<artifactId>animated-gif-lib</artifactId>
 			<version>1.4</version>
 		</dependency>
-		
-		<!-- baidu ai -->
-		<dependency>
-    		<groupId>com.baidu.aip</groupId>
-    		<artifactId>java-sdk</artifactId>
-    		<version>4.12.0</version>
-		</dependency>
-		<dependency>
-    		<groupId>net.coobird</groupId>
-    		<artifactId>thumbnailator</artifactId>
-    		<version>0.4.8</version>
-		</dependency>
-		<dependency>
-		    <groupId>com.google.zxing</groupId>
-		    <artifactId>javase</artifactId>
-		    <version>3.4.0</version>
-		</dependency>
-
-		
 	</dependencies>
 	
 	<build>

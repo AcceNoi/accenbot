@@ -17,9 +17,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.LongSerializationPolicy;
+import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * 通过调用验证码和登录接口实现的Auth Fresher，貌似没有其他实现方式了
  * @author <a href="1339liu@gmail.com">Accen</a>
@@ -32,8 +30,6 @@ public class HttpAuthFresher implements AuthFresher{
 	private String vcUrl;
 	private String username;
 	private String password;
-	private Gson gson = new GsonBuilder()
-			.setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
 	private final static Pattern vertificationCodePattern = Pattern.compile("[a-zA-Z0-9]{4}");
 	public HttpAuthFresher(PixivcAuthConfigurationProperties prop) {
 		this.retry = prop.loginRetry();
@@ -91,7 +87,7 @@ public class HttpAuthFresher implements AuthFresher{
 			if(resp.statusCode()==200) {
 				String result = resp.body();
 				@SuppressWarnings("unchecked")
-				Map<String, Object> bodyMap = gson.fromJson(result, Map.class);
+				Map<String, Object> bodyMap =  new ObjectMapper().readValue(result, Map.class);
 				@SuppressWarnings("unchecked")
 				String vid = (String) ((Map<String,Object>)bodyMap.get("data")).get("vid");
 				@SuppressWarnings("unchecked")

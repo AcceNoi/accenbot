@@ -24,9 +24,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.LongSerializationPolicy;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 @Transactional
@@ -73,31 +72,7 @@ public class BilibiliSchedule {
 			//========初始化结束
 			
 			//========开始调用
-			/*subMap.forEach((key,value)->{
-				List<BilibliVideoInfo>  infos = bilibiliSearchApiClientPk.searchUpVideo(Long.parseLong(key));
-				
-				if(infos!=null&&!infos.isEmpty()) {
-					logger.info(infos.toString());
-					infos.forEach(info->{
-						if(curTimestamp-info.getPostTime()<=15*60*1000) {
-							//15分钟以内，则认为是最新投稿的视频
-							value.forEach((targetId,subscribers)->{
-								GeneralTask task = new GeneralTask();
-								task.setSelfQnum(botId);
-								task.setType("group");
-								task.setTargetId(targetId);
-								String ats = subscribers.stream()
-											.map(subscri->CQUtil.at(subscri.getSubscriber()))
-											.collect(Collectors.joining(" "));
-											
-								task.setMessage(ats+"您订阅的B站UP主"+subscribers.get(0).getSubObjMark()+"("+subscribers.get(0).getSubObj()+")更新视频啦："
-										+info.getTitle()+"[https://www.bilibili.com/video/av"+info.getaId()+"] 快去围观吧喵~");
-								taskManager.addGeneralTask(task);
-							});
-						}
-					});
-				}
-			});*/
+			
 			
 			//accen@20191122不再使用各个分散的API，统一使用动态
 			 
@@ -151,8 +126,7 @@ public class BilibiliSchedule {
 		}
 		
 	}
-	private static final Gson gson = new GsonBuilder()
-			.setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
+
 	/**
 	 * 解析B站动态发布API 的内容
 	 * @param card
@@ -164,10 +138,15 @@ public class BilibiliSchedule {
 		Map<String, Object> desc = (Map<String, Object>) card.get("desc");
 		int type = (int)desc.get("type");
 		String cardJson = StringUtil.unicodeToString(((String) card.get("card"))).replaceAll("\n", " ");
-//		logger.info(card.get("card").toString());
 		logger.debug(cardJson);
-		Map<String, Object> cardMap = gson.fromJson(cardJson, Map.class);
-		return parseDynamicCardMap(cardMap,type,0,null);
+		Map<String, Object> cardMap;
+		try {
+			cardMap = new ObjectMapper().readValue(cardJson, Map.class);
+			return parseDynamicCardMap(cardMap,type,0,null);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return null;
 		
 	}
 	/**
@@ -201,7 +180,12 @@ public class BilibiliSchedule {
 			//番剧是没有上传者名字的，用标题代替，不过在上一级无所谓，拿到的反正是空
 			
 			String orginJson = (String)cardMap.get("origin");
-			return new String[] {msgBuf.append(parseDynamicCardMap(gson.fromJson(orginJson, Map.class),originType, ++depth,originUname)[0]).toString(),null};
+			try {
+				return new String[] {msgBuf.append(parseDynamicCardMap(new ObjectMapper().readValue(orginJson, Map.class),originType, ++depth,originUname)[0]).toString(),null};
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			return null;
 		}else if(type>>1==1) {
 			String description = (String) ((Map<String,Object>)cardMap.get("item")).get("description");
 //			description = description.length()>83?(description.substring(0, 80)+"..."):description;

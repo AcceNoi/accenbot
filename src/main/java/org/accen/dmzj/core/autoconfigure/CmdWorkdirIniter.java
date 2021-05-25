@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CmdWorkdirIniter implements BeanPostProcessor{
 	private final static Logger logger = LoggerFactory.getLogger(CmdWorkdirIniter.class);
+	@SuppressWarnings("preview")
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if(bean instanceof Workdirer wbean) {

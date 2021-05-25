@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.accen.dmzj.core.AccenbotContext;
-import org.accen.dmzj.core.EventParser;
 import org.accen.dmzj.core.security.CqhttpSecurity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

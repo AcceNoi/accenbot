@@ -8,14 +8,19 @@ import org.accen.dmzj.util.ApplicationContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TaskCoolqProcessor {
 	private final static Logger logger = LoggerFactory.getLogger(TaskCoolqProcessor.class);
 	public String processs(GeneralTask task) {
 		if("group".equals(task.getType())) {
 			Map<String, Object> resultMap = sendGroupMsg(task.getTargetId(),task.getMessage(),false);
-			return new Gson().toJson(resultMap);
+			try {
+				return new ObjectMapper().writeValueAsString(resultMap);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
 		}
 		return "";
 	}
