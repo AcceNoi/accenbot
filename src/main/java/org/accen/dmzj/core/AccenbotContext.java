@@ -84,7 +84,7 @@ public class AccenbotContext implements BeanPostProcessor{
 						sign = ".";
 					}else {
 						//驼峰转下划线
-						sign = p.getName().replaceAll("[A-Z]", "_$0").toLowerCase();
+						sign = ".".concat(p.getName().replaceAll("[A-Z]", "_$0").toLowerCase());
 					}
 				}else {
 					sign = autoParam.value();
