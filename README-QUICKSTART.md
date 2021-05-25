@@ -19,7 +19,7 @@ git clone https://github.com/AcceNoi/accenbot.git yourproject
 
 ### 3.Menu & Menu Group
 
-> ```org.accen.dmzj.core.handler.cmd```这个包下为本项目此前已写好的功能，你可以选择保留或者删除。你可以看到这些实现了[CmdAdapter](https://github.com/AcceNoi/accenbot/blob/master/src/main/java/org/accen/dmzj/core/handler/cmd/CmdAdapter.java)接口的若干个类，例如实现了P站榜单功能的[PixivRank](https://github.com/AcceNoi/accenbot/blob/master/src/main/java/org/accen/dmzj/core/handler/cmd/PixivRank.java)，或者实现了菜单展示功能的[Shower](https://github.com/AcceNoi/accenbot/blob/master/src/main/java/org/accen/dmzj/core/handler/cmd/Shower.java)，这些接口有些是被注解了@FuncSwitch，标识该功能将作为菜单展示，然而需要注意的是，菜单与功能实际并不是绑定的，@FuncSwitch标识了一个菜单，而[实现功能有很多方式](#5.coding-with-accenbot-framework)
+> ```org.accen.dmzj.core.handler.cmd```这个包下为本项目此前已写好的功能，你可以选择保留或者删除。你可以看到这些实现了[CmdAdapter](https://github.com/AcceNoi/accenbot/blob/master/src/main/java/org/accen/dmzj/core/handler/cmd/CmdAdapter.java)接口的若干个类（这是老式的功能编写方式，后续可能会移除），例如实现了P站榜单功能的[PixivRank](https://github.com/AcceNoi/accenbot/blob/master/src/main/java/org/accen/dmzj/core/handler/cmd/PixivRank.java)，或者实现了菜单展示功能的[Shower](https://github.com/AcceNoi/accenbot/blob/master/src/main/java/org/accen/dmzj/core/handler/cmd/Shower.java)，这些接口有些是被注解了@FuncSwitch，标识该功能将作为菜单展示，然而需要注意的是，菜单与功能实际并不是绑定的，@FuncSwitch标识了一个菜单，而[实现功能有很多方式](#user-content-5coding-with-accenbot-framework )
 ```java
 @FuncSwitch(groupClass = Image.class,showMenu = true, title = "p站榜单",format = "p站本月榜[1-9]")
 ```
@@ -141,7 +141,7 @@ pixivc: #pixivc功能模块，不需要可以去除
 
 ### 6.Setup your Bot
 
-本项目依赖于以Onebot为标准的HTTP AIP，例如[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)，你需要先配置好你的HTTP API，然后按照[4.Configuration](#4.configuration)中配置你的accenbot，打包。
+本项目依赖于以Onebot为标准的HTTP AIP，例如[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)，你需要先配置好你的HTTP API，然后按照[4.Configuration](#user-content-4configuration )中配置你的accenbot，打包。
 
 ```shell
 java -jar accenbot.jar
