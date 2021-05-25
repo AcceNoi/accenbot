@@ -1,3 +1,8 @@
+<div align="center">
+<img width="250" src="https://raw.githubusercontent.com/AcceNoi/accenbot/master/accenbot-logo-1.png" alt="logo">
+<h2 id="quick-start"><a href="https://github.com/AcceNoi/accenbot/blob/master/README-QUICKSTART.md">Accenbot Framework</a></h2>
+</div>
+
 **基于[Onebot](https://github.com/howmanybots/onebot)和[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)实现的QQ聊天机器人极简框架。**
 ---
 
