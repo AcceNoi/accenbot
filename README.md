@@ -1,4 +1,4 @@
-**基于[Onebot]和[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)实现的QQ群聊天机器人框架。**
+**基于[Onebot](https://github.com/howmanybots/onebot)和[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)实现的QQ聊天机器人极简框架。**
 ---
 
 [![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)
@@ -23,6 +23,8 @@
 - 整理各个功能的配置（基于Springboot-configuration-processor2.4+）
 - 隔离每个功能的工作空间
 - 集成[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)
+
+## [Quick Start](https://github.com/AcceNoi/accenbot/blob/master/README-QUICKSTART.md)
 
 ## 模块介绍
 
@@ -133,10 +135,6 @@ public @interface CmdMessage {
 ```
 
 除了上面四种，@CmdRegular（也就是第2点描述的）也是相同的原理，只是因为常用（现在实现的80%功能都是属于这种类型）所以单列出来了。
-
-## Quick Start
-
-待补充...
 
 ## [已实现的功能](https://github.com/AcceNoi/accenbot/blob/master/README-FUNCTION.md)
 
