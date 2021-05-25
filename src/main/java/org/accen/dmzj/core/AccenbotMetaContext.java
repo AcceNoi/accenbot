@@ -14,6 +14,7 @@ import org.accen.dmzj.core.annotation.CmdMeta;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
 import org.accen.dmzj.core.exception.CmdRegisterException;
 import org.accen.dmzj.core.meta.MetaEventType;
+import org.accen.dmzj.core.meta.MetaSubType;
 import org.accen.dmzj.core.meta.PostType;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
@@ -38,9 +39,14 @@ public class AccenbotMetaContext extends AccenbotContext {
 	@Override
 	public void acceptEvent(Map<String, Object> event) {
 		MetaEventType metaType = MetaEventType.valueOf(((String)event.get("meta_event_type")).toUpperCase());
+		MetaSubType subType = event.containsKey("sub_type")?MetaSubType.valueOf(((String)event.get("sub_type")).toUpperCase()):MetaSubType._ALL;
 		metaCmdProxy.stream().forEach(proxy->{
 			if(Arrays.stream(((CmdMeta)proxy.anno()).metaEventType())
-						.anyMatch(avaliableMessageType -> avaliableMessageType == metaType)) {
+						.anyMatch(avaliableMetaType -> avaliableMetaType == MetaEventType._ALL || avaliableMetaType == metaType)
+				&&
+				Arrays.stream(((CmdMeta)proxy.anno()).subType())
+						.anyMatch(avaliableSubType -> avaliableSubType == MetaSubType._ALL || avaliableSubType == subType)
+			) {
 				
 				try {
 					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));

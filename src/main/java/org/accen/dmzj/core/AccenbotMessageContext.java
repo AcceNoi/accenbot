@@ -13,6 +13,7 @@ import java.util.stream.IntStream;
 import org.accen.dmzj.core.annotation.CmdMessage;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
 import org.accen.dmzj.core.exception.CmdRegisterException;
+import org.accen.dmzj.core.meta.MessageSubType;
 import org.accen.dmzj.core.meta.MessageType;
 import org.accen.dmzj.core.meta.PostType;
 import org.accen.dmzj.core.task.GeneralTask;
@@ -39,9 +40,14 @@ public class AccenbotMessageContext extends AccenbotContext {
 	@Override
 	public void acceptEvent(Map<String, Object> event) {
 		MessageType messageType = MessageType.valueOf(((String)event.get("message_type")).toUpperCase());
+		MessageSubType subType = event.containsKey("sub_type")?MessageSubType.valueOf(((String)event.get("sub_type")).toUpperCase()):MessageSubType._ALL;
 		messageCmdProxy.stream().forEach(proxy->{
 			if(Arrays.stream(((CmdMessage)proxy.anno()).messageType())
-						.anyMatch(avaliableMessageType -> avaliableMessageType == messageType)) {
+						.anyMatch(avaliableMessageType -> (avaliableMessageType == MessageType._ALL||avaliableMessageType == messageType))
+				&&
+				Arrays.stream(((CmdMessage)proxy.anno()).subType())
+						.anyMatch(avaliableSubType -> (avaliableSubType == MessageSubType._ALL||avaliableSubType == subType))
+			) {
 				
 				try {
 					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));

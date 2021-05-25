@@ -15,6 +15,7 @@ import org.accen.dmzj.core.annotation.CmdRequest;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
 import org.accen.dmzj.core.exception.CmdRegisterException;
 import org.accen.dmzj.core.meta.PostType;
+import org.accen.dmzj.core.meta.RequestSubType;
 import org.accen.dmzj.core.meta.RequestType;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
@@ -38,9 +39,14 @@ public class AccenbotRequestContext extends AccenbotContext {
 	@Override
 	public void acceptEvent(Map<String, Object> event) {
 		RequestType requestType = RequestType.valueOf(((String)event.get("request_type")).toUpperCase());
+		RequestSubType subType = event.containsKey("sub_type")?RequestSubType.valueOf(((String)event.get("sub_type")).toUpperCase()):RequestSubType._ALL;
 		requestCmdProxy.stream().forEach(proxy->{
 			if(Arrays.stream(((CmdRequest)proxy.anno()).requestType())
-						.anyMatch(avaliableMessageType -> avaliableMessageType == requestType)) {
+						.anyMatch(avaliableRequestType -> avaliableRequestType == RequestType._ALL || avaliableRequestType == requestType)
+				&&
+				Arrays.stream(((CmdRequest)proxy.anno()).subType())
+						.anyMatch(avaliableSubType -> avaliableSubType == RequestSubType._ALL || avaliableSubType == subType)
+			) {
 				
 				try {
 					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));

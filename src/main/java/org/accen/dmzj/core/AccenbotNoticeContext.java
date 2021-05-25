@@ -14,6 +14,7 @@ import java.util.stream.IntStream;
 import org.accen.dmzj.core.annotation.CmdNotice;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
 import org.accen.dmzj.core.exception.CmdRegisterException;
+import org.accen.dmzj.core.meta.NoticeSubType;
 import org.accen.dmzj.core.meta.NoticeType;
 import org.accen.dmzj.core.meta.PostType;
 import org.accen.dmzj.core.task.GeneralTask;
@@ -38,9 +39,14 @@ public class AccenbotNoticeContext extends AccenbotContext {
 	@Override
 	public void acceptEvent(Map<String, Object> event) {
 		NoticeType noticeType = NoticeType.valueOf(((String)event.get("notice_type")).toUpperCase());
+		NoticeSubType subType = event.containsKey("sub_type")?NoticeSubType.valueOf(((String)event.get("sub_type")).toUpperCase()):NoticeSubType._ALL;
 		noticeCmdProxy.stream().forEach(proxy->{
 			if(Arrays.stream(((CmdNotice)proxy.anno()).noticeType())
-						.anyMatch(avaliableMessageType -> avaliableMessageType == noticeType)) {
+						.anyMatch(avaliableNoticeType -> avaliableNoticeType == NoticeType._ALL || avaliableNoticeType == noticeType)
+				&&
+				Arrays.stream(((CmdNotice)proxy.anno()).subType())
+						.anyMatch(avaliableSubType -> avaliableSubType == NoticeSubType._ALL || avaliableSubType == subType)
+			) {
 				
 				try {
 					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));
