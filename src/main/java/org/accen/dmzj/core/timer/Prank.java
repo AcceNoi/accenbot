@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Prank {
-	@Value("${sys.static.html.upload}")
+	@Value("${accenbot.persistent}")
 	private String rankImageTempHome ;
 
 	private static final String tempDir = "prank/";

@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 public class ApiBiliBiliApiClient {
 	@Autowired
 	private BilibiliApiClient apiClient;
-	@Value("${sys.static.html.mime}")
+	@Value("${accenbot.persistent}")
 	private String tempMimePath;//usr/local/niginx/music/
 
 	@Autowired

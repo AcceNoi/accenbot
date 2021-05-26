@@ -10,6 +10,10 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 @ConstructorBinding
 public class CqHttpConfigurationProperties {
 	public final static String CONFIG_CQHTTP_PREFIX = "cq";
+	private String imageLocation;
+	public String imageLocation() {return imageLocation;}
+	private String recordLocation;
+	public String recordLocation() {return recordLocation;}
 	private String pushUrl;
 	/**
 	 * 推送cq的地址
@@ -55,7 +59,9 @@ public class CqHttpConfigurationProperties {
 								@DefaultValue("60000")int readTimeout,
 								@DefaultValue("10000")int connectTimeout,
 								String botId,
-								Set<Long> adminId) {
+								Set<Long> adminId,
+								@DefaultValue("data/OneBot/image/") String imageLocation,
+								@DefaultValue("data/OneBot/record/") String recordLocation) {
 		this.pushUrl = pushUrl;
 		this.token = token;
 		this.maxAttempt = maxAttempt;
@@ -63,5 +69,7 @@ public class CqHttpConfigurationProperties {
 		this.connectTimeout = connectTimeout;
 		this.botId = botId;
 		this.adminId = adminId;
+		this.imageLocation = imageLocation;
+		this.recordLocation = recordLocation;
 	}
 }

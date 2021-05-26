@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.accen.dmzj.core.api.cq.CqHttpConfigurationProperties;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -19,6 +20,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -29,16 +31,18 @@ import org.springframework.util.StringUtils;
  */
 @Component
 public class FilePersistentUtil {
-	@Value("${sys.static.html.upload}")
+	public FilePersistentUtil(@Autowired CqHttpConfigurationProperties cqProp) {
+		imageHome = cqProp.imageLocation();
+		recordHome = cqProp.recordLocation();
+	}
+	@Value("${accenbot.persistent}")
 	private String localFilePath;
-	@Value("${sys.static.url.upload}")
+	@Value("${accenbot.persistent-map}")
 	private String localUrl;
 	
 	/*@Value("${coolq.base.home}")
 	private String coolqHome;*/
-	@Value("${sys.static.temp.home.image}")
 	private String imageHome;
-	@Value("${sys.static.temp.home.record}")
 	private String recordHome;
 	
 	private HttpClient httpClient = HttpClientBuilder.create().build();
