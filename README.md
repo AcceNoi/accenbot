@@ -6,7 +6,7 @@
 **基于[Onebot](https://github.com/howmanybots/onebot)和[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)实现的QQ聊天机器人极简框架。**
 ---
 
-[![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)
+[![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)[![OneBot v11](https://img.shields.io/badge/OneBot-v11-black)](https://github.com/howmanybots/onebot/blob/master/v11/specs/README.md)
 
 | Author | Accen/クロノス    |
 | ------ | ----------------- |
@@ -23,11 +23,11 @@
 >
 
 ### V2.0+待填的坑
-- 支持解析分P的B站视频
-- 集成ffmpeg（当前是外挂）
-- 整理各个功能的配置（基于Springboot-configuration-processor2.4+）
-- 隔离每个功能的工作空间
-- 集成[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)
+- [x] 支持解析分P的B站视频 feat [0742](https://github.com/AcceNoi/accenbot/commit/0742012a269be069031d8c98dec8387a2f6b3e5e)
+- [ ] 集成ffmpeg（当前是外挂）
+- [ ] 整理各个功能的配置（基于Springboot-configuration-processor2.4+）
+- [ ] 隔离每个功能的工作空间
+- [x] 集成onebot-kotlin feat [onebot-kotlin-embedded](https://github.com/AcceNoi/accenbot/tree/onebot-kotlin-embedded)
 
 ## [Quick Start](https://github.com/AcceNoi/accenbot/blob/master/README-QUICKSTART.md)
 

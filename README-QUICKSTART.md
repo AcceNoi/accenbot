@@ -6,7 +6,7 @@
 **基于[Onebot](https://github.com/howmanybots/onebot)和[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)实现的QQ聊天机器人极简框架。**
 ---
 
-[![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)
+[![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)[![OneBot v11](https://img.shields.io/badge/OneBot-v11-black)](https://github.com/howmanybots/onebot/blob/master/v11/specs/README.md)
 
 | Author | Accen/クロノス    |
 | ------ | ----------------- |
@@ -146,10 +146,16 @@ pixivc: #pixivc功能模块，不需要可以去除
 
 ### 6.Setup your Bot
 
-本项目依赖于以Onebot为标准的HTTP AIP，例如[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)，你需要先配置好你的HTTP API，然后按照[4.Configuration](#user-content-4configuration )中配置你的accenbot，打包。
+accebot项目依赖于以Onebot为标准的HTTP AIP，例如[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)，你需要先配置好你的HTTP API，然后按照[4.Configuration](#user-content-4configuration )中配置你的accenbot，打包。
 
 ```shell
 java -jar accenbot.jar
+```
+
+或者使用accenbot-embedded分支，集成了onebot-kotlin，直接使用
+
+```shell
+java -jar accenbot-embedded.jar --account yraccount --password yrpassword
 ```
 
 另外，如果你使用了Pixivc的功能，请关注日志中需要你填写登录验证码。
