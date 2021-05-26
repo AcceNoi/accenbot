@@ -13,13 +13,25 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.4.4</version>
 	</parent>
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 	<properties>
 		<jsoup.version></jsoup.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>15</maven.compiler.source>
         <maven.compiler.target>15</maven.compiler.target>
+        <onebot-kotlin-version>0.3.4-all</onebot-kotlin-version>
 	</properties>
 	<dependencies>
+		<dependency>
+		    <groupId>com.github.yyuueexxiinngg</groupId>
+		    <artifactId>onebot-kotlin</artifactId>
+		    <version>${onebot-kotlin-version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -80,7 +92,7 @@
 	</dependencies>
 	
 	<build>
-		<finalName>accenbot</finalName>
+		<finalName>accenbot-embedded</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
