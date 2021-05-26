@@ -34,11 +34,11 @@ import org.springframework.util.StringUtils;
 @Component
 public class BiliBiliAudioGrep implements CmdAdapter {
 
-	@Value("${sys.static.html.music}")
+	@Value("${accenbot.persistent}")
 	private String tempMusicPath;//usr/local/niginx/music/
 //	@Value("${sys.static.url}")
 //	private String staticUrl;//http://localhost:80/
-	@Value("${sys.static.url.music:music/}")
+	@Value("${accenbot.persistent-map}")
 	private String staticMusic;
 	@Autowired
 	private FfmpegUtil ffmpegUtil;

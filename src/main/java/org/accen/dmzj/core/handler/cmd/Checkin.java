@@ -54,7 +54,7 @@ public class Checkin implements CmdAdapter,CallbackListener {
 	@Value("${coolq.mem.ticketProb:0.05}")
 	private double ticketProb ;//卡券获取概率
 	
-	@Value("${sys.static.html.upload}")
+	@Value("${accenbot.persistent}")
 	private String groundTempHome ;
 
 	private static final String groundDir = "pground/";
