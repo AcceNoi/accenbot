@@ -2,6 +2,7 @@ package org.accen.dmzj.core.handler;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,7 +54,7 @@ public class GroupMessageEventHandlerAdpter {
 	
 	private Set<String> adminRoles = Set.of("owner","admin");
 	@GeneralMessage
-	public String execute(@AutowiredParam(".") Map<String, Object> event
+	public List<String> execute(@AutowiredParam(".") Map<String, Object> event
 			,@AutowiredParam(".message") String message
 			,@AutowiredParam(".group_id") long groupId
 			,@AutowiredParam(".self_id") long selfId
@@ -63,31 +64,32 @@ public class GroupMessageEventHandlerAdpter {
 			if("召唤".equals(message)) {
 				if(noActiveGroup.contains(groupId)) {
 					noActiveGroup.remove(groupId);
-					return "冲喵！";
+					return List.of("冲喵！");
 				}else {
-					return "已冲喵！";
+					return List.of("已冲喵！");
 				}
 			}else if("去面壁".equals(message)) {
 				noActiveGroup.add(groupId);
-				return "面壁中！";
+				return List.of("面壁中！");
 			}
 		}
 		if(noActiveGroup.contains(groupId)) {
 			return null;
 		}
+		List<String> t = new LinkedList<>();
 		if(RandomUtil.randomPass(((double)tpsc.triggerPro(""+groupId))/100)) {
 			CfgQuickReply aReply = cfgQuickReplyMapper.queryByApplyRandom(2, ""+groupId, 1, message.trim());
 			if(aReply!=null) {
 				//匹配到精确词条
-				return (1==aReply.getNeedAt()?CQUtil.at(""+userId):"")
-					+aReply.getReply();
+				t.add( (1==aReply.getNeedAt()?CQUtil.at(""+userId):"")
+					+aReply.getReply());
 			}else {
 				//没有精确词条，则取找模糊词条
 				CfgQuickReply fReply = cfgQuickReplyMapper.queryByApplyRandom(2, ""+groupId, 2, message.trim());
 				if(fReply!=null) {
 					//模糊匹配到了
-					return (1==fReply.getNeedAt()?CQUtil.at(""+userId):"")
-						+fReply.getReply();
+					t.add( (1==fReply.getNeedAt()?CQUtil.at(""+userId):"")
+						+fReply.getReply());
 				}
 			}
 		}
@@ -114,7 +116,7 @@ public class GroupMessageEventHandlerAdpter {
 		//4.5 回调监听型
 		
 		callbackManager.accept(qmessage);
-		return null;
+		return t;
 	}
 	public boolean isActiveGroup(Long groupId) {
 		return !noActiveGroup.contains(groupId);

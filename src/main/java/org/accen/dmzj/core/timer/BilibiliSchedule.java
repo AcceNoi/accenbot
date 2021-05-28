@@ -72,7 +72,7 @@ public class BilibiliSchedule {
 			//========初始化结束
 			
 			//========开始调用
-			
+				
 			
 			//accen@20191122不再使用各个分散的API，统一使用动态
 			 
@@ -175,7 +175,7 @@ public class BilibiliSchedule {
 			}
 			
 			//转发的动态拿到原始的动态
-			int originType = new BigDecimal((double)((Map<String,Object>)cardMap.get("item")).get("orig_type")).intValue();
+			int originType = (Integer)((Map<String,Object>)cardMap.get("item")).get("orig_type");
 			String originUname = (String) ((Map<String,Object>) ((Map<String,Object>)cardMap.get("origin_user")).get("info")).get("uname");
 			//番剧是没有上传者名字的，用标题代替，不过在上一级无所谓，拿到的反正是空
 			
@@ -222,7 +222,7 @@ public class BilibiliSchedule {
 			}else if(depth==0) {
 				msgBuf.append("更新了一个视频：\n");
 			}
-			long aid = new BigDecimal((double)cardMap.get("aid")).longValue();
+			long aid = (Integer)cardMap.get("aid");
 			String title = (String)cardMap.get("title");
 			String description = (String) cardMap.get("desc");
 //			description = description.length()>83?(description.substring(0, 80)+"..."):description;
@@ -260,7 +260,7 @@ public class BilibiliSchedule {
 			}else if(depth==0) {
 				msgBuf.append("发布了一则专栏：\n");
 			}
-			long cvId = new BigDecimal((double)cardMap.get("id")).longValue();
+			long cvId = (Integer)cardMap.get("id");
 			String title = (String) cardMap.get("title");
 			String summary = (String) cardMap.get("summary");
 			String description = title.trim()+"\n"+summary;
