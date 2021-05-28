@@ -51,11 +51,11 @@ public class AccenbotNoticeContext extends AccenbotContext {
 				try {
 					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));
 					boolean isGroup = Set.of("group_upload","group_admin","group_decrease","group_ban","group_recall","notify").contains(event.get("notice_type"));
-					GeneralTask task = super.generalMessage(rs, proxy.cmdMethod()
+					GeneralTask[] tasks = super.generalMessage(rs, proxy.cmdMethod()
 							, isGroup?"group":"private"
 							, isGroup?""+event.get("group_id"):""+event.get("user_id")
 							, ""+event.get("self_id"));
-					taskManager.addGeneralTask(task);
+					taskManager.addGeneralTasks(tasks);
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {

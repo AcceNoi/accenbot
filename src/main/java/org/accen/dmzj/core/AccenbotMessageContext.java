@@ -51,11 +51,11 @@ public class AccenbotMessageContext extends AccenbotContext {
 				
 				try {
 					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));
-					GeneralTask task = super.generalMessage(rs, proxy.cmdMethod()
+					GeneralTask[] tasks = super.generalMessage(rs, proxy.cmdMethod()
 							, (String)event.get("message_type")
 							, "group".equals(event.get("message_type"))?""+event.get("group_id"):""+event.get("user_id")
 							, ""+event.get("self_id"));
-					taskManager.addGeneralTask(task);
+					taskManager.addGeneralTasks(tasks);
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {

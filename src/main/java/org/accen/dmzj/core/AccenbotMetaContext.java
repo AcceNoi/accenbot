@@ -50,11 +50,11 @@ public class AccenbotMetaContext extends AccenbotContext {
 				
 				try {
 					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));
-					GeneralTask task = super.generalMessage(rs, proxy.cmdMethod()
+					GeneralTask[] tasks = super.generalMessage(rs, proxy.cmdMethod()
 							,null
 							,null
 							,null);
-					taskManager.addGeneralTask(task);
+					taskManager.addGeneralTasks(tasks);
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {

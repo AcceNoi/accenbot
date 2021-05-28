@@ -1,5 +1,6 @@
 package org.accen.dmzj.core.task;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -51,6 +52,9 @@ public class TaskManager {
 	 */
 	public void addGeneralTasks(List<GeneralTask> generalTasks) {
 		generalTasks.forEach(this::addGeneralTask);
+	}
+	public void addGeneralTasks(GeneralTask[] generalTasks) {
+		Arrays.stream(generalTasks).forEach(this::addGeneralTask);
 	}
 	/**
 	 * 新增一个指定时间任务

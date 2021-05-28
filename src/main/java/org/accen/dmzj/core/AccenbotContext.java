@@ -1,9 +1,11 @@
 package org.accen.dmzj.core;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -49,12 +51,27 @@ public class AccenbotContext implements BeanPostProcessor{
 		return ;
 	}
 	
-	@SuppressWarnings("preview")
-	protected GeneralTask generalMessage(Object result,Method m,String type,String targetId,String selfId) {
+	@SuppressWarnings({ "preview", "rawtypes", "unchecked" })
+	protected GeneralTask[] generalMessage(Object result,Method m, String type,String targetId,String selfId) {
 		if(result instanceof GeneralTask task) {
-			return task;
-		}else if(m.isAnnotationPresent(GeneralMessage.class)&&result instanceof String r) {
-			return new GeneralTask(type, targetId, r, selfId);
+			return new GeneralTask[] {task};
+		}else if(m.isAnnotationPresent(GeneralMessage.class)) {
+			GeneralMessage gm = m.getDeclaredAnnotation(GeneralMessage.class);
+			String _selfId = "".equals(gm.selfNum())?selfId:gm.selfNum();
+			String _type = "".equals(gm.type())?type:gm.type();
+			String _targetId = "".equals(gm.targetId())?targetId:gm.targetId();
+			if(result.getClass().isArray()) {
+				return IntStream.range(0, Array.getLength(result))
+							.mapToObj(index->Array.get(result, index) instanceof GeneralTask ot?ot:new GeneralTask(_type,_targetId,Array.get(result, index).toString(),_selfId))
+							.toArray(GeneralTask[]::new);
+			}else if(result instanceof Collection c) {
+				return (GeneralTask[]) c.stream()
+						.map(o->o instanceof GeneralTask ot?ot:new GeneralTask(_type,_targetId,o.toString(),_selfId))
+						.toArray(GeneralTask[]::new);
+			}else {
+				return new GeneralTask[] { new GeneralTask(_type, _targetId, result.toString(), _selfId)};
+			}
+			
 		}else {
 			return null;
 		}
