@@ -7,12 +7,15 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 
 import org.accen.dmzj.core.annotation.AutowiredParam;
 import org.accen.dmzj.core.annotation.GeneralMessage;
+import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
+import org.accen.dmzj.core.autoconfigure.EventPostProcessor;
 import org.accen.dmzj.core.exception.AutowiredParamIndexException;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
 import org.accen.dmzj.core.meta.PostType;
@@ -31,17 +34,23 @@ import org.springframework.stereotype.Component;
 @Component("accenbotContext")
 public class AccenbotContext implements BeanPostProcessor{
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	/*private AccenbotMessageContext messageContext;
-	private AccenbotMetaContext metaContext;
-	private AccenbotRequestContext requestContext;
-	private AccenbotNoticeContext noticeContext;*/
 	private Map<PostType,AccenbotContext> contexts;
+	/**
+	 * 接受event时执行处理器
+	 */
+	protected Set<EventPostProcessor> eventPostProcessors;
+	/**
+	 * cmd接受event前后执行处理器
+	 */
+	protected Set<EventCmdPostProcessor> eventCmdPostProcessors;
 	
 	protected void registerContext(PostType postType,AccenbotContext context) {
 		contexts.put(postType, context);
 	}
 	public AccenbotContext() {
 		contexts = new HashMap<>(4);
+		eventPostProcessors = new HashSet<>(4);
+		eventCmdPostProcessors = new HashSet<>(4);
 	}
 	/**
 	 * context需实现此方法来处理自己范围内的Event
@@ -115,22 +124,31 @@ public class AccenbotContext implements BeanPostProcessor{
 		return parameters;
 	}
 	public final void accept(Map<String, Object> event) {
+		//TODO 生成Index和使用的工作后续将在EventPostProcessor和EventCmdPostProcessor
 		AutowiredParamHelper.generateIndex(event);
+		//执行EventPostProcessor的beforeEventPost，可以通过实现这个方法对event进行预处理
+		eventPostProcessors.parallelStream().forEach(p->p.beforeEventPost(event));
+		
 		String postType = (String) event.get("post_type");
 		try {
 			PostType.valueOf(postType.toUpperCase());
 		}catch(Exception e) {
 			logger.error("PostType定义错误：{}",postType.toUpperCase());
 			AutowiredParamHelper.removeIndex(event);
+			//执行EventPostProcessor的afterEventPostFaild，可以通过实现此方法实现预处理的回滚
+			eventPostProcessors.parallelStream().forEach(p->p.afterEventPostFaild(event));
 			return;
 		}
 		if(contexts.containsKey(PostType.valueOf(postType.toUpperCase()))) {
 			contexts.get(PostType.valueOf(postType.toUpperCase())).acceptEvent(event);
 			AutowiredParamHelper.removeIndex(event);
+			//执行EventPostProcessor的afterEventPostSuccess，可以通过实现此方法对event进行后处理
+			eventPostProcessors.parallelStream().forEach(p->p.afterEventPostSuccess(event, contexts.get(PostType.valueOf(postType.toUpperCase()))));
 		}else {
 			logger.warn("未定义PostType：{}对应的Context，将由AccenbotContext处理此event！");
 			this.acceptEvent(event);
 			AutowiredParamHelper.removeIndex(event);
+			eventPostProcessors.parallelStream().forEach(p->p.afterEventPostFaild(event));
 			return;
 		}
 	}
@@ -187,7 +205,10 @@ public class AccenbotContext implements BeanPostProcessor{
 		return clazz.getName()+"#"+method.getName();
 	}
 
-	public void register(Object cmd,Method cmdMethod) {
-		
+	public void registerEventPostProcessor(EventPostProcessor eventPostProcessor) {
+		eventPostProcessors.add(eventPostProcessor);
+	}
+	public void registerEventCmdPostProcessor(EventCmdPostProcessor eventCmdPostProcessor) {
+		eventCmdPostProcessors.add(eventCmdPostProcessor);
 	}
 }

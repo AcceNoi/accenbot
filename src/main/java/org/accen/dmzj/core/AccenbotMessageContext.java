@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.accen.dmzj.core.annotation.CmdMessage;
+import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
 import org.accen.dmzj.core.exception.CmdRegisterException;
 import org.accen.dmzj.core.meta.MessageSubType;
@@ -33,7 +34,10 @@ public class AccenbotMessageContext extends AccenbotContext {
 	List<AccenbotCmdProxy> messageCmdProxy = new LinkedList<>();
 	Map<String,AccenbotCmdProxy> messageCmdProxyIndex = new HashMap<>();
 	
+	private AccenbotContext parentContext;
+	
 	public AccenbotMessageContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext) {
+		this.parentContext = parentContext;
 		parentContext.registerContext(PostType.MESSAGE, this);
 	}
 	
@@ -49,8 +53,18 @@ public class AccenbotMessageContext extends AccenbotContext {
 						.anyMatch(avaliableSubType -> (avaliableSubType == MessageSubType._ALL||avaliableSubType == subType))
 			) {
 				
+				//cmd执行前的预处理，可以控制是否执行
+				if(!parentContext.eventCmdPostProcessors.parallelStream().allMatch(p->p.beforeEventCmdPost(proxy, event))) {
+					return;
+				}
+				
 				try {
 					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));
+					//cmd执行后的后处理，可以对cmd结果进行格式化，但是此方法比较危险，EventCmdPostProcessor互相可以影响
+					for(EventCmdPostProcessor p:parentContext.eventCmdPostProcessors) {
+						rs = p.afterEventCmdPost(proxy, event, rs);
+					}
+					
 					GeneralTask[] tasks = super.generalMessage(rs, proxy.cmdMethod()
 							, (String)event.get("message_type")
 							, "group".equals(event.get("message_type"))?""+event.get("group_id"):""+event.get("user_id")

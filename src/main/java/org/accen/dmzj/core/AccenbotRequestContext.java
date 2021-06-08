@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.accen.dmzj.core.annotation.CmdRequest;
+import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
 import org.accen.dmzj.core.exception.CmdRegisterException;
 import org.accen.dmzj.core.meta.PostType;
@@ -32,7 +33,9 @@ public class AccenbotRequestContext extends AccenbotContext {
 	private TaskManager taskManager;
 	List<AccenbotCmdProxy> requestCmdProxy = new LinkedList<>();
 	Map<String,AccenbotCmdProxy> requestCmdProxyIndex = new HashMap<>();
+	private AccenbotContext parentContext;
 	public AccenbotRequestContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext) {
+		this.parentContext = parentContext;
 		parentContext.registerContext(PostType.REQUEST, this);
 	}
 	
@@ -47,9 +50,16 @@ public class AccenbotRequestContext extends AccenbotContext {
 				Arrays.stream(((CmdRequest)proxy.anno()).subType())
 						.anyMatch(avaliableSubType -> avaliableSubType == RequestSubType._ALL || avaliableSubType == subType)
 			) {
-				
+				//cmd执行前的预处理，可以控制是否执行
+				if(!parentContext.eventCmdPostProcessors.parallelStream().allMatch(p->p.beforeEventCmdPost(proxy, event))) {
+					return;
+				}
 				try {
 					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));
+					//cmd执行后的后处理，可以对cmd结果进行格式化，但是此方法比较危险，EventCmdPostProcessor互相可以影响
+					for(EventCmdPostProcessor p:parentContext.eventCmdPostProcessors) {
+						rs = p.afterEventCmdPost(proxy, event, rs);
+					}
 					boolean isGroup = Set.of("group").contains(event.get("request_type"));
 					GeneralTask[] tasks = super.generalMessage(rs, proxy.cmdMethod()
 							, isGroup?"group":"private"
