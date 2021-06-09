@@ -6,7 +6,7 @@
 **基于[Onebot](https://github.com/howmanybots/onebot)和[onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)实现的QQ聊天机器人极简框架。**
 ---
 
-[![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)[![OneBot v11](https://img.shields.io/badge/OneBot-v11-black)](https://github.com/howmanybots/onebot/blob/master/v11/specs/README.md)
+[![License](https://img.shields.io/github/license/AcceNoi/dmzjbot)](https://img.shields.io/github/license/AcceNoi/dmzjbot) [![Size](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot)](https://img.shields.io/github/repo-size/AcceNoi/dmzjbot) [![OneBot v11](https://img.shields.io/badge/OneBot-v11-black)](https://github.com/howmanybots/onebot/blob/master/v11/specs/README.md)
 
 | Author | Accen/クロノス    |
 | ------ | ----------------- |
@@ -31,7 +31,7 @@
 
 ## [Quick Start](https://github.com/AcceNoi/accenbot/blob/master/README-QUICKSTART.md)
 
-## 模块介绍
+## 特性介绍
 
 ### 1. 菜单生成器
 
@@ -140,6 +140,56 @@ public @interface CmdMessage {
 ```
 
 除了上面四种，@CmdRegular（也就是第2点描述的）也是相同的原理，只是因为常用（现在实现的80%功能都是属于这种类型）所以单列出来了。
+
+## 4.Event和EventCmd前后置处理器
+AccenbotContext管理着所有的事件上报处理，提供了两个接入点以供扩展。
+### 4.1 EventPostProcessor
+
+```java
+/**
+ * AccenbotContex的事件处理器前后预置，{@link AccenbotContext#accept(Map)}
+ * @author <a href="1339liu@gmail.com">Accen</a>
+ * @since 2.2
+ */
+public interface EventPostProcessor {
+	default public void beforeEventPost(Map<String, Object> event) {};
+	default public void afterEventPostSuccess(Map<String, Object> event,AccenbotContext context) {};
+	default public void afterEventPostFaild(Map<String,Object> event) {};
+}
+```
+
+实现此接口，并注册到@Qualifier("accenbotContext")AccenbotContext中。
+
+beforeEventPost将在AccenbotContext在接受到事件上报时执行，你可以对event进行预处理。
+
+afterEventPostSuccess将在AccenbotContext寻找到特定的Context处理事件后执行，你可以对event进行后处理。
+
+afterEventPostFaild将在AccenbotContext未能寻找到Context时执行，你可以对预处理进行回滚等操作。
+
+### 4.2 EventCmdPostProcessor
+
+```java
+/**
+ * cmd执行器前后预置，{@link AccenbotContext#acceptEvent}
+ * @author <a href="1339liu@gmail.com">Accen</a>
+ * @since 2.2
+ */
+public interface EventCmdPostProcessor {
+	default public boolean beforeEventCmdPost(AccenbotCmdProxy proxy,Map<String, Object> event) {return true;}
+	default public Object afterEventCmdPost(AccenbotCmdProxy proxy,Map<String, Object> event,Object invokeResult) {return invokeResult;}
+}
+```
+
+实现此接口，并注册到@Qualifier("accenbotContext")AccenbotContext中。
+
+beforeEventCmdPost将在特定的CmdProxy（功能）处理前执行，需要返回一个boolean确定是否继续执行。
+
+afterEventCmdPost将在特定的CmdProxy（功能）处理后执行，可以接受CmdProxy处理的返回值，或者对预处理进行回滚操作。
+
+> 现已通过接入前后置处理器实现的功能有：依赖与排斥。后续还将重构其他功能。
+
+
+
 
 ## [已实现的功能](https://github.com/AcceNoi/accenbot/blob/master/README-FUNCTION.md)
 
