@@ -12,6 +12,8 @@ import org.accen.dmzj.core.annotation.Rejection;
 import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.autoconfigure.EventPostProcessor;
 import org.accen.dmzj.core.exception.DependencyRejectionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,6 +23,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CmdDependencyRejectionPostProcessor implements EventPostProcessor,EventCmdPostProcessor{
+	public CmdDependencyRejectionPostProcessor(@Autowired @Qualifier("accenbotContext")AccenbotContext accenbotContext) {
+		accenbotContext.registerEventPostProcessor(this);
+		accenbotContext.registerEventCmdPostProcessor(this);
+	}
 	private static final String CMD_RECORD_KEY = "_CMD_RECORD";
 	@Override
 	public void beforeEventPost(Map<String, Object> event) {
