@@ -12,15 +12,14 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import javax.imageio.ImageIO;
 
 import org.accen.dmzj.web.vo.SysGroupMember;
 import org.springframework.util.StringUtils;
+
+import render.RenderImage;
 
 public class CheckinRender implements Render,Backgroudable{
 	private RenderImage backgroundImg;
@@ -82,7 +81,7 @@ public class CheckinRender implements Render,Backgroudable{
 //		int radius = 80;
 		Ellipse2D.Double shape = new Ellipse2D.Double(100*3-faceRadius, 100*3-faceRadius+30*3, faceRadius*2-border, faceRadius*2-border);
 		wrapperG.clip(shape);
-		wrapperG.drawImage(profileImg.getBuffer(), new AffineTransformOp(AffineTransform.getScaleInstance((float)faceRadius/320, (float)faceRadius/320), null), 100*3-faceRadius, 100*3-faceRadius+30*3);
+		wrapperG.drawImage(profileImg.getBufferedImage(), new AffineTransformOp(AffineTransform.getScaleInstance((float)faceRadius/320, (float)faceRadius/320), null), 100*3-faceRadius, 100*3-faceRadius+30*3);
 
 		try {
 			wrapperG.dispose();
@@ -96,7 +95,7 @@ public class CheckinRender implements Render,Backgroudable{
 	@Override
 	public void setBackgroud(Graphics2D graph) {
 		AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance((float)WIDTH/backgroundImg.getWidth(), (float)WIDTH/backgroundImg.getWidth()), null);//等比例缩放
-		graph.drawImage(backgroundImg.getBuffer(), ato, 0, 0);
+		graph.drawImage(backgroundImg.getBufferedImage(), ato, 0, 0);
 		
 	}
 	@Deprecated
@@ -107,7 +106,7 @@ public class CheckinRender implements Render,Backgroudable{
 		int radius = 80;
 		Ellipse2D.Double shape = new Ellipse2D.Double(100-radius, 100-radius, radius*2-border, radius*2-border);
 		wrapperG.clip(shape);
-		wrapperG.drawImage(profileImg.getBuffer(), null, 100-radius, 100-radius);
+		wrapperG.drawImage(profileImg.getBufferedImage(), null, 100-radius, 100-radius);
 	}
 	protected void renderHeader(Graphics2D wrapperG) {
 		int headerSize = 25*3;
@@ -125,7 +124,7 @@ public class CheckinRender implements Render,Backgroudable{
 		renderTextOutline(wrapperG, x, y, ft16, nameText);
 	}
 	protected void renderTextOutline(Graphics2D wrapperG,float x,float y,Font font,String text) {
-		PixivUrlRenderImage.renderTextAndOutline(1f,text,font,wrapperG,x,y,Color.WHITE, Color.BLACK);
+		TextRenderUtil.renderTextAndOutline(1f,text,font,wrapperG,x,y,Color.WHITE, Color.BLACK);
 	}
 	protected void renderMem(Graphics2D wrapperG,float x,float y) {
 		Font ft18 = new Font("微软雅黑", Font.BOLD, 18*3);

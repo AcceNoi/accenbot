@@ -8,16 +8,17 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.accen.dmzj.core.exception.DataNeverInitedException;
 import org.accen.dmzj.core.handler.callbacker.AsyncCallback;
 import org.accen.dmzj.core.api.pixivc.PixivicApiClient;
 import org.accen.dmzj.util.render.PixivUrlRenderImage;
-import org.accen.dmzj.util.render.SimpleImageRender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import render.DivideGroupsImageRender;
+import render.algorithm.AverageBacktraceDivide;
+import render.algorithm.SequenceDivide;
 
 @Component
 public class Prank {
@@ -61,7 +62,7 @@ public class Prank {
 				}else {
 					//初始化renderImages
 					final boolean[] initSuccess = new boolean[] {true};
-					List<PixivUrlRenderImage> waitingRenderImages = dataList.stream()
+					PixivUrlRenderImage[] waitingRenderImages = dataList.stream()
 							 .skip(page/3*9)
 							 .limit(9)
 							 .parallel()
@@ -86,23 +87,17 @@ public class Prank {
 								}
 								return null ;
 							 })
-							 .collect(Collectors.toList());
+							 .filter(i->i!=null)
+							 .toArray(PixivUrlRenderImage[]::new);
 					if(callback!=null&&initSuccess[0]==false) {
 						callback.callback("failed",null,callbackParams);
 					}
 					//使用render去绘制
-					SimpleImageRender rankRender = new SimpleImageRender();
-					rankRender.setImgs(waitingRenderImages);
-					try {
-						rankRender.render(rankFile);
-						if(callback!=null) {
-							callback.callback("success","file:///"+rankImageTempHome+reltivePath,callbackParams);
-						}
-					} catch (DataNeverInitedException e) {
-						if(callback!=null) {
-							callback.callback("failed",null,callbackParams);
-						}
-						e.printStackTrace();
+					DivideGroupsImageRender rankRender = new DivideGroupsImageRender(3, 5,new AverageBacktraceDivide(3));
+					rankRender.acceptImages(waitingRenderImages);
+					rankRender.render(rankFile);
+					if(callback!=null) {
+						callback.callback("success","file:///"+rankImageTempHome+reltivePath,callbackParams);
 					}
 				}
 			}).start();

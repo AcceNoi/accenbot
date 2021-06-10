@@ -25,7 +25,6 @@ import org.accen.dmzj.util.FilePersistentUtil;
 import org.accen.dmzj.util.RandomUtil;
 import org.accen.dmzj.util.render.CheckinRender;
 import org.accen.dmzj.util.render.LocalFileRenderImage;
-import org.accen.dmzj.util.render.UrlRenderImage;
 import org.accen.dmzj.web.dao.CfgConfigValueMapper;
 import org.accen.dmzj.web.dao.CfgResourceMapper;
 import org.accen.dmzj.web.dao.SysGroupMemberMapper;
@@ -38,6 +37,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import render.UrlRenderImage;
 
 @FuncSwitch(groupClass = Default.class, title = "签到")
 @Component
