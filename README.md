@@ -141,7 +141,7 @@ public @interface CmdMessage {
 
 除了上面四种，@CmdRegular（也就是第2点描述的）也是相同的原理，只是因为常用（现在实现的80%功能都是属于这种类型）所以单列出来了。
 
-## 4.Event和EventCmd前后置处理器
+## 4.Context、Event和EventCmd前后置处理器
 AccenbotContext管理着所有的事件上报处理，提供了两个接入点以供扩展。
 ### 4.1 EventPostProcessor
 
@@ -158,7 +158,7 @@ public interface EventPostProcessor {
 }
 ```
 
-实现此接口，并注册到@Qualifier("accenbotContext")AccenbotContext中。
+实现此接口，并注册到SpringIoc中。
 
 beforeEventPost将在AccenbotContext在接受到事件上报时执行，你可以对event进行预处理。
 
@@ -180,7 +180,7 @@ public interface EventCmdPostProcessor {
 }
 ```
 
-实现此接口，并注册到@Qualifier("accenbotContext")AccenbotContext中。
+实现此接口，并注册到SpringIoc中。
 
 beforeEventCmdPost将在特定的CmdProxy（功能）处理前执行，需要返回一个boolean确定是否继续执行。
 
@@ -188,8 +188,32 @@ afterEventCmdPost将在特定的CmdProxy（功能）处理后执行，可以接�
 
 > 现已通过接入前后置处理器实现的功能有：依赖与排斥。后续还将重构其他功能。
 
+### 4.3 ContextPostProcessor
 
+```java
+/**
+ * 监听accenbotcontext的注册和注销
+ * @author <a href="1339liu@gmail.com">Accen</a>
+ * since 2.2
+ */
+public interface ContextPostProcessor {
+	/**
+	 * 注册完一个context后收到此通知
+	 * @param postType
+	 * @param context
+	 */
+	default public void afterRegisterContext(PostType postType,AccenbotContext context) {}
+	//TODO 注销
+}
+```
 
+与上类似
+
+## 5.监控
+
+```GET /cmd/list```
+
+可以查看所有框架内处理的功能点
 
 ## [已实现的功能](https://github.com/AcceNoi/accenbot/blob/master/README-FUNCTION.md)
 
