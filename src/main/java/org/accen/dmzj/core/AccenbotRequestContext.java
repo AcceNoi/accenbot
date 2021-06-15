@@ -4,14 +4,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.accen.dmzj.core.AccenbotContext.AccenbotCmdProxy;
 import org.accen.dmzj.core.annotation.CmdRequest;
 import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
@@ -30,17 +28,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccenbotRequestContext extends AccenbotContext {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	@Autowired
 	private TaskManager taskManager;
-	List<AccenbotCmdProxy> requestCmdProxy = new LinkedList<>();
-	@Override
-	public List<AccenbotCmdProxy> myProxies(){
-		return requestCmdProxy;
-	}
 	Map<String,AccenbotCmdProxy> requestCmdProxyIndex = new HashMap<>();
 	private AccenbotContext parentContext;
-	public AccenbotRequestContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext) {
+	public AccenbotRequestContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext,@Autowired TaskManager taskManager) {
 		this.parentContext = parentContext;
+		this.taskManager = taskManager;
 		parentContext.registerContext(PostType.REQUEST, this);
 	}
 	
@@ -48,7 +41,7 @@ public class AccenbotRequestContext extends AccenbotContext {
 	public void acceptEvent(Map<String, Object> event) {
 		RequestType requestType = RequestType.valueOf(((String)event.get("request_type")).toUpperCase());
 		RequestSubType subType = event.containsKey("sub_type")?RequestSubType.valueOf(((String)event.get("sub_type")).toUpperCase()):RequestSubType._ALL;
-		requestCmdProxy.stream().forEach(proxy->{
+		super.myProxies().stream().forEach(proxy->{
 			if(Arrays.stream(((CmdRequest)proxy.anno()).requestType())
 						.anyMatch(avaliableRequestType -> avaliableRequestType == RequestType._ALL || avaliableRequestType == requestType)
 				&&
@@ -160,7 +153,7 @@ public class AccenbotRequestContext extends AccenbotContext {
 		if(requestCmdProxyIndex.containsKey(name)) {
 			throw new CmdRegisterDuplicateException(name, bean.getClass(), method);
 		}else {
-			requestCmdProxy.add(new AccenbotCmdProxy(name,bean, method, anno,CmdRequest.class));
+			registerMyCmdProxy(new AccenbotCmdProxy(name,bean, method, anno,CmdRequest.class));
 			return name;
 		}
 	}

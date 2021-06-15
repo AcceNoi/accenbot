@@ -3,12 +3,14 @@ package org.accen.dmzj.core;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import org.accen.dmzj.core.autoconfigure.EventPostProcessor;
 /**
  * 提供对AutowiredParam的支持
  * @author <a href="1339liu@gmail.com">Accen</a>
  *
  */
-public class AutowiredParamHelper {
+public class AutowiredParamHelper implements EventPostProcessor{
 	public final static String quickIndexSign = "_INDEX";
 	private static Map<String, Map<String,Object>> quickIndex = new HashMap<String, Map<String,Object>>();
 	/**
@@ -49,4 +51,25 @@ public class AutowiredParamHelper {
 	public static boolean hasEventIndex(String eventUuid) {
 		return quickIndex.containsKey(eventUuid);
 	}
+	
+	/**
+	 * 为event建立索引
+	 */
+	public void beforeEventPost(Map<String, Object> event) {
+		generateIndex(event);
+	}
+	/**
+	 * 结束后删除索引
+	 */
+	public void afterEventPostSuccess(Map<String, Object> event,AccenbotContext context) {
+		removeIndex(event);
+	}
+	/**
+	 * 失败回滚删除索引
+	 */
+	public void afterEventPostFaild(Map<String,Object> event) {
+		removeIndex(event);
+	}
+	
+	
 }

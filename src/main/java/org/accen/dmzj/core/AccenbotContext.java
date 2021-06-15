@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +19,7 @@ import org.accen.dmzj.core.annotation.GeneralMessage;
 import org.accen.dmzj.core.autoconfigure.ContextPostProcessor;
 import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.autoconfigure.EventPostProcessor;
+import org.accen.dmzj.core.autoconfigure.ProxyPostProcessor;
 import org.accen.dmzj.core.exception.AutowiredParamIndexException;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
 import org.accen.dmzj.core.meta.PostType;
@@ -38,8 +40,20 @@ import org.springframework.stereotype.Component;
 public class AccenbotContext implements BeanPostProcessor{
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private Map<PostType,AccenbotContext> contexts;
-	public List<AccenbotCmdProxy> myProxies(){
-		return null;
+	/**
+	 * accenbot所管辖的proxy
+	 */
+	private List<AccenbotCmdProxy> myCmdProxy = new LinkedList<>();
+	protected void registerMyCmdProxy(AccenbotCmdProxy proxy) {
+		for(ProxyPostProcessor ppp:proxyPostProcessors) {
+			proxy = ppp.beforeRegisterProxy(this, proxy);
+		}
+		myCmdProxy.add(proxy);
+		final AccenbotCmdProxy acp = proxy;
+		proxyPostProcessors.stream().forEach(ppp->ppp.afterRegisterProxy(this, acp));
+	}
+	protected List<AccenbotCmdProxy> myProxies(){
+		return myCmdProxy;
 	}
 	/**
 	 * 接受event时执行处理器
@@ -56,6 +70,11 @@ public class AccenbotContext implements BeanPostProcessor{
 	 */
 	@Autowired
 	protected Set<ContextPostProcessor> contextPostProcessors;
+	/**
+	 * 接受proxy前后置处理器
+	 */
+	@Autowired
+	protected Set<ProxyPostProcessor> proxyPostProcessors;
 	
 	protected void registerContext(PostType postType,AccenbotContext context) {
 		contexts.put(postType, context);
@@ -138,8 +157,6 @@ public class AccenbotContext implements BeanPostProcessor{
 		return parameters;
 	}
 	public final void accept(Map<String, Object> event) {
-		//TODO 生成Index和使用的工作后续将在EventPostProcessor和EventCmdPostProcessor
-		AutowiredParamHelper.generateIndex(event);
 		//执行EventPostProcessor的beforeEventPost，可以通过实现这个方法对event进行预处理
 		eventPostProcessors.parallelStream().forEach(p->p.beforeEventPost(event));
 		
@@ -148,20 +165,17 @@ public class AccenbotContext implements BeanPostProcessor{
 			PostType.valueOf(postType.toUpperCase());
 		}catch(Exception e) {
 			logger.error("PostType定义错误：{}",postType.toUpperCase());
-			AutowiredParamHelper.removeIndex(event);
 			//执行EventPostProcessor的afterEventPostFaild，可以通过实现此方法实现预处理的回滚
 			eventPostProcessors.parallelStream().forEach(p->p.afterEventPostFaild(event));
 			return;
 		}
 		if(contexts.containsKey(PostType.valueOf(postType.toUpperCase()))) {
 			contexts.get(PostType.valueOf(postType.toUpperCase())).acceptEvent(event);
-			AutowiredParamHelper.removeIndex(event);
 			//执行EventPostProcessor的afterEventPostSuccess，可以通过实现此方法对event进行后处理
 			eventPostProcessors.parallelStream().forEach(p->p.afterEventPostSuccess(event, contexts.get(PostType.valueOf(postType.toUpperCase()))));
 		}else {
 			logger.warn("未定义PostType：{}对应的Context，将由AccenbotContext处理此event！");
 			this.acceptEvent(event);
-			AutowiredParamHelper.removeIndex(event);
 			eventPostProcessors.parallelStream().forEach(p->p.afterEventPostFaild(event));
 			return;
 		}

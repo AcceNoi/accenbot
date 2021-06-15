@@ -4,13 +4,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.accen.dmzj.core.AccenbotContext.AccenbotCmdProxy;
 import org.accen.dmzj.core.annotation.CmdMessage;
 import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
@@ -29,19 +27,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccenbotMessageContext extends AccenbotContext {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	@Autowired
 	private TaskManager taskManager;
 	
-	List<AccenbotCmdProxy> messageCmdProxy = new LinkedList<>();
-	@Override
-	public List<AccenbotCmdProxy> myProxies(){
-		return messageCmdProxy;
-	}
 	Map<String,AccenbotCmdProxy> messageCmdProxyIndex = new HashMap<>();
 	
 	private AccenbotContext parentContext;
 	
-	public AccenbotMessageContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext) {
+	public AccenbotMessageContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext,@Autowired TaskManager taskManager) {
+		this.taskManager = taskManager;
 		this.parentContext = parentContext;
 		parentContext.registerContext(PostType.MESSAGE, this);
 	}
@@ -50,7 +43,7 @@ public class AccenbotMessageContext extends AccenbotContext {
 	public void acceptEvent(Map<String, Object> event) {
 		MessageType messageType = MessageType.valueOf(((String)event.get("message_type")).toUpperCase());
 		MessageSubType subType = event.containsKey("sub_type")?MessageSubType.valueOf(((String)event.get("sub_type")).toUpperCase()):MessageSubType._ALL;
-		messageCmdProxy.stream().forEach(proxy->{
+		super.myProxies().stream().forEach(proxy->{
 			if(Arrays.stream(((CmdMessage)proxy.anno()).messageType())
 						.anyMatch(avaliableMessageType -> (avaliableMessageType == MessageType._ALL||avaliableMessageType == messageType))
 				&&
@@ -175,7 +168,7 @@ public class AccenbotMessageContext extends AccenbotContext {
 		if(messageCmdProxyIndex.containsKey(name)) {
 			throw new CmdRegisterDuplicateException(name, bean.getClass(), method);
 		}else {
-			messageCmdProxy.add(new AccenbotCmdProxy(name,bean, method,anno,CmdMessage.class));
+			registerMyCmdProxy(new AccenbotCmdProxy(name,bean, method,anno,CmdMessage.class));
 			return name;
 		}
 		

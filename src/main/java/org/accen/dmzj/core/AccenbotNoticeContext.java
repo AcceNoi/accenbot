@@ -30,16 +30,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccenbotNoticeContext extends AccenbotContext {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	@Autowired
 	private TaskManager taskManager;
-	List<AccenbotCmdProxy> noticeCmdProxy = new LinkedList<>();
-	@Override
-	public List<AccenbotCmdProxy> myProxies(){
-		return noticeCmdProxy;
-	}
 	Map<String,AccenbotCmdProxy> noticeCmdProxyIndex = new HashMap<>();
 	private AccenbotContext parentContext;
-	public AccenbotNoticeContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext) {
+	public AccenbotNoticeContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext,@Autowired TaskManager taskManager) {
+		this.taskManager = taskManager;
 		this.parentContext = parentContext;
 		parentContext.registerContext(PostType.NOTICE, this);
 	}
@@ -48,7 +43,7 @@ public class AccenbotNoticeContext extends AccenbotContext {
 	public void acceptEvent(Map<String, Object> event) {
 		NoticeType noticeType = NoticeType.valueOf(((String)event.get("notice_type")).toUpperCase());
 		NoticeSubType subType = event.containsKey("sub_type")?NoticeSubType.valueOf(((String)event.get("sub_type")).toUpperCase()):NoticeSubType._ALL;
-		noticeCmdProxy.stream().forEach(proxy->{
+		super.myProxies().stream().forEach(proxy->{
 			if(Arrays.stream(((CmdNotice)proxy.anno()).noticeType())
 						.anyMatch(avaliableNoticeType -> avaliableNoticeType == NoticeType._ALL || avaliableNoticeType == noticeType)
 				&&
@@ -162,7 +157,7 @@ public class AccenbotNoticeContext extends AccenbotContext {
 		if(noticeCmdProxyIndex.containsKey(name)) {
 			throw new CmdRegisterDuplicateException(name, bean.getClass(), method);
 		}else {
-			noticeCmdProxy.add(new AccenbotCmdProxy(name,bean, method,anno,CmdNotice.class));
+			registerMyCmdProxy(new AccenbotCmdProxy(name,bean, method,anno,CmdNotice.class));
 			return name;
 		}
 		

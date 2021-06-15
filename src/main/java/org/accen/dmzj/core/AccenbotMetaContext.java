@@ -4,13 +4,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.accen.dmzj.core.AccenbotContext.AccenbotCmdProxy;
 import org.accen.dmzj.core.annotation.CmdMeta;
 import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
@@ -29,17 +27,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccenbotMetaContext extends AccenbotContext {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	@Autowired
 	private TaskManager taskManager;
-	List<AccenbotCmdProxy> metaCmdProxy = new LinkedList<>();
-	@Override
-	public List<AccenbotCmdProxy> myProxies(){
-		return metaCmdProxy;
-	}
+
 	Map<String,AccenbotCmdProxy> metaCmdProxyIndex = new HashMap<>();
 	
 	private AccenbotContext parentContext;
-	public AccenbotMetaContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext) {
+	public AccenbotMetaContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext,@Autowired TaskManager taskManager) {
+		this.taskManager = taskManager;
 		this.parentContext = parentContext;
 		parentContext.registerContext(PostType.META_EVENT, this);
 	}
@@ -48,7 +42,7 @@ public class AccenbotMetaContext extends AccenbotContext {
 	public void acceptEvent(Map<String, Object> event) {
 		MetaEventType metaType = MetaEventType.valueOf(((String)event.get("meta_event_type")).toUpperCase());
 		MetaSubType subType = event.containsKey("sub_type")?MetaSubType.valueOf(((String)event.get("sub_type")).toUpperCase()):MetaSubType._ALL;
-		metaCmdProxy.stream().forEach(proxy->{
+		super.myProxies().stream().forEach(proxy->{
 			if(Arrays.stream(((CmdMeta)proxy.anno()).metaEventType())
 						.anyMatch(avaliableMetaType -> avaliableMetaType == MetaEventType._ALL || avaliableMetaType == metaType)
 				&&
@@ -160,7 +154,7 @@ public class AccenbotMetaContext extends AccenbotContext {
 		if(metaCmdProxyIndex.containsKey(name)) {
 			throw new CmdRegisterDuplicateException(name, bean.getClass(), method);
 		}else {
-			metaCmdProxy.add(new AccenbotCmdProxy(name,bean, method,anno,CmdMeta.class));
+			registerMyCmdProxy(new AccenbotCmdProxy(name,bean, method,anno,CmdMeta.class));
 			return name;
 		}
 	}
