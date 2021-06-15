@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.LastModified;
 
 @Component
 public class AccenbotMessageContext extends AccenbotContext {
@@ -57,7 +58,17 @@ public class AccenbotMessageContext extends AccenbotContext {
 				}
 				
 				try {
-					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));
+					Object[] params = Arrays.stream(proxy.cmdMethod().getParameters())
+											.map(p->{
+												Object lastParameterValue = null;
+												for(EventCmdPostProcessor processor:parentContext.eventCmdPostProcessors) {
+													processor.eventCmdParamPost(proxy, event, p, lastParameterValue);
+												}
+												return lastParameterValue;
+											})
+											.toArray(Object[]::new);
+					Object rs = proxy.cmdMethod().invoke(proxy.cmd(),params);
+//					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));
 					//cmd执行后的后处理，可以对cmd结果进行格式化，但是此方法比较危险，EventCmdPostProcessor互相可以影响
 					for(EventCmdPostProcessor p:parentContext.eventCmdPostProcessors) {
 						rs = p.afterEventCmdPost(proxy, event, rs);

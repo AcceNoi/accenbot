@@ -76,14 +76,13 @@ public class AccenbotContext implements BeanPostProcessor{
 	@Autowired
 	protected Set<ProxyPostProcessor> proxyPostProcessors;
 	
+	
 	protected void registerContext(PostType postType,AccenbotContext context) {
 		contexts.put(postType, context);
 		contextPostProcessors.parallelStream().forEach(cp->cp.afterRegisterContext(postType, context));
 	}
 	public AccenbotContext() {
 		contexts = new HashMap<>(4);
-		eventPostProcessors = new HashSet<>(4);
-		eventCmdPostProcessors = new HashSet<>(4);
 	}
 	/**
 	 * context需实现此方法来处理自己范围内的Event
@@ -123,7 +122,9 @@ public class AccenbotContext implements BeanPostProcessor{
 	 * @param params
 	 * @param event
 	 * @return
+	 * @since 2.2 deprecated
 	 */
+	@Deprecated
 	protected Object[] autowiredParams(Parameter[] params,Map<String,Object> event) {
 		if(!event.containsKey(AutowiredParamHelper.quickIndexSign)) {
 			throw new AutowiredParamIndexException("当前event未初始化Index：%s".formatted(event.toString()));
