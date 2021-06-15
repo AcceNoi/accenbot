@@ -33,6 +33,7 @@ import org.springframework.util.StringUtils;
  * @author <a href="1339liu@gmail.com">Accen</a>
  *
  */
+@Deprecated
 @Component
 public class CmdRegularManager implements BeanPostProcessor{
 	private final Logger logger = LoggerFactory.getLogger(CmdRegularManager.class);;

@@ -15,10 +15,12 @@ import org.accen.dmzj.web.vo.Qmessage;
  * @see CmdManager.CmdRegularManager
  * @author <a href="1339liu@gmail.com">Accen</a>
  * @since 2.1
+ * @since 2.2 deprecated
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Deprecated
 public @interface CmdRegular {
 	String name() default "";
 	/**

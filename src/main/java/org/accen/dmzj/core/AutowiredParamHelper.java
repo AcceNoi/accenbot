@@ -1,16 +1,23 @@
 package org.accen.dmzj.core;
 
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.accen.dmzj.core.AccenbotContext.AccenbotCmdProxy;
+import org.accen.dmzj.core.annotation.AutowiredParam;
+import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.autoconfigure.EventPostProcessor;
+import org.accen.dmzj.core.exception.AutowiredParamIndexException;
+import org.springframework.stereotype.Component;
 /**
  * 提供对AutowiredParam的支持
  * @author <a href="1339liu@gmail.com">Accen</a>
  *
  */
-public class AutowiredParamHelper implements EventPostProcessor{
+@Component
+public class AutowiredParamHelper implements EventPostProcessor,EventCmdPostProcessor{
 	public final static String quickIndexSign = "_INDEX";
 	private static Map<String, Map<String,Object>> quickIndex = new HashMap<String, Map<String,Object>>();
 	/**
@@ -70,6 +77,33 @@ public class AutowiredParamHelper implements EventPostProcessor{
 	public void afterEventPostFaild(Map<String,Object> event) {
 		removeIndex(event);
 	}
-	
+	/**
+	 * 处理AutowireParam
+	 */
+	public Object eventCmdParamPost(AccenbotCmdProxy proxy,Map<String, Object> event,Parameter p,Object lastParameterValue) {
+		if(!event.containsKey(AutowiredParamHelper.quickIndexSign)) {
+			throw new AutowiredParamIndexException("当前event未初始化Index：%s".formatted(event.toString()));
+		}
+		String eventKey = (String) event.get(AutowiredParamHelper.quickIndexSign);
+		if(!AutowiredParamHelper.hasEventIndex(eventKey)) {
+			throw new AutowiredParamIndexException("当前event的Index不存在或已被删除：%s".formatted(eventKey));
+		}
+		if(p.isAnnotationPresent(AutowiredParam.class)) {
+			AutowiredParam autoParam = p.getDeclaredAnnotation(AutowiredParam.class);
+			String sign = null;
+			if("".equals(autoParam.value())) {
+				if("event".equals(p.getName())){
+					sign = ".";
+				}else {
+					//驼峰转下划线
+					sign = ".".concat(p.getName().replaceAll("[A-Z]", "_$0").toLowerCase());
+				}
+			}else {
+				sign = autoParam.value();
+			}
+			return AutowiredParamHelper.catchIndex(eventKey, sign);
+		}
+		return lastParameterValue;
+	}
 	
 }
