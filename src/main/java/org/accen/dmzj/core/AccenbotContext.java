@@ -8,12 +8,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 
 import org.accen.dmzj.core.annotation.AutowiredParam;
 import org.accen.dmzj.core.annotation.GeneralMessage;
+import org.accen.dmzj.core.autoconfigure.ContextPostProcessor;
 import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.autoconfigure.EventPostProcessor;
 import org.accen.dmzj.core.exception.AutowiredParamIndexException;
@@ -23,6 +25,7 @@ import org.accen.dmzj.core.task.GeneralTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
@@ -35,17 +38,28 @@ import org.springframework.stereotype.Component;
 public class AccenbotContext implements BeanPostProcessor{
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private Map<PostType,AccenbotContext> contexts;
+	public List<AccenbotCmdProxy> myProxies(){
+		return null;
+	}
 	/**
 	 * 接受event时执行处理器
 	 */
+	@Autowired
 	protected Set<EventPostProcessor> eventPostProcessors;
 	/**
 	 * cmd接受event前后执行处理器
 	 */
+	@Autowired
 	protected Set<EventCmdPostProcessor> eventCmdPostProcessors;
+	/**
+	 * 接受context前后置处理器
+	 */
+	@Autowired
+	protected Set<ContextPostProcessor> contextPostProcessors;
 	
 	protected void registerContext(PostType postType,AccenbotContext context) {
 		contexts.put(postType, context);
+		contextPostProcessors.parallelStream().forEach(cp->cp.afterRegisterContext(postType, context));
 	}
 	public AccenbotContext() {
 		contexts = new HashMap<>(4);
@@ -60,7 +74,7 @@ public class AccenbotContext implements BeanPostProcessor{
 		return ;
 	}
 	
-	@SuppressWarnings({ "preview", "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected GeneralTask[] generalMessage(Object result,Method m, String type,String targetId,String selfId) {
 		if(result instanceof GeneralTask task) {
 			return new GeneralTask[] {task};
@@ -193,7 +207,6 @@ public class AccenbotContext implements BeanPostProcessor{
 	}
 	
 	 
-	@SuppressWarnings("preview")
 	public record AccenbotCmdProxy(String name,Object cmd,Method cmdMethod,Object anno,Class<? extends Annotation> annoClass){}
 	
 	/**
@@ -210,5 +223,8 @@ public class AccenbotContext implements BeanPostProcessor{
 	}
 	public void registerEventCmdPostProcessor(EventCmdPostProcessor eventCmdPostProcessor) {
 		eventCmdPostProcessors.add(eventCmdPostProcessor);
+	}
+	public void registerContextPostProcessor(ContextPostProcessor contextPostProcessor) {
+		contextPostProcessors.add(contextPostProcessor);
 	}
 }

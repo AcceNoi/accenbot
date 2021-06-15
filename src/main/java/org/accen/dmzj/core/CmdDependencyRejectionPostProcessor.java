@@ -24,8 +24,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CmdDependencyRejectionPostProcessor implements EventPostProcessor,EventCmdPostProcessor{
 	public CmdDependencyRejectionPostProcessor(@Autowired @Qualifier("accenbotContext")AccenbotContext accenbotContext) {
-		accenbotContext.registerEventPostProcessor(this);
-		accenbotContext.registerEventCmdPostProcessor(this);
 	}
 	private static final String CMD_RECORD_KEY = "_CMD_RECORD";
 	@Override

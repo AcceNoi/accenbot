@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.accen.dmzj.core.AccenbotContext.AccenbotCmdProxy;
 import org.accen.dmzj.core.annotation.CmdMessage;
 import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.exception.CmdRegisterDuplicateException;
@@ -32,6 +33,10 @@ public class AccenbotMessageContext extends AccenbotContext {
 	private TaskManager taskManager;
 	
 	List<AccenbotCmdProxy> messageCmdProxy = new LinkedList<>();
+	@Override
+	public List<AccenbotCmdProxy> myProxies(){
+		return messageCmdProxy;
+	}
 	Map<String,AccenbotCmdProxy> messageCmdProxyIndex = new HashMap<>();
 	
 	private AccenbotContext parentContext;
