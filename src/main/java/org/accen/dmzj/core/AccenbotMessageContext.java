@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.LastModified;
 
 @Component
 public class AccenbotMessageContext extends AccenbotContext {
@@ -62,7 +61,7 @@ public class AccenbotMessageContext extends AccenbotContext {
 											.map(p->{
 												Object lastParameterValue = null;
 												for(EventCmdPostProcessor processor:parentContext.eventCmdPostProcessors) {
-													processor.eventCmdParamPost(proxy, event, p, lastParameterValue);
+													lastParameterValue = processor.eventCmdParamPost(proxy, event, p, lastParameterValue);
 												}
 												return lastParameterValue;
 											})
@@ -149,9 +148,14 @@ public class AccenbotMessageContext extends AccenbotContext {
 	@Override
 	public String parseAndRegisterMethod(Object bean,Method method) throws CmdRegisterDuplicateException{
 		if(method.isAnnotationPresent(CmdMessage.class)) {
+			CmdMessage cm = method.getDeclaredAnnotation(CmdMessage.class);
+			String name = cm.value();
+			if(name==null||name.isBlank()) {
+				name = defineMethodName(method, bean.getClass());
+			}
 			return parseAndRegisterMethod( bean
 					, method
-					,defineMethodName(method, bean.getClass())
+					, name
 					,method.getDeclaredAnnotation(CmdMessage.class)
 					);
 		}else {

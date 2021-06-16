@@ -159,7 +159,7 @@ public class AccenbotContext implements BeanPostProcessor{
 	}
 	public final void accept(Map<String, Object> event) {
 		//执行EventPostProcessor的beforeEventPost，可以通过实现这个方法对event进行预处理
-		eventPostProcessors.parallelStream().forEach(p->p.beforeEventPost(event));
+		eventPostProcessors.stream().forEach(p->p.beforeEventPost(event));
 		
 		String postType = (String) event.get("post_type");
 		try {

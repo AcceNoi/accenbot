@@ -22,5 +22,5 @@ public interface ProxyPostProcessor {
 	 * @param contex
 	 * @param proxy
 	 */
-	default public void afterRegisterProxy(AccenbotContext contex,AccenbotCmdProxy proxy) {}
+	default public void afterRegisterProxy(AccenbotContext context,AccenbotCmdProxy proxy) {}
 }

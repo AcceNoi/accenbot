@@ -54,7 +54,17 @@ public class AccenbotMetaContext extends AccenbotContext {
 					return;
 				}
 				try {
-					Object rs = proxy.cmdMethod().invoke(proxy.cmd(), super.autowiredParams(proxy.cmdMethod().getParameters(), event));
+					
+					Object[] params = Arrays.stream(proxy.cmdMethod().getParameters())
+											.map(p->{
+												Object lastParameterValue = null;
+												for(EventCmdPostProcessor processor:parentContext.eventCmdPostProcessors) {
+													lastParameterValue = processor.eventCmdParamPost(proxy, event, p, lastParameterValue);
+												}
+												return lastParameterValue;
+											})
+											.toArray(Object[]::new);
+					Object rs = proxy.cmdMethod().invoke(proxy.cmd(),params);
 					//cmd执行后的后处理，可以对cmd结果进行格式化，但是此方法比较危险，EventCmdPostProcessor互相可以影响
 					for(EventCmdPostProcessor p:parentContext.eventCmdPostProcessors) {
 						rs = p.afterEventCmdPost(proxy, event, rs);
@@ -126,9 +136,14 @@ public class AccenbotMetaContext extends AccenbotContext {
 	@Override
 	public String parseAndRegisterMethod(Object bean,Method method) throws CmdRegisterDuplicateException{
 		if(method.isAnnotationPresent(CmdMeta.class)) {
+			CmdMeta cm = method.getDeclaredAnnotation(CmdMeta.class);
+			String name = cm.value();
+			if(name==null||name.isBlank()) {
+				name = defineMethodName(method, bean.getClass());
+			}
 			return parseAndRegisterMethod( bean
 					, method
-					,defineMethodName(method, bean.getClass())
+					, name
 					,method.getDeclaredAnnotation(CmdMeta.class));
 		}else {
 			return null;

@@ -33,13 +33,11 @@ public class CmdController implements ContextPostProcessor,ProxyPostProcessor{
 	@Override
 	public void afterRegisterContext(PostType postType,AccenbotContext context) {
 		copy.put(postType.name(), context);
+		proxyCopies.put(context, new LinkedList<>());
 	}
 	@Override
-	public void afterRegisterProxy(AccenbotContext contex,AccenbotCmdProxy proxy) {
-		if(!proxyCopies.containsKey(contex)) {
-			proxyCopies.put(contex, new LinkedList<>());
-		}
-		proxyCopies.get(contex).add(proxy);
+	public void afterRegisterProxy(AccenbotContext context,AccenbotCmdProxy proxy) {
+		proxyCopies.get(context).add(proxy);
 	}
 	public CmdController(@Autowired @Qualifier("accenbotContext") AccenbotContext accenbotContext) {
 		
