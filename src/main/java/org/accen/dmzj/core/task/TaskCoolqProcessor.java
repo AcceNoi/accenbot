@@ -21,6 +21,13 @@ public class TaskCoolqProcessor {
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 			}
+		}else if("private".equals(task.getType())) {
+			Map<String, Object> resultMap = sendPrivateMsg(task.getTargetId(),task.getMessage(),false);
+			try {
+				return new ObjectMapper().writeValueAsString(resultMap);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
 		}
 		return "";
 	}
@@ -38,6 +45,21 @@ public class TaskCoolqProcessor {
 			logger.error(e.getMessage());
 		}
 		
+		return null;
+	}
+	public Map<String,Object> sendPrivateMsg(String userId,String message,boolean autoEscape){
+		Map<String, Object> request = new HashMap<String, Object>();
+		request.put("user_id", userId);
+		request.put("message", message);
+		request.put("auto_escape", autoEscape);
+		CqhttpClient client = ApplicationContextUtil.getBean(CqhttpClient.class);
+		try {
+			Map<String, Object> rs = client.sendPrivateMsg(request);
+			return rs;
+		}catch (Exception e) {
+			// TODO 暂时不处理
+			logger.error(e.getMessage());
+		}
 		return null;
 	}
 }

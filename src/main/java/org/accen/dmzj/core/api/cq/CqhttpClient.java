@@ -87,8 +87,8 @@ public interface CqhttpClient {
 	 * @param autoEscape
 	 * @return
 	 */
-	@GetMapping(value="/send_private_msg",headers= {"Content-Type: application/json","Accept: application/json"})
-	public Map<String,Object> sendPrivateMsg(@RequestParam("user_id")long userId,@RequestParam("message")String message,@RequestParam("auto_escape")String autoEscape);
+	@PostMapping(value="/send_private_msg",headers= {"Content-Type: application/json","Accept: application/json"})
+	public Map<String,Object> sendPrivateMsg(Map<String, Object> body);
 	
 	/**
 	 * 撤回消息
