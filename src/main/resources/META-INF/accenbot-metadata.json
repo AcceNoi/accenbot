@@ -1,0 +1,10 @@
+{
+	"project":"Accenbot",
+	"version":"2.2",
+	"alias":"Magna",
+	"author":"Accen",
+	"email":"1339liu@gmail.com",
+	"profile":"https://github.com/AcceNoi",
+	"project-page":"https://github.com/AcceNoi/accenbot",
+	"description":"基于Onebot-kotlin实现的QQ群聊天机器人，遵循OneBot标准。极简、高效的框架。"
+}
