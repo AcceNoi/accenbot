@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.accen.dmzj.core.AccenbotContext.AccenbotCmdProxy;
 import org.accen.dmzj.core.annotation.AutowiredParam;
+import org.accen.dmzj.core.annotation.Order;
 import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.autoconfigure.EventPostProcessor;
 import org.accen.dmzj.core.exception.AutowiredParamIndexException;
@@ -33,7 +34,7 @@ public class AutowiredParamHelper implements EventPostProcessor,EventCmdPostProc
 		event.put(quickIndexSign, uuid);
 		quickIndex.put(uuid, index);
 	}
-	@SuppressWarnings({ "preview", "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static void scanMap(String prefix,Map<String, Object> map,Map<String, Object> index) {
 		if(map!=null) {
 			map.forEach((key,value)->{
@@ -80,6 +81,7 @@ public class AutowiredParamHelper implements EventPostProcessor,EventCmdPostProc
 	/**
 	 * 处理AutowireParam
 	 */
+	@Order(value = 0,xvalue = 0)
 	public Object eventCmdParamPost(AccenbotCmdProxy proxy,Map<String, Object> event,Parameter p,Object lastParameterValue) {
 		if(!event.containsKey(AutowiredParamHelper.quickIndexSign)) {
 			throw new AutowiredParamIndexException("当前event未初始化Index：%s".formatted(event.toString()));

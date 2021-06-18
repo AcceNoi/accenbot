@@ -8,6 +8,7 @@ import java.util.Set;
 import org.accen.dmzj.core.AccenbotContext.AccenbotCmdProxy;
 import org.accen.dmzj.core.annotation.DependMode;
 import org.accen.dmzj.core.annotation.Dependency;
+import org.accen.dmzj.core.annotation.Order;
 import org.accen.dmzj.core.annotation.Rejection;
 import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.autoconfigure.EventPostProcessor;
@@ -46,6 +47,7 @@ public class CmdDependencyRejectionPostProcessor implements EventPostProcessor,E
 	 * 在cmd执行前，检查依赖和排斥是否通过
 	 */
 	@Override
+	@Order(value = 0,xvalue = 0)
 	public boolean beforeEventCmdPost(AccenbotCmdProxy proxy,Map<String, Object> event) {
 		if(!event.containsKey(CMD_RECORD_KEY)) {
 			throw new DependencyRejectionException("DependencyRejection cmd record未初始化或已删除！");

@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.actuate.endpoint.web.Link;
 import org.springframework.stereotype.Component;
 
 /**
@@ -92,7 +93,18 @@ public class AccenbotContext implements BeanPostProcessor{
 		return ;
 	}
 	
+	/**
+	 * 封装cmd的处理结果为task
+	 * @param result
+	 * @param m
+	 * @param type
+	 * @param targetId
+	 * @param selfId
+	 * @return
+	 * @since deprecated at 2.3 for decoupling, please see {@link GeneralTaskBindingHelper}
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Deprecated
 	protected GeneralTask[] generalMessage(Object result,Method m, String type,String targetId,String selfId) {
 		if(result instanceof GeneralTask task) {
 			return new GeneralTask[] {task};

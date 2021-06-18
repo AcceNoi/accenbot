@@ -16,8 +16,6 @@ import org.accen.dmzj.core.exception.CmdRegisterException;
 import org.accen.dmzj.core.meta.MessageSubType;
 import org.accen.dmzj.core.meta.MessageType;
 import org.accen.dmzj.core.meta.PostType;
-import org.accen.dmzj.core.task.GeneralTask;
-import org.accen.dmzj.core.task.TaskManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +25,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccenbotMessageContext extends AccenbotContext {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private TaskManager taskManager;
-	
 	Map<String,AccenbotCmdProxy> messageCmdProxyIndex = new HashMap<>();
 	
 	private AccenbotContext parentContext;
 	
-	public AccenbotMessageContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext,@Autowired TaskManager taskManager) {
-		this.taskManager = taskManager;
+	public AccenbotMessageContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext) {
 		this.parentContext = parentContext;
 		parentContext.registerContext(PostType.MESSAGE, this);
 	}
@@ -73,11 +68,11 @@ public class AccenbotMessageContext extends AccenbotContext {
 						rs = p.afterEventCmdPost(proxy, event, rs);
 					}
 					
-					GeneralTask[] tasks = super.generalMessage(rs, proxy.cmdMethod()
+					/*GeneralTask[] tasks = super.generalMessage(rs, proxy.cmdMethod()
 							, (String)event.get("message_type")
 							, "group".equals(event.get("message_type"))?""+event.get("group_id"):""+event.get("user_id")
 							, ""+event.get("self_id"));
-					taskManager.addGeneralTasks(tasks);
+					taskManager.addGeneralTasks(tasks);*/
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {

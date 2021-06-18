@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -17,8 +16,6 @@ import org.accen.dmzj.core.exception.CmdRegisterException;
 import org.accen.dmzj.core.meta.PostType;
 import org.accen.dmzj.core.meta.RequestSubType;
 import org.accen.dmzj.core.meta.RequestType;
-import org.accen.dmzj.core.task.GeneralTask;
-import org.accen.dmzj.core.task.TaskManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +25,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccenbotRequestContext extends AccenbotContext {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private TaskManager taskManager;
 	Map<String,AccenbotCmdProxy> requestCmdProxyIndex = new HashMap<>();
 	private AccenbotContext parentContext;
-	public AccenbotRequestContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext,@Autowired TaskManager taskManager) {
+	public AccenbotRequestContext(@Autowired @Qualifier("accenbotContext")AccenbotContext parentContext) {
 		this.parentContext = parentContext;
-		this.taskManager = taskManager;
 		parentContext.registerContext(PostType.REQUEST, this);
 	}
 	
@@ -67,12 +62,12 @@ public class AccenbotRequestContext extends AccenbotContext {
 					for(EventCmdPostProcessor p:parentContext.eventCmdPostProcessors) {
 						rs = p.afterEventCmdPost(proxy, event, rs);
 					}
-					boolean isGroup = Set.of("group").contains(event.get("request_type"));
+					/*boolean isGroup = Set.of("group").contains(event.get("request_type"));
 					GeneralTask[] tasks = super.generalMessage(rs, proxy.cmdMethod()
 							, isGroup?"group":"private"
 							, isGroup?""+event.get("group_id"):""+event.get("user_id")
 							, ""+event.get("self_id"));
-					taskManager.addGeneralTasks(tasks);
+					taskManager.addGeneralTasks(tasks);*/
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {

@@ -12,6 +12,7 @@ import org.accen.dmzj.core.AccenbotContext.AccenbotCmdProxy;
 import org.accen.dmzj.core.annotation.AutowiredRegular;
 import org.accen.dmzj.core.annotation.CmdMessage;
 import org.accen.dmzj.core.annotation.MessageRegular;
+import org.accen.dmzj.core.annotation.Order;
 import org.accen.dmzj.core.autoconfigure.EventCmdPostProcessor;
 import org.accen.dmzj.core.autoconfigure.ProxyPostProcessor;
 import org.accen.dmzj.core.exception.AutowiredRegularIndexException;
@@ -88,6 +89,7 @@ public class MessageRegularHelper implements EventCmdPostProcessor,ProxyPostProc
 	 * cmd执行时，通过前一步建立的索引，封装param
 	 */
 	@Override
+	@Order(value = 0,xvalue = 1)
 	public Object eventCmdParamPost(AccenbotCmdProxy proxy,Map<String, Object> event,Parameter p,Object lastParameterValue) {
 		if(lastParameterValue==null&&p.isAnnotationPresent(AutowiredRegular.class)) {
 			if(!event.containsKey(QUICK_REGULAR_INDEX)) {
