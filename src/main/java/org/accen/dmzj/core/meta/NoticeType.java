@@ -13,7 +13,7 @@ public enum NoticeType {
 	/**
 	 * 群成员减少
 	 */
-	GROUP_DEGREASE,
+	GROUP_DECREASE,
 	/**
 	 * 群成员增加
 	 */
