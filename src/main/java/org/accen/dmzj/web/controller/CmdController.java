@@ -1,6 +1,9 @@
 package org.accen.dmzj.web.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +12,11 @@ import java.util.stream.Collectors;
 
 import org.accen.dmzj.core.AccenbotContext;
 import org.accen.dmzj.core.AccenbotContext.AccenbotCmdProxy;
+import org.accen.dmzj.core.annotation.CmdMessage;
+import org.accen.dmzj.core.annotation.CmdMeta;
+import org.accen.dmzj.core.annotation.CmdNotice;
+import org.accen.dmzj.core.annotation.CmdRequest;
+import org.accen.dmzj.core.annotation.MessageRegular;
 import org.accen.dmzj.core.autoconfigure.ContextPostProcessor;
 import org.accen.dmzj.core.autoconfigure.ProxyPostProcessor;
 import org.accen.dmzj.core.meta.PostType;
@@ -34,6 +42,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class CmdController implements ContextPostProcessor,ProxyPostProcessor{
 	private Map<String, AccenbotContext> copy = new HashMap<String, AccenbotContext>(4);
 	private Map<AccenbotContext,List<AccenbotCmdProxy>> proxyCopies = new HashMap<>(4);
+	private Map<String,AccenbotCmdProxy> proxyMap = new HashMap<>(8);
 	@Override
 	public void afterRegisterContext(PostType postType,AccenbotContext context) {
 		copy.put(postType.name(), context);
@@ -42,6 +51,7 @@ public class CmdController implements ContextPostProcessor,ProxyPostProcessor{
 	@Override
 	public void afterRegisterProxy(AccenbotContext context,AccenbotCmdProxy proxy) {
 		proxyCopies.get(context).add(proxy);
+		proxyMap.put(proxy.name(), proxy);
 	}
 	public CmdController(@Autowired @Qualifier("accenbotContext") AccenbotContext accenbotContext) {
 		initMetadata();
@@ -55,7 +65,8 @@ public class CmdController implements ContextPostProcessor,ProxyPostProcessor{
 			accenbotMetaInfo = new ObjectMapper().readValue(new ClassPathResource(ACCENBOT_METADATA_LOCATION).getInputStream(), Map.class);
 			List<Map<String, Object>> apis = List.of(
 					Map.of("url","/monitor/cmd/list/","description","all cmd list."),
-					Map.of("url","/monitor/cmd/list/{scope}","description","just see the cmd list filt by scope like messsage, meta, request or notice.")
+					Map.of("url","/monitor/cmd/list/{scope}","description","just see the cmd list filt by scope like messsage, meta, request or notice."),
+					Map.of("url","/monitor/cmd/detail/{name}","description","detail of the cmd by the name.")
 					);
 			accenbotMetaInfo.put("monitors", apis);
 		} catch (IOException e) {
@@ -87,6 +98,7 @@ public class CmdController implements ContextPostProcessor,ProxyPostProcessor{
 															Map.of("name", proxy.name()
 																	,"anno",proxy.annoClass().getName()
 																	,"location",proxy.cmdMethod().toGenericString()
+																	,"detail","/monitor/cmd/detail/".concat(URLEncoder.encode(proxy.name(), Charset.forName("utf-8")))
 															)
 														)
 														.collect(Collectors.toList())
@@ -100,8 +112,41 @@ public class CmdController implements ContextPostProcessor,ProxyPostProcessor{
 	public Map<String,Object> list(){
 		return list(null);
 	}
-	@GetMapping("/detail/{aa}")
-	public Map<String,Object> detail(){
+	@GetMapping("/cmd/detail/{name}")
+	@ResponseBody
+	public Map<String,Object> detail(@PathVariable("name")String name){
+		if(proxyMap.containsKey(name)) {
+			AccenbotCmdProxy proxy = proxyMap.get(name);
+			Map<String,Object> rs = new HashMap<>();
+			rs.put("name", proxy.name());
+			rs.put("anno",proxy.annoClass().getName());
+			rs.put("location",proxy.cmdMethod().toGenericString());
+			Object anno =  proxy.anno();
+			if(anno instanceof CmdMessage cm) {
+				rs.put("order",  cm.order());
+				rs.put("messageType", Arrays.stream(cm.messageType()).map(mt->mt.name()).collect(Collectors.joining(",")));
+				rs.put("subType",  Arrays.stream(cm.subType()).map(st->st.name()).collect(Collectors.joining(",")));
+				if(proxy.cmdMethod().isAnnotationPresent(MessageRegular.class)) {
+					Map<String, Object> rsr = new HashMap<String, Object>();
+					rs.put("regular",  rsr);
+					MessageRegular mr = proxy.cmdMethod().getDeclaredAnnotation(MessageRegular.class);
+					rsr.put("expression",  mr.expression());
+				}
+			}else if(anno instanceof CmdMeta cm) {
+				rs.put("order",  cm.order());
+				rs.put("metaEventType",  Arrays.stream(cm.metaEventType()).map(mt->mt.name()).collect(Collectors.joining(",")));
+				rs.put("subType", Arrays.stream(cm.subType()).map(mt->mt.name()).collect(Collectors.joining(",")));
+			}else if(anno instanceof CmdNotice cn) {
+				rs.put("order",  cn.order());
+				rs.put("noticeType",  Arrays.stream(cn.noticeType()).map(mt->mt.name()).collect(Collectors.joining(",")));
+				rs.put("subType", Arrays.stream(cn.subType()).map(mt->mt.name()).collect(Collectors.joining(",")));
+			}else if(anno instanceof CmdRequest cr) {
+				rs.put("order",  cr.order());
+				rs.put("requestType",  Arrays.stream(cr.requestType()).map(mt->mt.name()).collect(Collectors.joining(",")));
+				rs.put("subType", Arrays.stream(cr.subType()).map(mt->mt.name()).collect(Collectors.joining(",")));
+			}
+			return rs;
+		}
 		return null;
 	}
 }
