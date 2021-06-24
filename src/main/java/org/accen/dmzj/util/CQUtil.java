@@ -175,5 +175,14 @@ public class CQUtil {
 	public static boolean hasImg(String str) {
 		return patternCqImg.matcher(str).matches();
 	}
-	
+	private final static Pattern patternCq = Pattern
+			.compile(".*?\\[CQ\\:.*?,.*?\\].*");
+	/**
+	 * 判断是否含有cq
+	 * @param str
+	 * @return
+	 */
+	public static boolean hasCq(String str) {
+		return patternCq.matcher(str).matches();
+	}
 }

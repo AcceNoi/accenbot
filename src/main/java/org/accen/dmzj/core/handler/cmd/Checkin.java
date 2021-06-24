@@ -19,7 +19,6 @@ import org.accen.dmzj.core.handler.callbacker.CallbackManager;
 import org.accen.dmzj.core.handler.group.Default;
 import org.accen.dmzj.core.task.GeneralTask;
 import org.accen.dmzj.core.task.TaskManager;
-import org.accen.dmzj.core.api.HitokotoApiClient;
 import org.accen.dmzj.util.CQUtil;
 import org.accen.dmzj.util.FilePersistentUtil;
 import org.accen.dmzj.util.RandomUtil;
@@ -73,7 +72,7 @@ public class Checkin implements CmdAdapter,CallbackListener {
 	@Autowired
 	private FilePersistentUtil filePersistentUtil;
 	@Autowired
-	private HitokotoApiClient hitokotoApiClient;
+	private HitokotoContribute hitokotoContribute;
 
 	@Autowired
 	private CallbackManager callbackManager;
@@ -162,7 +161,7 @@ public class Checkin implements CmdAdapter,CallbackListener {
 							String card = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("card");
 							String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
 //							String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
-							Map<String, Object> hitokotoMap = hitokotoApiClient.hitokoto();
+							Map<String, Object> hitokotoMap = hitokotoContribute.catchHitokoto();
 							try {
 								Object[] backgroud = randomGroundFileEx(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 								CheckinRender render = new CheckinRender(new LocalFileRenderImage((File)backgroud[0])
@@ -224,7 +223,7 @@ public class Checkin implements CmdAdapter,CallbackListener {
 						String card = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("card");
 						String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
 //						String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
-						Map<String, Object> hitokotoMap = hitokotoApiClient.hitokoto();
+						Map<String, Object> hitokotoMap = hitokotoContribute.catchHitokoto();
 						try {
 							Object[] backgroud = randomGroundFileEx(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 							CheckinRender render = new CheckinRender(new LocalFileRenderImage((File)backgroud[0])
@@ -268,7 +267,7 @@ public class Checkin implements CmdAdapter,CallbackListener {
 					String card = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("card");
 					String nickName = (String) ((Map<String,Object>)qmessage.getEvent().get("sender")).get("nickname");
 //					String[][] svCompletions = svCmd.formatMyCardCompletion2(qmessage.getMessageType(),qmessage.getGroupId(), qmessage.getUserId());
-					Map<String, Object> hitokotoMap = hitokotoApiClient.hitokoto();
+					Map<String, Object> hitokotoMap = hitokotoContribute.catchHitokoto();
 					try {
 						Object[] backgroud = randomGroundFileEx(qmessage.getMessageType(), qmessage.getGroupId(), qmessage.getUserId());
 						CheckinRender render = new CheckinRender(new LocalFileRenderImage((File)backgroud[0])
