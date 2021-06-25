@@ -58,7 +58,7 @@ public class HitokotoContribute {
 					,"from_who",nickname
 					,"length",fmtMessage.length());
 			try {
-				Files.writeString(localFilePath,json.writeValueAsString(aHitoko),StandardOpenOption.APPEND);
+				Files.writeString(localFilePath,System.lineSeparator()+json.writeValueAsString(aHitoko),StandardOpenOption.APPEND);
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -74,7 +74,7 @@ public class HitokotoContribute {
 		if(RandomUtil.randomPass(config.usageRatio())) {
 			Map<String,Object> r = catchHitokotoFromLocal();
 			if(r!=null) {
-				return null;
+				return r;
 			}
 		}
 		return catchHitokotoFromApi();
@@ -87,6 +87,7 @@ public class HitokotoContribute {
 		try{
 			Map<String,Object> r = hitokotoApiClient.hitokoto();
 			r.put(SOURCE_KEY, "api");
+			return r;
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
